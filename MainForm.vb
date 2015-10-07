@@ -7,8 +7,10 @@
     Public LeftPressed As Boolean
 
     Public Player As Person
-    Public GroundBrush As Brush
+    Public GroundBrush As TextureBrush
     Public Random As New Random(0)
+    Public ViewOffsetX As Double
+    Public ViewOffsetY As Double
     Public ReadOnly Property ScreenWidth As Integer
         Get
             Return ClientSize.Width
@@ -43,12 +45,12 @@
     End Sub
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-        e.Graphics.FillRectangle(GroundBrush, 0, 0, ScreenWidth, ScreenHeight)
+        e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX), CSng(-ViewOffsetY), ScreenWidth, ScreenHeight)
         For Each o As GameObject In GameObjects
-            If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X), CSng(o.Y + o.Image.Height - 7), o.Image.Width, 10)
+            If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X - ViewOffsetX), CSng(o.Y + o.Image.Height - 7 - ViewOffsetY), o.Image.Width, 10)
         Next
         For Each O As GameObject In GameObjects
-            e.Graphics.DrawImage(O.Image, CSng(O.X), CSng(O.Y + O.Z * (10 / 16)), O.Image.Width, O.Image.Height)
+            e.Graphics.DrawImage(O.Image, CSng(O.X - ViewOffsetX), CSng(O.Y + O.Z * (10 / 16) - ViewOffsetY), O.Image.Width, O.Image.Height)
         Next
     End Sub
 
@@ -103,6 +105,11 @@
             O.Update()
         Next
         ResortGameObjects()
+
+        ViewOffsetX = Player.X - (ScreenWidth / 2 - Player.HitBox.Width / 2)
+        ViewOffsetY = Player.Y - (ScreenHeight / 2 - Player.HitBox.Height / 2)
+        GroundBrush.ResetTransform()
+        GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -121,7 +128,7 @@
                 Select Case Player.Direction
                     Case Person.PersonDirection.Up
                         X = Player.X
-                        Y = Player.Y - My.Resources.Crate.Height
+                        Y = Player.Y - My.Resources.Crate.Height + 20
                     Case Person.PersonDirection.Down
                         X = Player.X
                         Y = Player.Y + Player.Image.Height + 1
