@@ -41,10 +41,6 @@
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
-        Dim TestObject2 = New Person(100, 100)
-        AddGameObject(Player)
-        AddGameObject(TestObject2)
 
         'Environment.Add(New RectangleF(-1, 0, 1, ScreenHeight))
         'Environment.Add(New RectangleF(0, -1, ScreenWidth, 1))
@@ -64,8 +60,8 @@
         World = New World("DavidAndBen", rooms, Nothing, Nothing, Nothing, Nothing)
 
         ' Load the player and testing stuff
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
-        Dim TestObject2 = New Person(100, 100)
+        Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
+        Dim TestObject2 = New Person(100, 100, 1)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
@@ -92,51 +88,52 @@
     End Sub
 
     Public Sub UpdateWorld()
-        For Each O As GameObject In GameObjects
-            Dim newx As Double = O.X + O.XSpeed
-            Dim newy As Double = O.Y + O.YSpeed
-            If (O.Equals(Player)) Then
-                If UpPressed Then
-                    newy -= Player.Speed
-                    Player.Direction = Person.PersonDirection.Up
+        For Each r As Room In World.Rooms
+            For Each O As GameObject In r.GameObjects
+                Dim newx As Double = O.X + O.XSpeed
+                Dim newy As Double = O.Y + O.YSpeed
+                If (O.Equals(Player)) Then
+                    If UpPressed Then
+                        newy -= Player.Speed
+                        Player.Direction = Person.PersonDirection.Up
+                    End If
+                    If DownPressed Then
+                        newy += Player.Speed
+                        Player.Direction = Person.PersonDirection.Down
+                    End If
+                    If RightPressed Then
+                        newx += Player.Speed
+                        Player.Direction = Person.PersonDirection.Right
+                    End If
+                    If LeftPressed Then
+                        newx -= Player.Speed
+                        Player.Direction = Person.PersonDirection.Left
+                    End If
                 End If
-                If DownPressed Then
-                    newy += Player.Speed
-                    Player.Direction = Person.PersonDirection.Down
+                Dim good As Boolean = True
+                For Each other As GameObject In r.GameObjects
+                    If other.Equals(O) Then Continue For
+                    If other.CollidesWith(O, newx, newy) Then
+                        good = False
+                        Exit For
+                    End If
+                Next
+                'For Each rectangle As RectangleF In Environment
+                '    Dim otherhitbox As RectangleF = O.HitBox
+                '    otherhitbox.X = newx
+                '    otherhitbox.Y = newy
+                '    If (otherhitbox.IntersectsWith(rectangle)) Then
+                '        good = False
+                '        Exit For
+                '    End If
+                'Next
+                If good Then
+                    O.X = newx
+                    O.Y = newy
                 End If
-                If RightPressed Then
-                    newx += Player.Speed
-                    Player.Direction = Person.PersonDirection.Right
-                End If
-                If LeftPressed Then
-                    newx -= Player.Speed
-                    Player.Direction = Person.PersonDirection.Left
-                End If
-            End If
-            Dim good As Boolean = True
-            For Each other As GameObject In r.GameObjects
-                If other.Equals(O) Then Continue For
-                If other.CollidesWith(O, newx, newy) Then
-                    good = False
-                    Exit For
-                End If
+                O.Update()
             Next
-            'For Each rectangle As RectangleF In Environment
-            '    Dim otherhitbox As RectangleF = O.HitBox
-            '    otherhitbox.X = newx
-            '    otherhitbox.Y = newy
-            '    If (otherhitbox.IntersectsWith(rectangle)) Then
-            '        good = False
-            '        Exit For
-            '    End If
-            'Next
-            If good Then
-                O.X = newx
-                O.Y = newy
-            End If
-            O.Update()
-        Next
-        r.ResortGameObjects()
+            r.ResortGameObjects()
         Next
 
         ViewOffsetX = Player.X - (ScreenWidth / 2 - Player.HitBox.Width / 2)
