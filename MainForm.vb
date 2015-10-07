@@ -5,6 +5,7 @@
     Public DownPressed As Boolean
     Public RightPressed As Boolean
     Public LeftPressed As Boolean
+    Public ControlPressed As Boolean
 
     Public Player As Person
     Public GroundBrush As TextureBrush
@@ -24,8 +25,8 @@
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
-        Dim TestObject2 = New Person(100, 100)
+        Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 2)
+        Dim TestObject2 = New Person(100, 10, 0)
         AddGameObject(Player)
         AddGameObject(TestObject2)
 
@@ -60,24 +61,32 @@
     End Sub
 
     Public Sub UpdateWorld()
+        If ControlPressed = True Then
+            Player.Speed = 5
+        Else
+            Player.Speed = 2
+        End If
+
+
+
         For Each O As GameObject In GameObjects
             Dim newx As Double = O.X + O.XSpeed
             Dim newy As Double = O.Y + O.YSpeed
             If (O.Equals(Player)) Then
                 If UpPressed Then
-                    newy -= 2
+                    newy -= Player.Speed
                     Player.Direction = Person.PersonDirection.Up
                 End If
                 If DownPressed Then
-                    newy += 2
+                    newy += Player.Speed
                     Player.Direction = Person.PersonDirection.Down
                 End If
                 If RightPressed Then
-                    newx += 2
+                    newx += Player.Speed
                     Player.Direction = Person.PersonDirection.Right
                 End If
                 If LeftPressed Then
-                    newx -= 2
+                    newx -= Player.Speed
                     Player.Direction = Person.PersonDirection.Left
                 End If
             End If
@@ -113,6 +122,10 @@
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
+            ControlPressed = True
+        End If
+
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = True
@@ -193,6 +206,9 @@
     End Sub
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
+            ControlPressed = False
+        End If
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = False
