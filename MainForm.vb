@@ -1,6 +1,4 @@
 ﻿Public Class MainForm
-    Public GameObjects As New List(Of GameObject)
-    Public Environment As New List(Of RectangleF)
     Public UpPressed As Boolean
     Public DownPressed As Boolean
     Public RightPressed As Boolean
@@ -11,6 +9,7 @@
     Public Random As New Random(0)
     Public ViewOffsetX As Double
     Public ViewOffsetY As Double
+    Public World As World
     Public ReadOnly Property ScreenWidth As Integer
         Get
             Return ClientSize.Width
@@ -22,89 +21,120 @@
         End Get
     End Property
 
+    Public Function RoomAt(X As Double, Y As Double) As Room
+        For Each r As Room In World.Rooms
+            If r.Bounds.Contains(X, Y) Then
+                Return r
+            End If
+        Next
+        Return Nothing
+    End Function
+
+    Public ReadOnly Property PlayerRoom As Room
+        Get
+            Return RoomAt(Player.X, Player.Y)
+        End Get
+    End Property
+
+    Public Loaded As Boolean = False
+
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
-        Dim TestObject2 = New Person(100, 100)
-        AddGameObject(Player)
-        AddGameObject(TestObject2)
 
-        Environment.Add(New RectangleF(-1, 0, 1, ScreenHeight))
-        Environment.Add(New RectangleF(0, -1, ScreenWidth, 1))
-        Environment.Add(New RectangleF(ScreenWidth, -1, 1, ScreenHeight))
-        Environment.Add(New RectangleF(-1, ScreenHeight, ScreenWidth, -1))
-
-        For i As Integer = 0 To 10
-            Dim l As New GameObject(My.Resources.CeilingLight, Random.Next(ScreenWidth), Random.Next(ScreenHeight))
-            l.CastsShadow = False
-            l.Z = 10
-            AddGameObject(l)
-        Next
+        'Environment.Add(New RectangleF(-1, 0, 1, ScreenHeight))
+        'Environment.Add(New RectangleF(0, -1, ScreenWidth, 1))
+        'Environment.Add(New RectangleF(ScreenWidth, -1, 1, ScreenHeight))
+        'Environment.Add(New RectangleF(-1, ScreenHeight, ScreenWidth, -1))
 
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
+
+        ' Load the rooms that we have.
+        Dim rooms As New List(Of Room)
+        For Each s As String In IO.Directory.EnumerateFiles("Rooms\")
+            Dim r As New Room(s)
+            rooms.Add(r)
+        Next
+
+        ' Generate the world to play in
+        World = New World("DavidAndBen", rooms, Nothing, Nothing, Nothing, Nothing)
+
+        ' Load the player and testing stuff
+        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
+        Dim TestObject2 = New Person(100, 100)
+        World.Rooms(0).AddGameObject(Player)
+        World.Rooms(0).AddGameObject(TestObject2)
+
+
+        Loaded = True ' Keep the timer from firing until the game is done loading.
     End Sub
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
-        e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX), CSng(-ViewOffsetY), ScreenWidth, ScreenHeight)
-        For Each o As GameObject In GameObjects
-            If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X - ViewOffsetX), CSng(o.Y + o.Image.Height - 7 - ViewOffsetY), o.Image.Width, 10)
-        Next
-        For Each O As GameObject In GameObjects
-            e.Graphics.DrawImage(O.Image, CSng(O.X - ViewOffsetX), CSng(O.Y + O.Z * (10 / 16) - ViewOffsetY), O.Image.Width, O.Image.Height)
+        For Each r As Room In World.Rooms
+            e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset), ScreenWidth, ScreenHeight)
+            For Each o As GameObject In r.GameObjects
+                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X - ViewOffsetX + r.XOffset), CSng(o.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+            Next
+            For Each O As GameObject In r.GameObjects
+                e.Graphics.DrawImage(O.Image, CSng(O.X - ViewOffsetX + r.XOffset), CSng(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+            Next
         Next
     End Sub
 
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
+        If Loaded = False Then Exit Sub
         Invalidate()
         UpdateWorld()
     End Sub
 
     Public Sub UpdateWorld()
-        For Each O As GameObject In GameObjects
-            Dim newx As Double = O.X + O.XSpeed
-            Dim newy As Double = O.Y + O.YSpeed
-            If (O.Equals(Player)) Then
-                If UpPressed Then
-                    newy -= 2
-                    Player.Direction = Person.PersonDirection.Up
+        For Each r As Room In World.Rooms
+
+            For Each O As GameObject In r.GameObjects
+                Dim newx As Double = O.X + O.XSpeed
+                Dim newy As Double = O.Y + O.YSpeed
+                If (O.Equals(Player)) Then
+                    If UpPressed Then
+                        newy -= 2
+                        Player.Direction = Person.PersonDirection.Up
+                    End If
+                    If DownPressed Then
+                        newy += 2
+                        Player.Direction = Person.PersonDirection.Down
+                    End If
+                    If RightPressed Then
+                        newx += 2
+                        Player.Direction = Person.PersonDirection.Right
+                    End If
+                    If LeftPressed Then
+                        newx -= 2
+                        Player.Direction = Person.PersonDirection.Left
+                    End If
                 End If
-                If DownPressed Then
-                    newy += 2
-                    Player.Direction = Person.PersonDirection.Down
+                Dim good As Boolean = True
+                For Each other As GameObject In r.GameObjects
+                    If other.Equals(O) Then Continue For
+                    If other.CollidesWith(O, newx, newy) Then
+                        good = False
+                        Exit For
+                    End If
+                Next
+                'For Each rectangle As RectangleF In Environment
+                '    Dim otherhitbox As RectangleF = O.HitBox
+                '    otherhitbox.X = newx
+                '    otherhitbox.Y = newy
+                '    If (otherhitbox.IntersectsWith(rectangle)) Then
+                '        good = False
+                '        Exit For
+                '    End If
+                'Next
+                If good Then
+                    O.X = newx
+                    O.Y = newy
                 End If
-                If RightPressed Then
-                    newx += 2
-                    Player.Direction = Person.PersonDirection.Right
-                End If
-                If LeftPressed Then
-                    newx -= 2
-                    Player.Direction = Person.PersonDirection.Left
-                End If
-            End If
-            Dim good As Boolean = True
-            For Each other As GameObject In GameObjects
-                If other.Equals(O) Then Continue For
-                If other.CollidesWith(O, newx, newy) Then
-                    good = False
-                    Exit For
-                End If
+                O.Update()
             Next
-            For Each rectangle As RectangleF In Environment
-                Dim otherhitbox As RectangleF = O.HitBox
-                otherhitbox.X = newx
-                otherhitbox.Y = newy
-                If (otherhitbox.IntersectsWith(rectangle)) Then
-                    good = False
-                    Exit For
-                End If
-            Next
-            If good Then
-                O.X = newx
-                O.Y = newy
-            End If
-            O.Update()
+            r.ResortGameObjects()
         Next
-        ResortGameObjects()
 
         ViewOffsetX = Player.X - (ScreenWidth / 2 - Player.HitBox.Width / 2)
         ViewOffsetY = Player.Y - (ScreenHeight / 2 - Player.HitBox.Height / 2)
@@ -141,55 +171,17 @@
                 End Select
                 Dim newcrate As New GameObject(My.Resources.Crate, X, Y)
                 Dim good As Boolean = True
-                For Each o As GameObject In GameObjects
+
+                For Each o As GameObject In PlayerRoom.GameObjects
                     If o.CollidesWith(newcrate, X, Y) Then
                         good = False
                         Exit For
                     End If
                 Next
                 If good Then
-                    AddGameObject(newcrate)
+                    PlayerRoom.AddGameObject(newcrate)
                 End If
         End Select
-    End Sub
-
-    Public Sub AddGameObject(O As GameObject)
-        GameObjects.Add(O)
-        ResortGameObjects()
-    End Sub
-
-    Public Sub RemoveGameObject(O As GameObject)
-        GameObjects.Remove(O)
-        ResortGameObjects()
-    End Sub
-
-    Public Sub RemoveGameObject(index As Integer)
-        GameObjects.RemoveAt(index)
-        ResortGameObjects()
-    End Sub
-
-    Public Sub ResortGameObjects()
-        Dim l As New List(Of GameObject)
-        While GameObjects.Count > 0
-            ' find the smallest y
-            Dim b As New List(Of GameObject)
-            Dim record As Integer = Integer.MaxValue
-            For Each o As GameObject In GameObjects
-                If o.Y - o.HitBox.Height + o.Z * (10 / 16) < record Then
-                    b.Clear()
-                    record = o.Y - o.HitBox.Height + o.Z * (10 / 16)
-                    b.Add(o)
-                ElseIf o.Y - o.HitBox.Height + o.Z * (10 / 16) = record
-                    b.Add(o)
-                End If
-            Next
-            For Each o As GameObject In b
-                GameObjects.Remove(o)
-                l.Add(o)
-            Next
-        End While
-
-        GameObjects = l
     End Sub
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
