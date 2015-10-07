@@ -19,6 +19,7 @@
             Return ClientSize.Height
         End Get
     End Property
+
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
         Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
@@ -123,13 +124,13 @@
                         Y = Player.Y - My.Resources.Crate.Height
                     Case Person.PersonDirection.Down
                         X = Player.X
-                        Y = Player.Y + Player.Image.Height
+                        Y = Player.Y + Player.Image.Height + 1
                     Case Person.PersonDirection.Right
                         X = Player.X + Player.Image.Width
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
+                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
                     Case Person.PersonDirection.Left
-                        X = Player.X - My.Resources.Crate.Width
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
+                        X = Player.X - My.Resources.Crate.Width - 1
+                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
                 End Select
                 Dim newcrate As New GameObject(My.Resources.Crate, X, Y)
                 Dim good As Boolean = True
@@ -167,11 +168,11 @@
             Dim b As New List(Of GameObject)
             Dim record As Integer = Integer.MaxValue
             For Each o As GameObject In GameObjects
-                If o.Y + o.Z * (10 / 16) < record Then
+                If o.Y - o.HitBox.Height + o.Z * (10 / 16) < record Then
                     b.Clear()
-                    record = o.Y + o.Z * (10 / 16)
+                    record = o.Y - o.HitBox.Height + o.Z * (10 / 16)
                     b.Add(o)
-                ElseIf o.Y + o.Z * (10 / 16) = record
+                ElseIf o.Y - o.HitBox.Height + o.Z * (10 / 16) = record
                     b.Add(o)
                 End If
             Next
