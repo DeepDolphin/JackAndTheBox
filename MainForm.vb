@@ -3,6 +3,7 @@
     Public DownPressed As Boolean
     Public RightPressed As Boolean
     Public LeftPressed As Boolean
+    Public ControlPressed As Boolean
 
     Public Player As Person
     Public GroundBrush As TextureBrush
@@ -40,6 +41,10 @@
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
+        Player = New Person(ScreenWidth / 2, ScreenHeight / 2)
+        Dim TestObject2 = New Person(100, 100)
+        AddGameObject(Player)
+        AddGameObject(TestObject2)
 
         'Environment.Add(New RectangleF(-1, 0, 1, ScreenHeight))
         'Environment.Add(New RectangleF(0, -1, ScreenWidth, 1))
@@ -87,53 +92,51 @@
     End Sub
 
     Public Sub UpdateWorld()
-        For Each r As Room In World.Rooms
-
-            For Each O As GameObject In r.GameObjects
-                Dim newx As Double = O.X + O.XSpeed
-                Dim newy As Double = O.Y + O.YSpeed
-                If (O.Equals(Player)) Then
-                    If UpPressed Then
-                        newy -= 2
-                        Player.Direction = Person.PersonDirection.Up
-                    End If
-                    If DownPressed Then
-                        newy += 2
-                        Player.Direction = Person.PersonDirection.Down
-                    End If
-                    If RightPressed Then
-                        newx += 2
-                        Player.Direction = Person.PersonDirection.Right
-                    End If
-                    If LeftPressed Then
-                        newx -= 2
-                        Player.Direction = Person.PersonDirection.Left
-                    End If
+        For Each O As GameObject In GameObjects
+            Dim newx As Double = O.X + O.XSpeed
+            Dim newy As Double = O.Y + O.YSpeed
+            If (O.Equals(Player)) Then
+                If UpPressed Then
+                    newy -= Player.Speed
+                    Player.Direction = Person.PersonDirection.Up
                 End If
-                Dim good As Boolean = True
-                For Each other As GameObject In r.GameObjects
-                    If other.Equals(O) Then Continue For
-                    If other.CollidesWith(O, newx, newy) Then
-                        good = False
-                        Exit For
-                    End If
-                Next
-                'For Each rectangle As RectangleF In Environment
-                '    Dim otherhitbox As RectangleF = O.HitBox
-                '    otherhitbox.X = newx
-                '    otherhitbox.Y = newy
-                '    If (otherhitbox.IntersectsWith(rectangle)) Then
-                '        good = False
-                '        Exit For
-                '    End If
-                'Next
-                If good Then
-                    O.X = newx
-                    O.Y = newy
+                If DownPressed Then
+                    newy += Player.Speed
+                    Player.Direction = Person.PersonDirection.Down
                 End If
-                O.Update()
+                If RightPressed Then
+                    newx += Player.Speed
+                    Player.Direction = Person.PersonDirection.Right
+                End If
+                If LeftPressed Then
+                    newx -= Player.Speed
+                    Player.Direction = Person.PersonDirection.Left
+                End If
+            End If
+            Dim good As Boolean = True
+            For Each other As GameObject In r.GameObjects
+                If other.Equals(O) Then Continue For
+                If other.CollidesWith(O, newx, newy) Then
+                    good = False
+                    Exit For
+                End If
             Next
-            r.ResortGameObjects()
+            'For Each rectangle As RectangleF In Environment
+            '    Dim otherhitbox As RectangleF = O.HitBox
+            '    otherhitbox.X = newx
+            '    otherhitbox.Y = newy
+            '    If (otherhitbox.IntersectsWith(rectangle)) Then
+            '        good = False
+            '        Exit For
+            '    End If
+            'Next
+            If good Then
+                O.X = newx
+                O.Y = newy
+            End If
+            O.Update()
+        Next
+        r.ResortGameObjects()
         Next
 
         ViewOffsetX = Player.X - (ScreenWidth / 2 - Player.HitBox.Width / 2)
@@ -143,6 +146,10 @@
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
+            ControlPressed = True
+        End If
+
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = True
@@ -185,6 +192,9 @@
     End Sub
 
     Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
+            ControlPressed = False
+        End If
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = False
