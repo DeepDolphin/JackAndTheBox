@@ -8,11 +8,11 @@ Current Version: 1.0.0_4 Beta
   
 # Changelog
 Version 1.0.0_4 Beta:
-  - Fixed most of the compiler errors
+  - Fixed all of the compiler errors
 
 Version 1.0.0_3 Beta:
   - Added the world
-  - Added AI for enemies
+  - Added simple AI for enemies
   
 Version 1.0.0_2 Beta:
   - Added running capability
