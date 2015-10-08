@@ -4,8 +4,8 @@
     Public radToPlayer As Double
     Public distToPlayer As Double
 
-    Public Sub New(x As Double, y As Double)
-        MyBase.New(My.Resources.CharacterUp1, x, y) ' TODO: Write a decent constructor.
+    Public Sub New(Room As Room, x As Double, y As Double)
+        MyBase.New(My.Resources.CharacterUp1, Room, x, y) ' TODO: Write a decent constructor.
     End Sub
 
     Public Overrides Sub Update()
@@ -18,8 +18,8 @@ End Class
 Public Class NormalEnemy
     Inherits Enemy
 
-    Public Sub New(x As Double, y As Double)
-        MyBase.New(x, y)
+    Public Sub New(Room As Room, x As Double, y As Double)
+        MyBase.New(Room, x, y)
     End Sub
 
     Public Overrides Sub update()
@@ -30,27 +30,6 @@ Public Class NormalEnemy
         Else
             XSpeed = 0
             YSpeed = 0
-        End If
-
-
-    End Sub
-End Class
-
-Public Class RunningEnemy
-    Inherits Enemy
-
-    Public Sub New(x As Double, y As Double)
-        MyBase.New(x, y)
-    End Sub
-
-    Public Overrides Sub update()
-        MyBase.Update()
-        If distToPlayer < 100.0 Then
-            XSpeed = 2.5 * Math.Cos(radToPlayer)
-            YSpeed = 2.5 * Math.Sign(radToPlayer)
-        Else
-            XSpeed = Math.Cos(radToPlayer)
-            YSpeed = Math.Sign(radToPlayer)
         End If
 
 

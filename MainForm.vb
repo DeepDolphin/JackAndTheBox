@@ -57,8 +57,8 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
-        Dim TestObject2 = New NormalEnemy(100, 100)
+        Player = New Person(World.RoomAt(150, 150), 150, 150, 1)
+        Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
