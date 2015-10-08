@@ -7,17 +7,20 @@
     Public HitBox As RectangleF
     Public Image As Bitmap
     Public CastsShadow As Boolean = True
+    Public Room As Room
 
-    Public Sub New(Image As Bitmap)
+    Public Sub New(Image As Bitmap, Room As Room)
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        Me.Room = Room
     End Sub
 
-    Public Sub New(Image As Bitmap, X As Double, Y As Double)
+    Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double)
         Me.X = X
         Me.Y = Y
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        Me.Room = Room
     End Sub
 
     Public Sub New(Image As Bitmap, X As Double, Y As Double, XSpeed As Double, YSpeed As Double)

@@ -9,8 +9,8 @@
     End Enum
     Public Direction As PersonDirection = PersonDirection.Up
 
-    Public Sub New(X As Double, Y As Double, Speed As Double)
-        MyBase.New(My.Resources.CharacterUp1, X, Y)
+    Public Sub New(Room As Room, X As Double, Y As Double, Speed As Double)
+        MyBase.New(My.Resources.CharacterUp1, Room, X, Y)
         HitBox = New RectangleF(0, 22, 16, 10)
         Me.Speed = Speed
     End Sub

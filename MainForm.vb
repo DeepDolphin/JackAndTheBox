@@ -22,18 +22,9 @@
         End Get
     End Property
 
-    Public Function RoomAt(X As Double, Y As Double) As Room
-        For Each r As Room In World.Rooms
-            If r.Bounds.Contains(X, Y) Then
-                Return r
-            End If
-        Next
-        Return Nothing
-    End Function
-
     Public ReadOnly Property PlayerRoom As Room
         Get
-            Return RoomAt(Player.X, Player.Y)
+            Return World.RoomAt(Player.X, Player.Y)
         End Get
     End Property
 
@@ -52,16 +43,22 @@
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
         For Each s As String In IO.Directory.EnumerateFiles("Rooms\")
+            If IO.Path.GetFileNameWithoutExtension(s) = "up" OrElse
+                    IO.Path.GetFileNameWithoutExtension(s) = "down" OrElse
+                    IO.Path.GetFileNameWithoutExtension(s) = "left" OrElse
+                    IO.Path.GetFileNameWithoutExtension(s) = "right" Then
+                Continue For
+            End If
             Dim r As New Room(s)
             rooms.Add(r)
         Next
 
         ' Generate the world to play in
-        World = New World("DavidAndBen", rooms, Nothing, Nothing, Nothing, Nothing)
+        World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
-        Dim TestObject2 = New Person(100, 100, 1)
+        Player = New Person(World.Rooms(0), World.Rooms(0).Width / 2, World.Rooms(0).Height / 2, 1)
+        Dim TestObject2 = New Person(World.Rooms(0), 100, 100, 1)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
@@ -71,13 +68,16 @@
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
-            e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset), ScreenWidth, ScreenHeight)
+            e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
+        Next
+        For Each r As Room In World.Rooms
             For Each o As GameObject In r.GameObjects
                 If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X - ViewOffsetX + r.XOffset), CSng(o.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
             Next
             For Each O As GameObject In r.GameObjects
                 e.Graphics.DrawImage(O.Image, CSng(O.X - ViewOffsetX + r.XOffset), CSng(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
             Next
+            e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
     End Sub
 
@@ -140,6 +140,15 @@
         ViewOffsetY = Player.Y - (ScreenHeight / 2 - Player.HitBox.Height / 2)
         GroundBrush.ResetTransform()
         GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
+
+        If IsNothing(PlayerRoom) = False Then
+            If Player.Room.Equals(PlayerRoom) = False Then
+                'Player.X += (PlayerRoom.XOffset - Player.Room.XOffset)
+                Player.Room.GameObjects.Remove(Player)
+                PlayerRoom.GameObjects.Add(Player)
+                Player.Room = PlayerRoom
+            End If
+        End If
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -173,7 +182,7 @@
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
                 End Select
-                Dim newcrate As New GameObject(My.Resources.Crate, X, Y)
+                Dim newcrate As New GameObject(My.Resources.Crate, PlayerRoom, X, Y)
                 Dim good As Boolean = True
 
                 For Each o As GameObject In PlayerRoom.GameObjects

@@ -1,0 +1,5 @@
+<Room DoorUp="False" DoorDown="False" DoorLeft="True" DoorRight="False">
+  <Crate X="250" Y="200"/>
+  <SurvivalTime Time="10"/>
+  <KillAllEnemies/>
+</Room>

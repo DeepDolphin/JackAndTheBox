@@ -7,6 +7,15 @@ Public Class Room
         Open
     End Enum
 
+    Public Enum DoorDirection
+        Up = 0
+        Right
+        Down
+        Left
+    End Enum
+
+    Public Filename As String = ""
+
     Public GameObjects As New List(Of GameObject)
     Public Objectives As New List(Of Objective)
 
@@ -15,11 +24,17 @@ Public Class Room
     Public DoorDown As DoorState = DoorState.None
     Public DoorRight As DoorState = DoorState.None
 
+    Public RoomUp As Room
+    Public RoomLeft As Room
+    Public RoomDown As Room
+    Public RoomRight As Room
+
     Public XOffset As Double = 0
     Public YOffset As Double = 0
 
     Public Const RoomWidth As Double = 500
     Public Const RoomHeight As Double = 300
+    Public Const RoomBuffer As Double = 16
     Public ReadOnly Property Width As Double
         Get
             Return RoomWidth
@@ -80,6 +95,7 @@ Public Class Room
     End Property
 
     Public Sub New(Filename As String)
+        Me.Filename = Filename
         Dim doc As New XmlDocument
         doc.Load(Filename)
         Dim RoomElement As XmlElement = doc("Room")
@@ -90,7 +106,7 @@ Public Class Room
         For Each e As XmlElement In RoomElement
             Select Case e.Name
                 Case "Crate"
-                    Dim c As New GameObject(My.Resources.Crate, e.GetAttribute("X"), e.GetAttribute("Y"))
+                    Dim c As New GameObject(My.Resources.Crate, Me, e.GetAttribute("X"), e.GetAttribute("Y"))
                     GameObjects.Add(c)
                 Case "SurvivalTime"
                     Dim o As New SurvivalTimeObjective(e.GetAttribute("Time"))
