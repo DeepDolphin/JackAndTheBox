@@ -57,8 +57,8 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Person(World.Rooms(0), World.Rooms(0).Width / 2, World.Rooms(0).Height / 2, 1)
-        Dim TestObject2 = New Person(World.Rooms(0), 100, 100, 1)
+        Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
+        Dim TestObject2 = New NormalEnemy(100, 100)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
@@ -88,6 +88,12 @@
     End Sub
 
     Public Sub UpdateWorld()
+        If ControlPressed Then
+            Player.Speed = 3
+        Else
+            Player.Speed = 2
+        End If
+
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
                 Dim newx As Double = O.X + O.XSpeed
@@ -152,9 +158,6 @@
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
-            ControlPressed = True
-        End If
 
         Select Case e.KeyCode
             Case Keys.Up
@@ -165,6 +168,8 @@
                 LeftPressed = True
             Case Keys.Right
                 RightPressed = True
+            Case Keys.ControlKey
+                ControlPressed = True
             Case Keys.Space
                 Dim X As Integer
                 Dim Y As Integer
@@ -197,10 +202,8 @@
         End Select
     End Sub
 
-    Private Sub Form1_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
-            ControlPressed = False
-        End If
+    Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
+
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = False
@@ -210,6 +213,15 @@
                 LeftPressed = False
             Case Keys.Right
                 RightPressed = False
+            Case Keys.ControlKey
+                ControlPressed = False
         End Select
     End Sub
+
+    Protected Overrides Function IsInputKey(
+        ByVal keyData As System.Windows.Forms.Keys) As Boolean
+        Return True
+
+    End Function
+
 End Class
