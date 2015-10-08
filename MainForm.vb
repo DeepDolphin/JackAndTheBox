@@ -1,4 +1,10 @@
 ﻿Public Class MainForm
+    Public ReadOnly Property Version As String
+        Get
+            Return "Version 1.0.0_04 Beta"
+        End Get
+    End Property
+
     Public UpPressed As Boolean
     Public DownPressed As Boolean
     Public RightPressed As Boolean
