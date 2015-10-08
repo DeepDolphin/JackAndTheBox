@@ -61,7 +61,7 @@
 
         ' Load the player and testing stuff
         Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
-        Dim TestObject2 = New Person(100, 100, 1)
+        Dim TestObject2 = New Enemy(100, 100)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
@@ -149,9 +149,6 @@
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        'If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
-        '    ControlPressed = True
-        'End If
 
         Select Case e.KeyCode
             Case Keys.Up
@@ -197,9 +194,6 @@
     End Sub
 
     Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        'If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
-        '    ControlPressed = False
-        'End If
 
         Select Case e.KeyCode
             Case Keys.Up
