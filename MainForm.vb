@@ -61,7 +61,7 @@
 
         ' Load the player and testing stuff
         Player = New Person(ScreenWidth / 2, ScreenHeight / 2, 1)
-        Dim TestObject2 = New Enemy(100, 100)
+        Dim TestObject2 = New NormalEnemy(100, 100)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
@@ -89,7 +89,7 @@
 
     Public Sub UpdateWorld()
         If ControlPressed Then
-            Player.Speed = 5
+            Player.Speed = 3
         Else
             Player.Speed = 2
         End If
