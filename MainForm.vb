@@ -88,6 +88,12 @@
     End Sub
 
     Public Sub UpdateWorld()
+        If ControlPressed Then
+            Player.Speed = 5
+        Else
+            Player.Speed = 2
+        End If
+
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
                 Dim newx As Double = O.X + O.XSpeed
@@ -192,6 +198,7 @@
         If ((System.Windows.Forms.Control.ModifierKeys And Keys.Control) = Keys.Control) Then
             ControlPressed = False
         End If
+
         Select Case e.KeyCode
             Case Keys.Up
                 UpPressed = False
