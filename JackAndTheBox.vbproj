@@ -100,6 +100,7 @@
     <Compile Include="Objective.vb" />
     <Compile Include="Person.vb" />
     <Compile Include="Room.vb" />
+    <Compile Include="Sprite.vb" />
     <Compile Include="World.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +148,10 @@
     <None Include="Resources\WallStrip.png" />
     <None Include="Resources\GradientLeft.png" />
     <None Include="Resources\GradientRight.png" />
+    <None Include="Resources\EXPOrb1.png" />
+    <None Include="Resources\EXPOrb2.png" />
+    <None Include="Resources\EXPOrb3.png" />
+    <None Include="Resources\EXPOrb4.png" />
     <Content Include="Rooms\down.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

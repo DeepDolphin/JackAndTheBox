@@ -127,6 +127,18 @@
   <data name="Crate" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Crate.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="EXPOrb1" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EXPOrb1.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="EXPOrb2" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EXPOrb2.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="EXPOrb3" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EXPOrb3.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="EXPOrb4" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\EXPOrb4.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="FloorTile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FloorTile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
