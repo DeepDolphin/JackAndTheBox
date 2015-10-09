@@ -4,7 +4,7 @@ Jack and the boxes game
 Current Version: 1.0.0_4 Beta
 
 # Known Bugs
-  - When player goes from starting to room to another room, his sprite goes off screen (but location doesn't)
+  - The player can walk out of rooms.
   
 # Changelog
 Version 1.0.0_4 Beta:

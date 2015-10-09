@@ -30,7 +30,7 @@
 
     Public ReadOnly Property PlayerRoom As Room
         Get
-            Return World.RoomAt(Player.X, Player.Y)
+            Return World.RoomAt(Player.X + Player.Room.XOffset, Player.Y + Player.Room.YOffset)
         End Get
     End Property
 
@@ -148,19 +148,22 @@
             r.ResortGameObjects()
         Next
 
-        ViewOffsetX = Player.X - (ScreenWidth / 2 - Player.HitBox.Width / 2)
-        ViewOffsetY = Player.Y - (ScreenHeight / 2 - Player.HitBox.Height / 2)
-        GroundBrush.ResetTransform()
-        GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
-
         If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
-                'Player.X += (PlayerRoom.XOffset - Player.Room.XOffset)
-                Player.Room.GameObjects.Remove(Player)
-                PlayerRoom.GameObjects.Add(Player)
-                Player.Room = PlayerRoom
+                Dim oldroom As Room = Player.Room
+                Dim newroom As Room = PlayerRoom
+                Player.X += (oldroom.XOffset - newroom.XOffset)
+                Player.Y += (oldroom.YOffset - newroom.YOffset)
+                oldroom.GameObjects.Remove(Player)
+                newroom.GameObjects.Add(Player)
+                Player.Room = newroom
             End If
         End If
+
+        ViewOffsetX = Player.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
+        ViewOffsetY = Player.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
+        GroundBrush.ResetTransform()
+        GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown

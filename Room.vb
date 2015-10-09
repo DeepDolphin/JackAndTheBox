@@ -117,4 +117,8 @@ Public Class Room
             End Select
         Next
     End Sub
+
+    Public Overrides Function ToString() As String
+        Return IO.Path.GetFileName(Filename) & " X:" & XOffset & ", Y:" & YOffset & " GameObjects:" & GameObjects.Count
+    End Function
 End Class
