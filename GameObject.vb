@@ -8,6 +8,7 @@
     Public Image As Bitmap
     Public CastsShadow As Boolean = True
     Public Room As Room
+    Public Properties As New Dictionary(Of String, String)
 
     Public Sub New(Image As Bitmap, Room As Room)
         Me.Image = Image

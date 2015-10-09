@@ -12,6 +12,7 @@
     Public Sub New(Room As Room, X As Double, Y As Double, Speed As Double)
         MyBase.New(My.Resources.CharacterUp1, Room, X, Y)
         HitBox = New RectangleF(0, 22, 16, 10)
+        Properties.Add("Health", "100")
         Me.Speed = Speed
     End Sub
 
