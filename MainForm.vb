@@ -130,15 +130,7 @@
                         Exit For
                     End If
                 Next
-                'For Each rectangle As RectangleF In Environment
-                '    Dim otherhitbox As RectangleF = O.HitBox
-                '    otherhitbox.X = newx
-                '    otherhitbox.Y = newy
-                '    If (otherhitbox.IntersectsWith(rectangle)) Then
-                '        good = False
-                '        Exit For
-                '    End If
-                'Next
+                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
                 If good Then
                     O.X = newx
                     O.Y = newy
