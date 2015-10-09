@@ -130,7 +130,16 @@
   <data name="FloorTile" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FloorTile.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="GradientLeft" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GradientLeft.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GradientRight" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GradientRight.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="Shadow" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Shadow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="WallStrip" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\WallStrip.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

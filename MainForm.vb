@@ -13,6 +13,7 @@
 
     Public Player As Person
     Public GroundBrush As TextureBrush
+    Public WallBrush As TextureBrush
     Public Random As New Random(0)
     Public ViewOffsetX As Double
     Public ViewOffsetY As Double
@@ -45,6 +46,7 @@
         'Environment.Add(New RectangleF(-1, ScreenHeight, ScreenWidth, -1))
 
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
+        WallBrush = New TextureBrush(My.Resources.WallStrip)
 
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
@@ -74,7 +76,10 @@
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
+            e.Graphics.FillRectangle(WallBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
             e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
+            e.Graphics.DrawImage(My.Resources.GradientLeft, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            e.Graphics.DrawImage(My.Resources.GradientRight, CSng(-ViewOffsetX + r.XOffset + r.Width - 63), CSng(-ViewOffsetY + r.YOffset - 32), 64, 32)
         Next
         For Each r As Room In World.Rooms
             For Each o As GameObject In r.GameObjects
@@ -156,6 +161,8 @@
         ViewOffsetY = Player.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
         GroundBrush.ResetTransform()
         GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
+        WallBrush.ResetTransform()
+        WallBrush.TranslateTransform(-Player.X Mod My.Resources.WallStrip.Width - 4, -Player.Y Mod My.Resources.WallStrip.Height + 2)
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -183,10 +190,10 @@
                         Y = Player.Y + Player.Image.Height + 1
                     Case Person.PersonDirection.Left
                         X = Player.X + Player.Image.Width
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
+                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                     Case Person.PersonDirection.Right
                         X = Player.X - My.Resources.Crate.Width - 1
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
+                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select
                 Dim newcrate As New GameObject(My.Resources.Crate, PlayerRoom, X, Y)
                 Dim good As Boolean = True

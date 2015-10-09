@@ -34,7 +34,7 @@ Public Class Room
 
     Public Const RoomWidth As Double = 500
     Public Const RoomHeight As Double = 300
-    Public Const RoomBuffer As Double = 16
+    Public Const RoomBuffer As Double = 48
     Public ReadOnly Property Width As Double
         Get
             Return RoomWidth

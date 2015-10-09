@@ -144,6 +144,9 @@
     <None Include="Resources\CeilingLight.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\WallStrip.png" />
+    <None Include="Resources\GradientLeft.png" />
+    <None Include="Resources\GradientRight.png" />
     <Content Include="Rooms\down.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
