@@ -183,16 +183,16 @@
                 Dim X As Integer
                 Dim Y As Integer
                 Select Case Player.Direction
-                    Case Person.PersonDirection.Up
-                        X = Player.X
-                        Y = Player.Y - My.Resources.Crate.Height + 20
                     Case Person.PersonDirection.Down
                         X = Player.X
+                        Y = Player.Y - My.Resources.Crate.Height + 20
+                    Case Person.PersonDirection.Up
+                        X = Player.X
                         Y = Player.Y + Player.Image.Height + 1
-                    Case Person.PersonDirection.Right
+                    Case Person.PersonDirection.Left
                         X = Player.X + Player.Image.Width
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
-                    Case Person.PersonDirection.Left
+                    Case Person.PersonDirection.Right
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height + 10
                 End Select
