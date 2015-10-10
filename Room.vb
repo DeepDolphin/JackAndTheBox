@@ -106,7 +106,7 @@ Public Class Room
         For Each e As XmlElement In RoomElement
             Select Case e.Name
                 Case "Crate"
-                    Dim c As New GameObject(My.Resources.Crate, Me, e.GetAttribute("X"), e.GetAttribute("Y"))
+                    Dim c As New GameObject(My.Resources.Crate, Me, e.GetAttribute("X"), e.GetAttribute("Y"), 10)
                     GameObjects.Add(c)
                 Case "SurvivalTime"
                     Dim o As New SurvivalTimeObjective(e.GetAttribute("Time"))

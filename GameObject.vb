@@ -14,6 +14,7 @@
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
+        Properties.Add("Health", -1)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double)
@@ -22,21 +23,25 @@
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
+        Properties.Add("Health", -1)
     End Sub
 
-    Public Sub New(Image As Bitmap, X As Double, Y As Double, XSpeed As Double, YSpeed As Double)
+    Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double, Health As Integer)
         Me.X = X
         Me.Y = Y
         Me.XSpeed = XSpeed
         Me.YSpeed = YSpeed
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        Properties.Add("Health", Health)
+        Me.Room = Room
     End Sub
 
     Public Overridable Sub Update()
-        'HitBox = New RectangleF(CSng(X), CSng(Y), HitBox.Width, HitBox.Height)
-        'X += XSpeed
-        'Y += YSpeed
+        If Properties("Health") = 0 Then
+            Room.RemoveGameObject(0)
+            Return
+        End If
     End Sub
 
     Public Overridable Function CollidesWith(O As GameObject, X As Double, Y As Double) As Boolean

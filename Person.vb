@@ -10,9 +10,8 @@
     Public Direction As PersonDirection = PersonDirection.Up
 
     Public Sub New(Room As Room, X As Double, Y As Double, Speed As Double)
-        MyBase.New(My.Resources.CharacterUp1, Room, X, Y)
+        MyBase.New(My.Resources.CharacterUp1, Room, X, Y, 100)
         HitBox = New RectangleF(0, 22, 16, 10)
-        Properties.Add("Health", "100")
         Me.Speed = Speed
     End Sub
 

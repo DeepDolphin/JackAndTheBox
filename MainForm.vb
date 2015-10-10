@@ -132,6 +132,8 @@
                     If other.Equals(O) Then Continue For
                     If other.CollidesWith(O, newx, newy) Then
                         good = False
+                        If (other.Properties("Health") > 0) Then other.Properties("Health") -= 1
+                        Throw New Exception("Health doesn't work. May crash game")
                         Exit For
                     End If
                 Next

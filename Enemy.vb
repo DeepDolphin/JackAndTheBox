@@ -5,8 +5,7 @@
     Public distToPlayer As Double
 
     Public Sub New(Room As Room, x As Double, y As Double)
-        MyBase.New(My.Resources.CharacterUp1, Room, x, y)
-        Properties.Add("Health", "100")
+        MyBase.New(My.Resources.CharacterUp1, Room, x, y, 100)
     End Sub
 
     Public Overrides Sub Update()
@@ -26,16 +25,14 @@ Public Class NormalEnemy
     Public Overrides Sub update()
         MyBase.Update()
         If distToPlayer < 75.0 Then
-            XSpeed = 2.0 * Math.Cos(radToPlayer)
-            YSpeed = 2.0 * Math.Sign(radToPlayer)
+            XSpeed = 1.5 * Math.Cos(radToPlayer)
+            YSpeed = 1.5 * Math.Sign(radToPlayer)
         ElseIf distToPlayer < 150.0 Then
-            XSpeed = 1.0 * Math.Cos(radToPlayer)
-            YSpeed = 1.0 * Math.Sign(radToPlayer)
+            XSpeed = 0.5 * Math.Cos(radToPlayer)
+            YSpeed = 0.5 * Math.Sign(radToPlayer)
         Else
             XSpeed = 0
             YSpeed = 0
         End If
-
-
     End Sub
 End Class
