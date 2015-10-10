@@ -195,17 +195,17 @@
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select
-                Dim newcrate As New GameObject(My.Resources.Crate, PlayerRoom, X, Y)
+                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, X, Y)
                 Dim good As Boolean = True
 
-                For Each o As GameObject In PlayerRoom.GameObjects
+                For Each o As GameObject In Player.Room.GameObjects
                     If o.CollidesWith(newcrate, X, Y) Then
                         good = False
                         Exit For
                     End If
                 Next
                 If good Then
-                    PlayerRoom.AddGameObject(newcrate)
+                    Player.Room.AddGameObject(newcrate)
                 End If
         End Select
     End Sub
