@@ -132,8 +132,12 @@
                     If other.Equals(O) Then Continue For
                     If other.CollidesWith(O, newx, newy) Then
                         good = False
-                        If (other.Properties("Health") > 0) Then other.Properties("Health") -= 1
-                        Throw New Exception("Health doesn't work. May crash game")
+                        If (other.Properties.Keys.Contains("Health") And O.Properties.Keys.Contains("Attack") And O.Properties.Keys.Contains("Attack Cooldown")) Then
+                            If (other.Properties("Health") > 0.0 And O.Properties("Attack Cooldown") = 0) Then
+                                other.Properties("Health") -= O.Properties("Attack")
+                                O.Properties("Attack Cooldown") = "10"
+                            End If
+                        End If
                         Exit For
                     End If
                 Next
@@ -144,6 +148,14 @@
                 End If
                 O.Update()
             Next
+
+            For value As Integer = 0 To r.GameObjects.Count - 1
+                If r.GameObjects(value).Properties.Keys.Contains("Delete") Then
+                    r.GameObjects.RemoveAt(value)
+                    Exit For
+                End If
+            Next
+
             r.ResortGameObjects()
         Next
 
@@ -170,13 +182,13 @@
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
 
         Select Case e.KeyCode
-            Case Keys.Up
+            Case Keys.W
                 UpPressed = True
-            Case Keys.Down
+            Case Keys.S
                 DownPressed = True
-            Case Keys.Left
+            Case Keys.A
                 LeftPressed = True
-            Case Keys.Right
+            Case Keys.D
                 RightPressed = True
             Case Keys.ControlKey
                 ControlPressed = True
@@ -197,7 +209,7 @@
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select
-                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, X, Y)
+                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, X, Y, 10)
                 Dim good As Boolean = True
 
                 For Each o As GameObject In Player.Room.GameObjects
@@ -215,13 +227,13 @@
     Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
 
         Select Case e.KeyCode
-            Case Keys.Up
+            Case Keys.W
                 UpPressed = False
-            Case Keys.Down
+            Case Keys.S
                 DownPressed = False
-            Case Keys.Left
+            Case Keys.A
                 LeftPressed = False
-            Case Keys.Right
+            Case Keys.D
                 RightPressed = False
             Case Keys.ControlKey
                 ControlPressed = False

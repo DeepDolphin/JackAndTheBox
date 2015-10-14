@@ -14,7 +14,6 @@
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
-        Properties.Add("Health", -1)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double)
@@ -23,7 +22,6 @@
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
-        Properties.Add("Health", -1)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double, Health As Integer)
@@ -38,9 +36,8 @@
     End Sub
 
     Public Overridable Sub Update()
-        If Properties("Health") = 0 Then
-            Room.RemoveGameObject(0)
-            Return
+        If Properties.Keys.Contains("Health") Then
+            If Properties("Health") <= 0 Then Properties.Add("Delete", "True")
         End If
     End Sub
 
