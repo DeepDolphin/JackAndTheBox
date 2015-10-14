@@ -1,7 +1,7 @@
 ﻿Public Class MainForm
     Public ReadOnly Property Version As String
         Get
-            Return "Version 1.0.0_04 Beta"
+            Return "Version 1.0.0_05 Beta"
         End Get
     End Property
 
