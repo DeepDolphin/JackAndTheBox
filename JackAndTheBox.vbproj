@@ -98,7 +98,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Objective.vb" />
-    <Compile Include="Person.vb" />
+    <Compile Include="Actor.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Sprite.vb" />
     <Compile Include="World.vb" />

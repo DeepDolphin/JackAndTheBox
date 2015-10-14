@@ -11,7 +11,7 @@
     Public LeftPressed As Boolean
     Public ControlPressed As Boolean
 
-    Public Player As Person
+    Public Player As Actor
     Public GroundBrush As TextureBrush
     Public WallBrush As TextureBrush
     Public Random As New Random(0)
@@ -65,66 +65,72 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Person(World.RoomAt(150, 150), 150, 150, 1)
+        Player = New Actor(World.RoomAt(150, 150), 150, 150, 1)
         Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
 
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
+        Watch = New Stopwatch()
+        Watch.Start()
     End Sub
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
-            e.Graphics.FillRectangle(WallBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
-            e.Graphics.FillRectangle(GroundBrush, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
-            e.Graphics.DrawImage(My.Resources.GradientLeft, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset - 32), 64, 32)
-            e.Graphics.DrawImage(My.Resources.GradientRight, CSng(-ViewOffsetX + r.XOffset + r.Width - 63), CSng(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            e.Graphics.FillRectangle(WallBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
+            e.Graphics.FillRectangle(GroundBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
+            e.Graphics.DrawImage(My.Resources.GradientLeft, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
         Next
         For Each r As Room In World.Rooms
             For Each o As GameObject In r.GameObjects
-                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CSng(o.X - ViewOffsetX + r.XOffset), CSng(o.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.X - ViewOffsetX + r.XOffset), CInt(o.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
             Next
             For Each O As GameObject In r.GameObjects
-                e.Graphics.DrawImage(O.Image, CSng(O.X - ViewOffsetX + r.XOffset), CSng(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                e.Graphics.DrawImage(O.Image, CInt(O.X - ViewOffsetX + r.XOffset), CInt(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
             Next
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
+            e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
+            e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         Next
     End Sub
 
+    Private Watch As Stopwatch
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
         If Loaded = False Then Exit Sub
         Invalidate()
-        UpdateWorld()
+        UpdateWorld(Watch.Elapsed.TotalSeconds)
+        Watch.Restart()
     End Sub
 
-    Public Sub UpdateWorld()
+    Public Sub UpdateWorld(t As Double)
         If ControlPressed Then
-            Player.Speed = 3
+            Player.Speed = 10
         Else
-            Player.Speed = 2
+            Player.Speed = 7
         End If
 
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
-                Dim newx As Double = O.X + O.XSpeed
-                Dim newy As Double = O.Y + O.YSpeed
+                Dim newx As Double = O.X + (O.XSpeed * t * O.HitBox.Width)
+                Dim newy As Double = O.Y + (O.YSpeed * t * O.HitBox.Height)
                 If (O.Equals(Player)) Then
                     If UpPressed Then
-                        newy -= Player.Speed
-                        Player.Direction = Person.PersonDirection.Up
+                        newy -= Player.Speed * t * Player.HitBox.Height
+                        Player.Direction = Actor.ActorDirection.Up
                     End If
                     If DownPressed Then
-                        newy += Player.Speed
-                        Player.Direction = Person.PersonDirection.Down
+                        newy += Player.Speed * t * Player.HitBox.Height
+                        Player.Direction = Actor.ActorDirection.Down
                     End If
                     If RightPressed Then
-                        newx += Player.Speed
-                        Player.Direction = Person.PersonDirection.Right
+                        newx += Player.Speed * t * Player.HitBox.Width
+                        Player.Direction = Actor.ActorDirection.Right
                     End If
                     If LeftPressed Then
-                        newx -= Player.Speed
-                        Player.Direction = Person.PersonDirection.Left
+                        newx -= Player.Speed * t * Player.HitBox.Width
+                        Player.Direction = Actor.ActorDirection.Left
                     End If
                 End If
                 Dim good As Boolean = True
@@ -133,9 +139,9 @@
                     If other.CollidesWith(O, newx, newy) Then
                         good = False
                         If (other.Properties.Keys.Contains("Health") And O.Properties.Keys.Contains("Attack") And O.Properties.Keys.Contains("Attack Cooldown")) Then
-                            If (other.Properties("Health") > 0.0 And O.Properties("Attack Cooldown") = 0) Then
+                            If (other.Properties("Health") > 0.0 And O.Properties("Attack Cooldown") <= 0.0) Then
                                 other.Properties("Health") -= O.Properties("Attack")
-                                O.Properties("Attack Cooldown") = "10"
+                                CType(O, Actor).Hit(other)
                             End If
                         End If
                         Exit For
@@ -146,11 +152,11 @@
                     O.X = newx
                     O.Y = newy
                 End If
-                O.Update()
+                O.Update(t)
             Next
 
             For value As Integer = 0 To r.GameObjects.Count - 1
-                If r.GameObjects(value).Properties.Keys.Contains("Delete") Then
+                If r.GameObjects(value).Flags.Contains("Delete") Then
                     r.GameObjects.RemoveAt(value)
                     Exit For
                 End If
@@ -196,16 +202,16 @@
                 Dim X As Integer
                 Dim Y As Integer
                 Select Case Player.Direction
-                    Case Person.PersonDirection.Down
+                    Case Actor.ActorDirection.Down
                         X = Player.X
                         Y = Player.Y - My.Resources.Crate.Height + 20
-                    Case Person.PersonDirection.Up
+                    Case Actor.ActorDirection.Up
                         X = Player.X
                         Y = Player.Y + Player.Image.Height + 1
-                    Case Person.PersonDirection.Left
+                    Case Actor.ActorDirection.Left
                         X = Player.X + Player.Image.Width
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
-                    Case Person.PersonDirection.Right
+                    Case Actor.ActorDirection.Right
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select

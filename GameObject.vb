@@ -9,6 +9,7 @@
     Public CastsShadow As Boolean = True
     Public Room As Room
     Public Properties As New Dictionary(Of String, String)
+    Public Flags As New List(Of String)
 
     Public Sub New(Image As Bitmap, Room As Room)
         Me.Image = Image
@@ -35,9 +36,9 @@
         Me.Room = Room
     End Sub
 
-    Public Overridable Sub Update()
+    Public Overridable Sub Update(t As Double)
         If Properties.Keys.Contains("Health") Then
-            If Properties("Health") <= 0 Then Properties.Add("Delete", "True")
+            If Properties("Health") <= 0 Then Flags.Add("Delete")
         End If
     End Sub
 
