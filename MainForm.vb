@@ -251,4 +251,12 @@
 
     End Function
 
+    Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
+        Select Case e.Button
+            Case MouseButtons.Left
+                For Each gameObject As GameObject In Player.canHitList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
+                    Player.Hit(gameObject)
+                Next
+        End Select
+    End Sub
 End Class

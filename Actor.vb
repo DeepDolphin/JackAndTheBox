@@ -2,10 +2,10 @@
     Inherits GameObject
     Public Speed As Double
     Public Enum ActorDirection
-        Up = 0
-        Right
-        Down
-        Left
+        Up = Math.PI / 2
+        Right = 0
+        Down = 3 * (Math.PI / 2)
+        Left = Math.PI
     End Enum
     Public Direction As ActorDirection = ActorDirection.Up
 
@@ -32,16 +32,14 @@
         End If
     End Sub
 
-    Public Function getHit() As List(Of GameObject)
+    Public Function canHitList(range As Double, angle As Double) As List(Of GameObject)
         Dim objectList As List(Of GameObject) = New List(Of GameObject)
-        Dim realRange As Double = Properties("attackRange") * HitBox.Width
-        Dim angleAsRadUpper As Double = ((Direction * -90) + Properties("attackAngle")) * (Math.PI / 180.0)
-        Dim angleAsRadLower As Double = (Direction * -90) * (Math.PI / 180.0)
+        Dim realRange As Double = range * HitBox.Width
 
         For Each gameObject As GameObject In Room.GameObjects
             If Math.Sqrt(Math.Pow((gameObject.Y - Y), 2) + Math.Pow((gameObject.X - X), 2)) <= realRange Then
                 Dim rad As Double = Math.Atan2(gameObject.Y - Y, gameObject.X - X)
-                If rad <= angleAsRadUpper AndAlso rad >= angleAsRadLower Then
+                If Math.Abs(Direction - rad) <= angle * (Math.PI / 180.0) / 2 Then
                     objectList.Add(gameObject)
                 End If
             End If
