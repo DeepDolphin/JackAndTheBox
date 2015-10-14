@@ -138,12 +138,7 @@
                     If other.Equals(O) Then Continue For
                     If other.CollidesWith(O, newx, newy) Then
                         good = False
-                        If (other.Properties.Keys.Contains("Health") And O.Properties.Keys.Contains("Attack") And O.Properties.Keys.Contains("Attack Cooldown")) Then
-                            If (other.Properties("Health") > 0.0 And O.Properties("Attack Cooldown") <= 0.0) Then
-                                other.Properties("Health") -= O.Properties("Attack")
-                                CType(O, Actor).Hit(other)
-                            End If
-                        End If
+                        If (O.Flags.Contains("actor")) Then CType(O, Actor).Hit(other)
                         Exit For
                     End If
                 Next
@@ -162,10 +157,14 @@
                 End If
             Next
 
-            r.ResortGameObjects()
-        Next
+            For Each Objective As Objective In r.Objectives
+                Objective.Update(t)
+            Next
 
-        If IsNothing(PlayerRoom) = False Then
+            r.ResortGameObjects()
+            Next
+
+            If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
