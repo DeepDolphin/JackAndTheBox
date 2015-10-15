@@ -72,6 +72,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Actor.vb" />
     <Compile Include="Enemy.vb" />
     <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
@@ -98,7 +99,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="Objective.vb" />
-    <Compile Include="Actor.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Sprite.vb" />
     <Compile Include="World.vb" />

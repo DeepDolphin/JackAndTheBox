@@ -18,6 +18,12 @@
     Public ViewOffsetX As Double
     Public ViewOffsetY As Double
     Public World As World
+    Public MaxFPS As Integer = 60
+    Public ReadOnly Property MaxTick As Double
+        Get
+            Return 1 / MaxFPS
+        End Get
+    End Property
     Public ReadOnly Property ScreenWidth As Integer
         Get
             Return ClientSize.Width
@@ -94,13 +100,24 @@
             e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
             e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         Next
+        e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
     End Sub
 
     Private Watch As Stopwatch
+    Private _tick As Double = 0.5
+    Public ReadOnly Property Tick As Double
+        Get
+            Return _tick
+        End Get
+    End Property
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
         If Loaded = False Then Exit Sub
         Invalidate()
+        While Watch.Elapsed.TotalSeconds < MaxTick
+            Threading.Thread.Sleep(1)
+        End While
         UpdateWorld(Watch.Elapsed.TotalSeconds)
+        _tick = Watch.Elapsed.TotalSeconds
         Watch.Restart()
     End Sub
 
@@ -150,10 +167,10 @@
                 O.Update(t)
             Next
 
-            For value As Integer = 0 To r.GameObjects.Count - 1
+            For value As Integer = r.GameObjects.Count - 1 To 0 Step -1 ' step backwards so we can continue looping without haveing any issues.
                 If r.GameObjects(value).Flags.Contains("Delete") Then
                     r.GameObjects.RemoveAt(value)
-                    Exit For
+                    'Exit For ' There might be more than one item flagged to delete in one tick.
                 End If
             Next
 
@@ -162,9 +179,9 @@
             Next
 
             r.ResortGameObjects()
-            Next
+        Next
 
-            If IsNothing(PlayerRoom) = False Then
+        If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
@@ -179,9 +196,9 @@
         ViewOffsetX = Player.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
         ViewOffsetY = Player.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
         GroundBrush.ResetTransform()
-        GroundBrush.TranslateTransform(-Player.X Mod My.Resources.FloorTile.Width, -Player.Y Mod My.Resources.FloorTile.Height)
+        GroundBrush.TranslateTransform(CInt(-Player.X Mod My.Resources.FloorTile.Width), CInt(-Player.Y Mod My.Resources.FloorTile.Height))
         WallBrush.ResetTransform()
-        WallBrush.TranslateTransform(-Player.X Mod My.Resources.WallStrip.Width - 4, -Player.Y Mod My.Resources.WallStrip.Height + 2)
+        WallBrush.TranslateTransform(CInt(-Player.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Y Mod My.Resources.WallStrip.Height + 2))
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
