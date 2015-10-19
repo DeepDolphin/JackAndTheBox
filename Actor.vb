@@ -2,12 +2,16 @@
     Inherits GameObject
     Public Speed As Double
     Public Enum ActorDirection
-        Up = Math.PI / 2
-        Right = 0
-        Down = 3 * (Math.PI / 2)
-        Left = Math.PI
+        East = 0
+        NorthEast = Math.PI / 4
+        North = Math.PI / 2
+        NorthWest = 3 * (Math.PI / 4)
+        West = Math.PI
+        SouthWest = 5 * (Math.PI / 4)
+        South = 3 * (Math.PI / 2)
+        SouthEast = 7 * (Math.PI / 4)
     End Enum
-    Public Direction As ActorDirection = ActorDirection.Up
+    Public Direction As ActorDirection = ActorDirection.North
 
     Public Sub New(Room As Room, X As Double, Y As Double, Speed As Double)
         MyBase.New(My.Resources.CharacterUp1, Room, X, Y, 100)
@@ -15,8 +19,8 @@
         Me.Speed = Speed
         Properties.Add("Attack Cooldown", "1")
         Properties.Add("Attack", "10")
-        Properties.Add("attackRange", "5")
-        Properties.Add("attackAngle", "180")
+        Properties.Add("attackRange", "2")
+        Properties.Add("attackAngle", "360")
         Flags.Add("actor")
     End Sub
 
@@ -27,19 +31,23 @@
 
     Public Overridable Sub Hit(O As GameObject)
         If (Properties("Attack Cooldown") <= 0.0) Then
-            If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then O.Properties("Health") -= Properties("Attack")
-            Properties("Attack Cooldown") = "1"
+            If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
+                O.Properties("Health") -= Properties("Attack")
+                Properties("Attack Cooldown") = "1"
+            End If
         End If
     End Sub
 
-    Public Function canHitList(range As Double, angle As Double) As List(Of GameObject)
+    Public Function getNearList(range As Double, angle As Double) As List(Of GameObject)
         Dim objectList As List(Of GameObject) = New List(Of GameObject)
         Dim realRange As Double = range * HitBox.Width
+        Dim myMiddle As PointF = GetMiddle()
 
         For Each gameObject As GameObject In Room.GameObjects
-            If Math.Sqrt(Math.Pow((gameObject.Y - Y), 2) + Math.Pow((gameObject.X - X), 2)) <= realRange Then
-                Dim rad As Double = Math.Atan2(gameObject.Y - Y, gameObject.X - X)
-                If Math.Abs(Direction - rad) <= angle * (Math.PI / 180.0) / 2 Then
+            Dim objectMiddle As PointF = gameObject.GetMiddle()
+            If Not gameObject.Equals(Me) AndAlso getDistanceTo(gameObject) <= realRange Then
+                Dim rad As Double = getDirectionTo(gameObject)
+                If Math.Abs(Direction - rad) <= (angle * (Math.PI / 180.0)) / 2 Then
                     objectList.Add(gameObject)
                 End If
             End If

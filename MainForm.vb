@@ -72,9 +72,12 @@
 
         ' Load the player and testing stuff
         Player = New Actor(World.RoomAt(150, 150), 150, 150, 1)
+        Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
         Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
+
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject2)
+        World.Rooms(0).AddGameObject(TestObject1)
 
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
@@ -135,19 +138,19 @@
                 If (O.Equals(Player)) Then
                     If UpPressed Then
                         newy -= Player.Speed * t * Player.HitBox.Height
-                        Player.Direction = Actor.ActorDirection.Up
+                        Player.Direction = Actor.ActorDirection.North
                     End If
                     If DownPressed Then
                         newy += Player.Speed * t * Player.HitBox.Height
-                        Player.Direction = Actor.ActorDirection.Down
+                        Player.Direction = Actor.ActorDirection.South
                     End If
                     If RightPressed Then
                         newx += Player.Speed * t * Player.HitBox.Width
-                        Player.Direction = Actor.ActorDirection.Right
+                        Player.Direction = Actor.ActorDirection.East
                     End If
                     If LeftPressed Then
                         newx -= Player.Speed * t * Player.HitBox.Width
-                        Player.Direction = Actor.ActorDirection.Left
+                        Player.Direction = Actor.ActorDirection.West
                     End If
                 End If
                 Dim good As Boolean = True
@@ -218,16 +221,16 @@
                 Dim X As Integer
                 Dim Y As Integer
                 Select Case Player.Direction
-                    Case Actor.ActorDirection.Down
+                    Case Actor.ActorDirection.South
                         X = Player.X
                         Y = Player.Y - My.Resources.Crate.Height + 20
-                    Case Actor.ActorDirection.Up
+                    Case Actor.ActorDirection.North
                         X = Player.X
                         Y = Player.Y + Player.Image.Height + 1
-                    Case Actor.ActorDirection.Left
+                    Case Actor.ActorDirection.West
                         X = Player.X + Player.Image.Width
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
-                    Case Actor.ActorDirection.Right
+                    Case Actor.ActorDirection.East
                         X = Player.X - My.Resources.Crate.Width - 1
                         Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select
@@ -271,9 +274,13 @@
     Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
         Select Case e.Button
             Case MouseButtons.Left
-                For Each gameObject As GameObject In Player.canHitList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
+                For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
                     Player.Hit(gameObject)
                 Next
         End Select
+    End Sub
+
+    Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+
     End Sub
 End Class

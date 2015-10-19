@@ -54,4 +54,16 @@
         Return myhitbox.IntersectsWith(otherhitbox)
     End Function
 
+    Public Function GetMiddle() As PointF
+        Return New PointF(X + HitBox.Width / 2, Y + HitBox.Width / 2)
+    End Function
+
+    Public Function getDistanceTo(o As GameObject) As Double
+        Return Math.Sqrt(Math.Pow((o.GetMiddle().Y - GetMiddle().Y), 2) + Math.Pow((o.GetMiddle().X - GetMiddle().X), 2))
+    End Function
+
+    Public Function getDirectionTo(o As GameObject) As Double
+        Return Math.Atan2(o.GetMiddle().Y - GetMiddle().Y, o.GetMiddle().X - GetMiddle().X)
+    End Function
+
 End Class

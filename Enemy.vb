@@ -10,7 +10,7 @@
 
     Public Overrides Sub Update(t As Double)
         MyBase.Update(t)
-        distToPlayer = Math.Sqrt(Math.Pow((MainForm.Player.Y - Y), 2) + Math.Pow((MainForm.Player.X - X), 2))
+        distToPlayer = getDistanceTo(MainForm.Player)
     End Sub
 End Class
 
@@ -23,7 +23,7 @@ Public Class NormalEnemy
 
     Public Overrides Sub update(t As Double)
         MyBase.Update(t)
-        Dim radToPlayer As Double = Math.Atan2(MainForm.Player.Y - Y, MainForm.Player.X - X)
+        Dim radToPlayer As Double = getDirectionTo(MainForm.Player)
         ' ToDo: Use Vectors stuffs
         XSpeed = Math.Cos(radToPlayer) + MainForm.Player.XSpeed
         YSpeed = Math.Sign(radToPlayer) + MainForm.Player.YSpeed
