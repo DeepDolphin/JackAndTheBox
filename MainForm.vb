@@ -100,10 +100,11 @@
                 e.Graphics.DrawImage(O.Image, CInt(O.X - ViewOffsetX + r.XOffset), CInt(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
             Next
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
-            e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
-            e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         Next
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
+        e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
+        e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
+        e.Graphics.DrawString(Player.Properties("test"), SystemFonts.CaptionFont, Brushes.Red, 150, 150)
     End Sub
 
     Private Watch As Stopwatch
@@ -138,19 +139,15 @@
                 If (O.Equals(Player)) Then
                     If UpPressed Then
                         newy -= Player.Speed * t * Player.HitBox.Height
-                        Player.Direction = Actor.ActorDirection.North
                     End If
                     If DownPressed Then
                         newy += Player.Speed * t * Player.HitBox.Height
-                        Player.Direction = Actor.ActorDirection.South
                     End If
                     If RightPressed Then
                         newx += Player.Speed * t * Player.HitBox.Width
-                        Player.Direction = Actor.ActorDirection.East
                     End If
                     If LeftPressed Then
                         newx -= Player.Speed * t * Player.HitBox.Width
-                        Player.Direction = Actor.ActorDirection.West
                     End If
                 End If
                 Dim good As Boolean = True
@@ -170,7 +167,7 @@
                 O.Update(t)
             Next
 
-            For value As Integer = r.GameObjects.Count - 1 To 0 Step -1 ' step backwards so we can continue looping without haveing any issues.
+            For value As Integer = r.GameObjects.Count - 1 To 0 Step -1 ' step backwards so we can continue looping without having any issues.
                 If r.GameObjects(value).Flags.Contains("Delete") Then
                     r.GameObjects.RemoveAt(value)
                     'Exit For ' There might be more than one item flagged to delete in one tick.
@@ -281,6 +278,8 @@
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
+        Dim direction As Double = Player.getDirectionTo(e.Location)
+        Player.Direction = 
 
     End Sub
 End Class

@@ -66,4 +66,8 @@
         Return Math.Atan2(o.GetMiddle().Y - GetMiddle().Y, o.GetMiddle().X - GetMiddle().X)
     End Function
 
+    Public Function getDirectionTo(point As PointF) As Double
+        Return Math.Atan2(point.Y - GetMiddle().Y, point.X - GetMiddle().X)
+    End Function
+
 End Class
