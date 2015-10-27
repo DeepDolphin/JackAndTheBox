@@ -5,6 +5,8 @@
         End Get
     End Property
 
+    Public testDirection As Double = 0.0
+
     Public UpPressed As Boolean
     Public DownPressed As Boolean
     Public RightPressed As Boolean
@@ -72,12 +74,12 @@
 
         ' Load the player and testing stuff
         Player = New Actor(World.RoomAt(150, 150), 150, 150, 1)
-        Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
-        Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
+        'Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
+        'Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
         World.Rooms(0).AddGameObject(Player)
-        World.Rooms(0).AddGameObject(TestObject2)
-        World.Rooms(0).AddGameObject(TestObject1)
+        'World.Rooms(0).AddGameObject(TestObject2)
+        'World.Rooms(0).AddGameObject(TestObject1)
 
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
@@ -105,6 +107,7 @@
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
         e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         e.Graphics.DrawString(Player.Properties("test"), SystemFonts.CaptionFont, Brushes.Red, 150, 150)
+        e.Graphics.DrawString(testDirection, SystemFonts.CaptionFont, Brushes.Red, 50, 50)
     End Sub
 
     Private Watch As Stopwatch
@@ -271,15 +274,19 @@
     Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
         Select Case e.Button
             Case MouseButtons.Left
-                For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
-                    Player.Hit(gameObject)
-                Next
+                'For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
+                '    Player.Hit(gameObject)
+                'Next
+                'Dim p As Point = e.Location
+                'p.Y *= -1
+                Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
+                Player.Direction = Actor.ToDirection(direction)
         End Select
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        Dim direction As Double = Player.getDirectionTo(e.Location)
-        Player.Direction = 
-
+        'Dim direction As Double = Player.getDirectionTo(e.Location)
+        'Player.Direction = Actor.ToDirection(direction)
+        testDirection = Actor.ToDirection(Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)))
     End Sub
 End Class
