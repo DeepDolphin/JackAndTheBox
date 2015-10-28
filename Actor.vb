@@ -11,7 +11,8 @@
         North
         NorthEast
     End Enum
-    Public Shared Function ToDirection(radians As Double) As ActorDirection
+
+    Public Shared Function ToActorDirection(radians As Double) As ActorDirection
         While radians < 0
             radians += Math.PI * 2
         End While
@@ -60,8 +61,7 @@
             Dim objectMiddle As PointF = gameObject.GetMiddle()
             If Not gameObject.Equals(Me) AndAlso getDistanceTo(gameObject) <= realRange Then
                 Dim rad As Double = getDirectionTo(gameObject)
-                If gameObject.Properties.Count = 1 Then Properties("test") = rad
-                If Math.Abs(ToRadians(Direction) - rad) <= (angle * (Math.PI / 180.0)) / 2 Then
+                If Math.Abs(ToRadians(Direction) - ToRadians(ToActorDirection(rad))) <= (angle * (Math.PI / 180.0)) / 2 Then
                     objectList.Add(gameObject)
                 End If
             End If

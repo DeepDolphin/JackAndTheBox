@@ -1,11 +1,9 @@
 ﻿Public Class MainForm
     Public ReadOnly Property Version As String
         Get
-            Return "Version 1.0.0_05 Beta"
+            Return "Version 1.0.0_06 Beta"
         End Get
     End Property
-
-    Public testDirection As Double = 0.0
 
     Public UpPressed As Boolean
     Public DownPressed As Boolean
@@ -107,7 +105,7 @@
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
         e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         e.Graphics.DrawString(Player.Properties("test"), SystemFonts.CaptionFont, Brushes.Red, 150, 150)
-        e.Graphics.DrawString(testDirection, SystemFonts.CaptionFont, Brushes.Red, 50, 50)
+        e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 50, 50)
     End Sub
 
     Private Watch As Stopwatch
@@ -220,6 +218,7 @@
             Case Keys.Space
                 Dim X As Integer
                 Dim Y As Integer
+                'ToDo: If Direction is not South/North/West/East places in default (top left corner) of room
                 Select Case Player.Direction
                     Case Actor.ActorDirection.South
                         X = Player.X
@@ -274,19 +273,15 @@
     Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
         Select Case e.Button
             Case MouseButtons.Left
-                'For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
-                '    Player.Hit(gameObject)
-                'Next
-                'Dim p As Point = e.Location
-                'p.Y *= -1
-                Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
-                Player.Direction = Actor.ToDirection(direction)
+                For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
+                    Player.Hit(gameObject)
+                Next
+
         End Select
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        'Dim direction As Double = Player.getDirectionTo(e.Location)
-        'Player.Direction = Actor.ToDirection(direction)
-        testDirection = Actor.ToDirection(Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)))
+        Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
+        Player.Direction = Actor.ToActorDirection(direction)
     End Sub
 End Class
