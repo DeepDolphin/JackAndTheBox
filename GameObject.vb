@@ -1,4 +1,6 @@
 ﻿Public Class GameObject
+    Public Position As Vector3
+    Public Speed As Vector2
     Public X As Double
     Public Y As Double
     Public Z As Double
@@ -17,19 +19,24 @@
         Me.Room = Room
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double)
-        Me.X = X
-        Me.Y = Y
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
+        Me.Position = Position
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, X As Double, Y As Double, Health As Integer)
-        Me.X = X
-        Me.Y = Y
-        Me.XSpeed = XSpeed
-        Me.YSpeed = YSpeed
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
+        Me.Position = Position
+        Me.Speed = Speed
+        Me.Image = Image
+        HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        Me.Room = Room
+    End Sub
+
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
+        Me.Position = Position
+        Me.Speed = Speed
         Me.Image = Image
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Properties.Add("Health", Health)
@@ -37,21 +44,26 @@
     End Sub
 
     Public Overridable Sub Update(t As Double)
+        'Delete if out of Health
         If Properties.Keys.Contains("Health") Then
             If Properties("Health") <= 0 Then Flags.Add("Delete")
         End If
     End Sub
 
-    Public Overridable Function CollidesWith(O As GameObject, X As Double, Y As Double) As Boolean
-        If (O.Z <> Z) Then Return False
+    Public Overridable Function CollidesWith(O As GameObject, Change As Vector2) As Boolean
+        If (O.Position.Z <> Position.Z) Then Return False
 
         Dim otherhitbox As RectangleF = O.HitBox
-        otherhitbox.X += X
-        otherhitbox.Y += Y
+        otherhitbox.X += O.Position.X
+        otherhitbox.Y += O.Position.Y
         Dim myhitbox As RectangleF = HitBox
-        myhitbox.X += Me.X
-        myhitbox.Y += Me.Y
+        myhitbox.X += Position.X + Change.X
+        myhitbox.Y += Position.Y + Change.Y
         Return myhitbox.IntersectsWith(otherhitbox)
+    End Function
+
+    Public Overridable Function CollidesWith(O As GameObject, Change As Vector3) As Boolean
+        Return If(O.Position.Z <> Position.Z + Change.Z, False, CollidesWith(O, Change.XY))
     End Function
 
     Public Function GetMiddle() As PointF
@@ -63,7 +75,7 @@
     End Function
 
     Public Function getDirectionTo(o As GameObject) As Double
-        Return Math.Atan2(o.GetMiddle().Y - GetMiddle().Y, o.GetMiddle().X - GetMiddle().X)
+        Return getDirectionTo(o.GetMiddle())
     End Function
 
     Public Function getDirectionTo(point As PointF) As Double

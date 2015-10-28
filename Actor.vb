@@ -16,7 +16,7 @@
         While radians < 0
             radians += Math.PI * 2
         End While
-        Return CInt(((radians Mod (Math.PI * 2)) - Math.PI / 8) / (Math.PI / 4))
+        Return CInt((radians Mod (Math.PI * 2)) / (Math.PI / 4)) Mod 8
     End Function
     Public Shared Function ToRadians(direction As ActorDirection) As Double
         Return direction * -Math.PI / 4
@@ -31,7 +31,7 @@
         Properties.Add("Attack Cooldown", "1")
         Properties.Add("Attack", "10")
         Properties.Add("attackRange", "4")
-        Properties.Add("attackAngle", "90")
+        Properties.Add("attackAngle", "45")
         Properties.Add("test", "null")
         Flags.Add("actor")
     End Sub

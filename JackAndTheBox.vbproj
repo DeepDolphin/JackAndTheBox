@@ -101,6 +101,7 @@
     <Compile Include="Objective.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Sprite.vb" />
+    <Compile Include="Vectors.vb" />
     <Compile Include="World.vb" />
   </ItemGroup>
   <ItemGroup>
