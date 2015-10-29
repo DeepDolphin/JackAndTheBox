@@ -69,11 +69,11 @@ Public Class Room
             Dim b As New List(Of GameObject)
             Dim record As Integer = Integer.MaxValue
             For Each o As GameObject In GameObjects
-                If o.Y - o.HitBox.Height + o.Z * (10 / 16) < record Then
+                If o.Position.Y - o.HitBox.Height + o.Position.Z * (10 / 16) < record Then
                     b.Clear()
-                    record = o.Y - o.HitBox.Height + o.Z * (10 / 16)
+                    record = o.Position.Y - o.HitBox.Height + o.Position.Z * (10 / 16)
                     b.Add(o)
-                ElseIf o.Y - o.HitBox.Height + o.Z * (10 / 16) = record
+                ElseIf o.position.Y - o.HitBox.Height + o.position.Z * (10 / 16) = record
                     b.Add(o)
                 End If
             Next
@@ -106,7 +106,7 @@ Public Class Room
         For Each e As XmlElement In RoomElement
             Select Case e.Name
                 Case "Crate"
-                    Dim c As New GameObject(My.Resources.Crate, Me, e.GetAttribute("X"), e.GetAttribute("Y"), 10)
+                    Dim c As New GameObject(My.Resources.Crate, Me, New Vector3(e.GetAttribute("X"), e.GetAttribute("Y"), 0), 10)
                     GameObjects.Add(c)
                 Case "SurvivalTime"
                     Dim o As New SurvivalTimeObjective(e.GetAttribute("Time"))

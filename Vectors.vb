@@ -37,7 +37,7 @@
         Return New Vector2(left.X + right.X, left.Y + right.Y)
     End Operator
     Public Shared Operator -(left As Vector2, right As Vector2) As Vector2
-        Return New Vector2(left.X - right.X, left.Y + right.Y)
+        Return New Vector2(left.X - right.X, left.Y - right.Y)
     End Operator
     Public Shared Operator *(left As Vector2, scalar As Double) As Vector2
         Return New Vector2(left.X * scalar, left.Y * scalar)

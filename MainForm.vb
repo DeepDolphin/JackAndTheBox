@@ -1,7 +1,7 @@
 ﻿Public Class MainForm
     Public ReadOnly Property Version As String
         Get
-            Return "Version 1.0.0_06 Beta"
+            Return "Version 1.0.0_07 Beta"
         End Get
     End Property
 
@@ -37,7 +37,7 @@
 
     Public ReadOnly Property PlayerRoom As Room
         Get
-            Return World.RoomAt(Player.X + Player.Room.XOffset, Player.Y + Player.Room.YOffset)
+            Return World.RoomAt(Player.Middle.X + Player.Room.XOffset, Player.Middle.Y + Player.Room.YOffset)
         End Get
     End Property
 
@@ -71,7 +71,7 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Actor(World.RoomAt(150, 150), 150, 150, 1)
+        Player = New Actor(World.RoomAt(150, 150))
         'Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
         'Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
@@ -94,17 +94,16 @@
         Next
         For Each r As Room In World.Rooms
             For Each o As GameObject In r.GameObjects
-                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.X - ViewOffsetX + r.XOffset), CInt(o.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
             Next
             For Each O As GameObject In r.GameObjects
-                e.Graphics.DrawImage(O.Image, CInt(O.X - ViewOffsetX + r.XOffset), CInt(O.Y + O.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
             Next
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
-        e.Graphics.DrawString(Player.Properties("Attack Cooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
-        e.Graphics.DrawString(Player.Properties("test"), SystemFonts.CaptionFont, Brushes.Red, 150, 150)
+        e.Graphics.DrawString(Player.Properties("AttackCooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
         e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 50, 50)
     End Sub
 
@@ -128,42 +127,42 @@
 
     Public Sub UpdateWorld(t As Double)
         If ControlPressed Then
-            Player.Speed = 10
+            Player.Speed.Length = 10
         Else
-            Player.Speed = 7
+            Player.Speed.Length = 10
         End If
 
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
-                Dim newx As Double = O.X + (O.XSpeed * t * O.HitBox.Width)
-                Dim newy As Double = O.Y + (O.YSpeed * t * O.HitBox.Height)
+                Dim newx As Double = O.Position.X + (O.Speed.X * t * O.HitBox.Width)
+                Dim newy As Double = O.Position.Y + (O.Speed.Y * t * O.HitBox.Height)
                 If (O.Equals(Player)) Then
                     If UpPressed Then
-                        newy -= Player.Speed * t * Player.HitBox.Height
+                        newy -= Player.Speed.Length * t * Player.HitBox.Height
                     End If
                     If DownPressed Then
-                        newy += Player.Speed * t * Player.HitBox.Height
+                        newy += Player.Speed.Length * t * Player.HitBox.Height
                     End If
                     If RightPressed Then
-                        newx += Player.Speed * t * Player.HitBox.Width
+                        newx += Player.Speed.Length * t * Player.HitBox.Width
                     End If
                     If LeftPressed Then
-                        newx -= Player.Speed * t * Player.HitBox.Width
+                        newx -= Player.Speed.Length * t * Player.HitBox.Width
                     End If
                 End If
                 Dim good As Boolean = True
                 For Each other As GameObject In r.GameObjects
                     If other.Equals(O) Then Continue For
-                    If other.CollidesWith(O, newx, newy) Then
+                    If other.CollidesWith(O, New Vector2(newx, newy)) Then
                         good = False
-                        If (O.Flags.Contains("actor")) Then CType(O, Actor).Hit(other)
+                        If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
                         Exit For
                     End If
                 Next
                 If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
                 If good Then
-                    O.X = newx
-                    O.Y = newy
+                    O.Position.X = newx
+                    O.Position.Y = newy
                 End If
                 O.Update(t)
             Next
@@ -186,20 +185,20 @@
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
-                Player.X += (oldroom.XOffset - newroom.XOffset)
-                Player.Y += (oldroom.YOffset - newroom.YOffset)
+                Player.Position.X += (oldroom.XOffset - newroom.XOffset)
+                Player.Position.Y += (oldroom.YOffset - newroom.YOffset)
                 oldroom.GameObjects.Remove(Player)
                 newroom.GameObjects.Add(Player)
                 Player.Room = newroom
             End If
         End If
 
-        ViewOffsetX = Player.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
-        ViewOffsetY = Player.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
+        ViewOffsetX = Player.Position.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
+        ViewOffsetY = Player.Position.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
         GroundBrush.ResetTransform()
-        GroundBrush.TranslateTransform(CInt(-Player.X Mod My.Resources.FloorTile.Width), CInt(-Player.Y Mod My.Resources.FloorTile.Height))
+        GroundBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.FloorTile.Width), CInt(-Player.Position.Y Mod My.Resources.FloorTile.Height))
         WallBrush.ResetTransform()
-        WallBrush.TranslateTransform(CInt(-Player.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Y Mod My.Resources.WallStrip.Height + 2))
+        WallBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Position.Y Mod My.Resources.WallStrip.Height + 2))
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -221,23 +220,23 @@
                 'ToDo: If Direction is not South/North/West/East places in default (top left corner) of room
                 Select Case Player.Direction
                     Case Actor.ActorDirection.South
-                        X = Player.X
-                        Y = Player.Y - My.Resources.Crate.Height + 20
+                        X = Player.Position.X
+                        Y = Player.Position.Y - My.Resources.Crate.Height + 20
                     Case Actor.ActorDirection.North
-                        X = Player.X
-                        Y = Player.Y + Player.Image.Height + 1
+                        X = Player.Position.X
+                        Y = Player.Position.Y + Player.Image.Height + 1
                     Case Actor.ActorDirection.West
-                        X = Player.X + Player.Image.Width
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
+                        X = Player.Position.X + Player.Image.Width
+                        Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                     Case Actor.ActorDirection.East
-                        X = Player.X - My.Resources.Crate.Width - 1
-                        Y = Player.Y + Player.Image.Height - My.Resources.Crate.Height
+                        X = Player.Position.X - My.Resources.Crate.Width - 1
+                        Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                 End Select
-                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, X, Y, 10)
+                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, New Vector3(X, Y, 0), 10)
                 Dim good As Boolean = True
 
                 For Each o As GameObject In Player.Room.GameObjects
-                    If o.CollidesWith(newcrate, X, Y) Then
+                    If o.CollidesWith(newcrate, New Vector2(X, Y)) Then
                         good = False
                         Exit For
                     End If
@@ -265,7 +264,7 @@
     End Sub
 
     Protected Overrides Function IsInputKey(
-        ByVal keyData As System.Windows.Forms.Keys) As Boolean
+        ByVal keyData As Keys) As Boolean
         Return True
 
     End Function
@@ -273,7 +272,7 @@
     Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
         Select Case e.Button
             Case MouseButtons.Left
-                For Each gameObject As GameObject In Player.getNearList(Player.Properties("attackRange"), Player.Properties("attackAngle"))
+                For Each gameObject As GameObject In Player.getNearList(Player.Properties("AttackRange"), Player.Properties("AttackAngle"))
                     Player.Hit(gameObject)
                 Next
 

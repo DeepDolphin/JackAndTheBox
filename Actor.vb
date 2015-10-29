@@ -1,6 +1,5 @@
 ﻿Public Class Actor
     Inherits GameObject
-    Public Speed As Double
     Public Enum ActorDirection As Integer
         East = 0
         SouthEast
@@ -24,27 +23,44 @@
 
     Public Direction As ActorDirection = ActorDirection.North
 
-    Public Sub New(Room As Room, X As Double, Y As Double, Speed As Double)
-        MyBase.New(My.Resources.CharacterUp1, Room, X, Y, 100)
+    Public Sub New(Room As Room)
+        MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100)
+        Init(1, 100, 3, 45)
+    End Sub
+
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
+        MyBase.New(Image, Room, Position, 100)
+        Init(1, 100, 3, 45)
+    End Sub
+
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
+        MyBase.New(Image, Room, Position, Speed, 100)
+        Init(1, 100, 3, 45)
+    End Sub
+
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
+        MyBase.New(Image, Room, Position, Speed, Health)
+        Init(1, 100, 3, 45)
+    End Sub
+
+    Public Sub Init(attackCooldown As Double, attackPower As Double, attackRange As Double, attackAngle As Double)
         HitBox = New RectangleF(0, 22, 16, 10)
-        Me.Speed = Speed
-        Properties.Add("Attack Cooldown", "1")
-        Properties.Add("Attack", "10")
-        Properties.Add("attackRange", "4")
-        Properties.Add("attackAngle", "45")
-        Properties.Add("test", "null")
-        Flags.Add("actor")
+        Properties.Add("AttackCooldown", attackCooldown)
+        Properties.Add("AttackPower", attackPower)
+        Properties.Add("AttackRange", attackRange)
+        Properties.Add("AttackAngle", attackAngle)
+        Flags.Add("Actor")
     End Sub
 
     Public Overrides Sub Update(t As Double)
         MyBase.Update(t)
 
 
-        If (Properties("Attack Cooldown") > 0.0) Then Properties("Attack Cooldown") -= t
+        If (Properties("AttackCooldown") > 0.0) Then Properties("AttackCooldown") -= t
     End Sub
 
     Public Overridable Sub Hit(O As GameObject)
-        If (Properties("Attack Cooldown") <= 0.0) Then
+        If (Properties("AttackCooldown") <= 0.0) Then
             If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
                 O.Properties("Health") -= Properties("Attack")
                 Properties("Attack Cooldown") = "1"
@@ -55,10 +71,8 @@
     Public Function getNearList(range As Double, angle As Double) As List(Of GameObject)
         Dim objectList As List(Of GameObject) = New List(Of GameObject)
         Dim realRange As Double = range * HitBox.Width
-        Dim myMiddle As PointF = GetMiddle()
 
         For Each gameObject As GameObject In Room.GameObjects
-            Dim objectMiddle As PointF = gameObject.GetMiddle()
             If Not gameObject.Equals(Me) AndAlso getDistanceTo(gameObject) <= realRange Then
                 Dim rad As Double = getDirectionTo(gameObject)
                 If Math.Abs(ToRadians(Direction) - ToRadians(ToActorDirection(rad))) <= (angle * (Math.PI / 180.0)) / 2 Then

@@ -1,16 +1,13 @@
 ﻿Public Class Enemy
     Inherits Actor
 
-    Public distToPlayer As Double
-
     Public Sub New(Room As Room, x As Double, y As Double)
-        MyBase.New(Room, x, y, 0)
+        MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(x, y, 0))
         Properties("Attack") = "1"
     End Sub
 
     Public Overrides Sub Update(t As Double)
         MyBase.Update(t)
-        distToPlayer = getDistanceTo(MainForm.Player)
     End Sub
 End Class
 
@@ -23,20 +20,19 @@ Public Class NormalEnemy
 
     Public Overrides Sub update(t As Double)
         MyBase.Update(t)
-        Dim radToPlayer As Double = getDirectionTo(MainForm.Player)
-        ' ToDo: Use Vectors stuffs
-        XSpeed = Math.Cos(radToPlayer) + MainForm.Player.XSpeed
-        YSpeed = Math.Sign(radToPlayer) + MainForm.Player.YSpeed
 
-        If distToPlayer < 75.0 Then
-            XSpeed *= 8
-            YSpeed *= 8
-        ElseIf distToPlayer < 150.0 Then
-            XSpeed *= 4
-            YSpeed *= 4
-        Else
-            XSpeed = 0
-            YSpeed = 0
+        Dim toPlayer As Vector2 = MainForm.Player.Middle.XY - Middle.XY
+        If (toPlayer.Length >= 150.0) Then
+            Speed.Length = 0
+            Return
+        End If
+
+        Speed = toPlayer
+
+        If toPlayer.Length < 75.0 Then
+            Speed.Length = 8
+        ElseIf toPlayer.Length < 150.0 Then
+            Speed.Length = 4
         End If
     End Sub
 End Class
