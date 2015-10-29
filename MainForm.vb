@@ -129,9 +129,10 @@
         If ControlPressed Then
             Player.Speed.Length = 10
         Else
-            Player.Speed.Length = 10
+            Player.Speed.Length = 8
         End If
 
+        'ToDo: get player speed to work
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
                 Dim newx As Double = O.Position.X + (O.Speed.X * t * O.HitBox.Width)
