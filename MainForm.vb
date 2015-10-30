@@ -126,10 +126,11 @@
     End Sub
 
     Public Sub UpdateWorld(t As Double)
+        Dim PlayerSpeed As Double
         If ControlPressed Then
-            Player.Speed.Length = 10
+            PlayerSpeed = 10
         Else
-            Player.Speed.Length = 8
+            PlayerSpeed = 8
         End If
 
         'ToDo: get player speed to work
@@ -139,16 +140,16 @@
                 Dim newy As Double = O.Position.Y + (O.Speed.Y * t * O.HitBox.Height)
                 If (O.Equals(Player)) Then
                     If UpPressed Then
-                        newy -= Player.Speed.Length * t * Player.HitBox.Height
+                        newy -= PlayerSpeed * t * Player.HitBox.Height
                     End If
                     If DownPressed Then
-                        newy += Player.Speed.Length * t * Player.HitBox.Height
+                        newy += PlayerSpeed * t * Player.HitBox.Height
                     End If
                     If RightPressed Then
-                        newx += Player.Speed.Length * t * Player.HitBox.Width
+                        newx += PlayerSpeed * t * Player.HitBox.Width
                     End If
                     If LeftPressed Then
-                        newx -= Player.Speed.Length * t * Player.HitBox.Width
+                        newx -= PlayerSpeed * t * Player.HitBox.Width
                     End If
                 End If
                 Dim good As Boolean = True
