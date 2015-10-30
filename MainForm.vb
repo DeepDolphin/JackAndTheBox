@@ -5,6 +5,8 @@
         End Get
     End Property
 
+    Public Glitch As Boolean = False
+
     Public UpPressed As Boolean
     Public DownPressed As Boolean
     Public RightPressed As Boolean
@@ -12,6 +14,7 @@
     Public ControlPressed As Boolean
 
     Public Player As Actor
+    Public Mouse As PointF
     Public GroundBrush As TextureBrush
     Public WallBrush As TextureBrush
     Public Random As New Random(0)
@@ -104,7 +107,11 @@
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
         e.Graphics.DrawString(Player.Properties("AttackCooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
-        e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 50, 50)
+        e.Graphics.DrawString(Player.Position.Z, SystemFonts.CaptionFont, Brushes.Red, 0, 10)
+        e.Graphics.DrawString(Glitch, SystemFonts.CaptionFont, Brushes.Red, 0, 20)
+        e.Graphics.DrawString(Mouse.ToString, SystemFonts.CaptionFont, Brushes.Red, 0, 30)
+        e.Graphics.DrawString((Mouse - Player.Middle.XY).Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
+        e.Graphics.DrawString(CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF).ToString, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
     End Sub
 
     Private Watch As Stopwatch
@@ -127,45 +134,100 @@
 
     Public Sub UpdateWorld(t As Double)
         Dim PlayerSpeed As Double
+        Dim MaxPlayerSpeed As Double
+        Dim CurrentPlayerSpeed As Double = Player.Speed.Length
+        Dim toMouse As Vector2 = CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF) - Player.Middle.XY
+        toMouse.Normalize()
+
         If ControlPressed Then
-            PlayerSpeed = 10
+            PlayerSpeed = 0.25
+            MaxPlayerSpeed = 13
         Else
-            PlayerSpeed = 8
+            PlayerSpeed = 0.5
+            MaxPlayerSpeed = 7
         End If
 
+        If UpPressed Then
+            Player.Speed.Direction = toMouse.Direction
+            If (CurrentPlayerSpeed = 0.0) Then
+                Player.Speed.X = toMouse.X * PlayerSpeed
+                Player.Speed.Y = toMouse.Y * PlayerSpeed
+            ElseIf (currentPlayerSpeed < MaxPlayerSpeed - PlayerSpeed) Then
+                Player.Speed.Length += PlayerSpeed
+            ElseIf (CurrentPlayerSpeed > MaxPlayerSpeed + PlayerSpeed) Then
+                Player.Speed.Length -= PlayerSpeed * 2
+            ElseIf (CurrentPlayerSpeed <> MaxPlayerSpeed) Then
+                Player.Speed.Length = MaxPlayerSpeed
+            End If
+        Else
+            If (CurrentPlayerSpeed > PlayerSpeed) Then
+                Player.Speed.Length -= PlayerSpeed * 2
+            ElseIf (Not DownPressed AndAlso CurrentPlayerSpeed <> 0.0) Then
+                Player.Speed.Length = 0.0
+            End If
+        End If
+
+        If DownPressed Then
+            '    Player.Speed.Direction = toMouse.Direction
+            '    If (Player.Speed.Length = 0.0) Then
+            '        Player.Speed.X = toMouse.X * -PlayerSpeed / 2
+            '        Player.Speed.Y = toMouse.Y * -PlayerSpeed / 2
+            '    ElseIf (Player.Speed.Length >= -MaxPlayerSpeed) Then
+            '        Player.Speed.Length -= PlayerSpeed / 2
+            '    End If
+            'Else
+            '    If (Player.Speed.Length < -PlayerSpeed) Then
+            '        Player.Speed.Length += PlayerSpeed
+            '    ElseIf (Not UpPressed AndAlso Player.Speed.Length <> 0.0) Then
+            '        Player.Speed.Length = 0.0
+            '    End If
+        End If
+
+        If RightPressed Then
+            'Player.Speed.X += PlayerSpeed
+        End If
+
+        If LeftPressed Then
+            'Player.Speed.X -= PlayerSpeed
+        End If
+
+        'Player.Speed.Direction = toMouse.Direction
         'ToDo: get player speed to work
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
-                Dim newx As Double = O.Position.X + (O.Speed.X * t * O.HitBox.Width)
-                Dim newy As Double = O.Position.Y + (O.Speed.Y * t * O.HitBox.Height)
-                If (O.Equals(Player)) Then
-                    If UpPressed Then
-                        newy -= PlayerSpeed * t * Player.HitBox.Height
-                    End If
-                    If DownPressed Then
-                        newy += PlayerSpeed * t * Player.HitBox.Height
-                    End If
-                    If RightPressed Then
-                        newx += PlayerSpeed * t * Player.HitBox.Width
-                    End If
-                    If LeftPressed Then
-                        newx -= PlayerSpeed * t * Player.HitBox.Width
+                If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
+                    Dim newx As Double = O.Position.X + (O.Speed.X * t * O.HitBox.Width)
+                    Dim newy As Double = O.Position.Y + (O.Speed.Y * t * O.HitBox.Height)
+                    'If (O.Equals(Player)) Then
+                    '    If UpPressed Then
+                    '        newy -= PlayerSpeed * t * Player.HitBox.Height
+                    '    End If
+                    '    If DownPressed Then
+                    '        newy += PlayerSpeed * t * Player.HitBox.Height
+                    '    End If
+                    '    If RightPressed Then
+                    '        newx += PlayerSpeed * t * Player.HitBox.Width
+                    '    End If
+                    '    If LeftPressed Then
+                    '        newx -= PlayerSpeed * t * Player.HitBox.Width
+                    '    End If
+                    'End If
+                    Dim good As Boolean = True
+                    For Each other As GameObject In r.GameObjects
+                        If other.Equals(O) Then Continue For
+                        If other.CollidesWith(O, New Vector2(newx, newy)) Then
+                            good = False
+                            If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
+                            Exit For
+                        End If
+                    Next
+                    If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
+                    If good Then
+                        O.Position.X = newx
+                        O.Position.Y = newy
                     End If
                 End If
-                Dim good As Boolean = True
-                For Each other As GameObject In r.GameObjects
-                    If other.Equals(O) Then Continue For
-                    If other.CollidesWith(O, New Vector2(newx, newy)) Then
-                        good = False
-                        If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
-                        Exit For
-                    End If
-                Next
-                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
-                If good Then
-                    O.Position.X = newx
-                    O.Position.Y = newy
-                End If
+
                 O.Update(t)
             Next
 
@@ -222,17 +284,37 @@
                 'ToDo: If Direction is not South/North/West/East places in default (top left corner) of room
                 Select Case Player.Direction
                     Case Actor.ActorDirection.South
-                        X = Player.Position.X
-                        Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                        If (Player.Speed.Length = 0) Then
+                            X = Player.Position.X
+                            Y = Player.Position.Y + Player.Image.Height + 1
+                        Else
+                            X = Player.Position.X
+                            Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                        End If
                     Case Actor.ActorDirection.North
-                        X = Player.Position.X
-                        Y = Player.Position.Y + Player.Image.Height + 1
+                        If (Player.Speed.Length = 0) Then
+                            X = Player.Position.X
+                            Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                        Else
+                            X = Player.Position.X
+                            Y = Player.Position.Y + Player.Image.Height + 1
+                        End If
                     Case Actor.ActorDirection.West
-                        X = Player.Position.X + Player.Image.Width
-                        Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        If (Player.Speed.Length = 0) Then
+                            X = Player.Position.X - My.Resources.Crate.Width - 1
+                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        Else
+                            X = Player.Position.X + Player.Image.Width
+                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        End If
                     Case Actor.ActorDirection.East
-                        X = Player.Position.X - My.Resources.Crate.Width - 1
-                        Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        If (Player.Speed.Length = 0) Then
+                            X = Player.Position.X + Player.Image.Width
+                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        Else
+                            X = Player.Position.X - My.Resources.Crate.Width - 1
+                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
+                        End If
                 End Select
                 Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, New Vector3(X, Y, 0), 10)
                 Dim good As Boolean = True
@@ -284,5 +366,6 @@
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
         Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
         Player.Direction = Actor.ToActorDirection(direction)
+        Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
     End Sub
 End Class

@@ -60,7 +60,9 @@
     Public Overridable Sub Update(t As Double)
         'Delete if out of Health
         If Properties.Keys.Contains("Health") Then
-            If Properties("Health") <= 0 Then Flags.Add("Delete")
+            If Properties("Health") <= 0.0 Then
+                Flags.Add("Delete")
+            End If
         End If
     End Sub
 
@@ -69,11 +71,15 @@
         If (O.Position.Z <> Position.Z) Then Return False
 
         Dim otherhitbox As RectangleF = O.HitBox
-        otherhitbox.X += O.Position.X
-        otherhitbox.Y += O.Position.Y
+        otherhitbox.X += Change.X
+        otherhitbox.Y += Change.Y
         Dim myhitbox As RectangleF = HitBox
-        myhitbox.X += Position.X + Change.X
-        myhitbox.Y += Position.Y + Change.Y
+        myhitbox.X += Position.X
+        myhitbox.Y += Position.Y
+        If myhitbox.IntersectsWith(otherhitbox) Then
+            Dim test = True
+        End If
+
         Return myhitbox.IntersectsWith(otherhitbox)
     End Function
 

@@ -25,22 +25,22 @@
 
     Public Sub New(Room As Room)
         MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100)
-        Init(1, 100, 3, 45)
+        Init(1, 100, 5, 45)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
         MyBase.New(Image, Room, Position, 100)
-        Init(1, 100, 3, 45)
+        Init(1, 100, 5, 45)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
         MyBase.New(Image, Room, Position, Speed, 100)
-        Init(1, 100, 3, 45)
+        Init(1, 100, 5, 45)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
         MyBase.New(Image, Room, Position, Speed, Health)
-        Init(1, 100, 3, 45)
+        Init(1, 100, 5, 45)
     End Sub
 
     Public Sub Init(attackCooldown As Double, attackPower As Double, attackRange As Double, attackAngle As Double)
@@ -62,8 +62,8 @@
     Public Overridable Sub Hit(O As GameObject)
         If (Properties("AttackCooldown") <= 0.0) Then
             If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
-                O.Properties("Health") -= Properties("Attack")
-                Properties("Attack Cooldown") = "1"
+                O.Properties("Health") -= Properties("AttackPower")
+                Properties("AttackCooldown") = "1"
             End If
         End If
     End Sub
