@@ -1,4 +1,6 @@
-﻿Public Class MainForm
+﻿Imports System.Xml
+
+Public Class MainForm
     Public ReadOnly Property Version As String
         Get
             Return "Version 1.0.1_00 Beta"
@@ -20,6 +22,8 @@
     Public ViewOffsetY As Double
     Public World As World
     Public MaxFPS As Integer = 60
+    Public Options As Dictionary(Of String, String) = New Dictionary(Of String, String)
+
     Public ReadOnly Property MaxTick As Double
         Get
             Return 1 / MaxFPS
@@ -68,11 +72,13 @@
             rooms.Add(r)
         Next
 
+        LoadFiles()
+
         ' Generate the world to play in
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Actor(World.RoomAt(150, 150))
+        Player = New Player(World.RoomAt(150, 150))
         'Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
         'Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
@@ -84,6 +90,24 @@
         Loaded = True ' Keep the timer from firing until the game is done loading.
         Watch = New Stopwatch()
         Watch.Start()
+    End Sub
+
+    Private Sub LoadFiles()
+        'Options File
+        Dim optionsDoc As New XmlDocument
+        optionsDoc.Load("options.xml")
+        Dim optionsElement As XmlElement = optionsDoc("Options")
+        For Each element As XmlElement In optionsElement
+            Select Case element.Name
+                Case "Player"
+                    For Each e As XmlElement In element
+                        Select Case e.Name
+                            Case "PlayerMovementType"
+                                Options.Add("PlayerMovementType", e.GetAttribute("Type"))
+                        End Select
+                    Next
+            End Select
+        Next
     End Sub
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
@@ -131,89 +155,90 @@
     End Sub
 
     Public Sub UpdateWorld(t As Double)
-        Dim PlayerAcceleration As Double
-        Dim MaxPlayerSpeed As Double
         Dim CurrentPlayerSpeed As Double = Player.Speed.Length
         Dim PlayerMovement As Vector2
         If ControlPressed Then
             Player.Properties("Stamina") -= 1
-            PlayerAcceleration = 3
-            MaxPlayerSpeed = 13
+            Player.Properties("Acceleration") = 3
+            Player.Properties("MaxSpeed") = 13
         Else
-            PlayerAcceleration = 2
-            MaxPlayerSpeed = 8
+            Player.Properties("Acceleration") = 2
+            Player.Properties("MaxSpeed") = 8
         End If
 
         'Player arcade movement
-        If UpPressed Then
-            PlayerMovement.Y -= 1
+        If Options("PlayerMovementType") = "ArcadeMovement" Then
+            If UpPressed Then
+                PlayerMovement.Y -= 1
+            End If
+            If DownPressed Then
+                PlayerMovement.Y += 1
+            End If
+            If RightPressed Then
+                PlayerMovement.X += 1
+            End If
+            If LeftPressed Then
+                PlayerMovement.X -= 1
+            End If
+            If (UpPressed Or DownPressed Or RightPressed Or LeftPressed) AndAlso Not CurrentPlayerSpeed = 0.0 Then Player.Speed.Direction = PlayerMovement.Direction
         End If
-        If DownPressed Then
-            PlayerMovement.Y += 1
-        End If
-        If RightPressed Then
-            PlayerMovement.X += 1
-        End If
-        If LeftPressed Then
-            PlayerMovement.X -= 1
-        End If
-        If (UpPressed Or DownPressed Or RightPressed Or LeftPressed) AndAlso Not CurrentPlayerSpeed = 0.0 Then Player.Speed.Direction = PlayerMovement.Direction
 
-        ''Player tank movement
-        'PlayerMovement = CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF) - Player.Middle.XY
-        'PlayerMovement.Normalize()
+        'Player tank movement
+        If Options("PlayerMovementType") = "TankMovement" Then
+            PlayerMovement = CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF) - Player.Middle.XY
+            PlayerMovement.Normalize()
+            If UpPressed Then
+                If (Not CurrentPlayerSpeed = 0.0) Then
+                    Player.Speed.Direction = PlayerMovement.Direction
+                End If
+            ElseIf DownPressed Then
+                Player.Properties("Acceleration") /= 2
+                Player.Properties("MaxSpeed") /= 2
+                If (CurrentPlayerSpeed = 0.0) Then
+                    PlayerMovement.Direction = PlayerMovement.Direction + Math.PI
+                Else
+                    Player.Speed.Direction = PlayerMovement.Direction + Math.PI
+                End If
+            End If
 
-        'If UpPressed Then
-        '    If (Not CurrentPlayerSpeed = 0.0) Then
-        '        Player.Speed.Direction = PlayerMovement.Direction
-        '    End If
-        'ElseIf DownPressed Then
-        '    PlayerAcceleration /= 2
-        '    MaxPlayerSpeed /= 2
-        '    If (CurrentPlayerSpeed = 0.0) Then
-        '        PlayerMovement.Direction = PlayerMovement.Direction + Math.PI
-        '    Else
-        '        Player.Speed.Direction = PlayerMovement.Direction + Math.PI
-        '    End If
-        'End If
-
-        'If RightPressed AndAlso Not LeftPressed Then
-        '    PlayerAcceleration /= 1.25
-        '    MaxPlayerSpeed /= 1.25
-        '    If (CurrentPlayerSpeed = 0.0) Then
-        '        PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
-        '    Else
-        '        PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
-        '        PlayerMovement.Length = MaxPlayerSpeed
-        '        Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
-        '    End If
-        'ElseIf LeftPressed AndAlso Not RightPressed Then
-        '    PlayerAcceleration /= 1.25
-        '    MaxPlayerSpeed /= 1.25
-        '    If (CurrentPlayerSpeed = 0.0) Then
-        '        PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
-        '    Else
-        '        PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
-        '        PlayerMovement.Length = MaxPlayerSpeed
-        '        Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
-        '    End If
-        'End If
+            If RightPressed AndAlso Not LeftPressed Then
+                Player.Properties("Acceleration") /= 1.25
+                Player.Properties("MaxSpeed") /= 1.25
+                If (CurrentPlayerSpeed = 0.0) Then
+                    PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
+                Else
+                    PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
+                    PlayerMovement.Length = Player.Properties("MaxSpeed")
+                    Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
+                End If
+            ElseIf LeftPressed AndAlso Not RightPressed Then
+                Player.Properties("Acceleration") /= 1.25
+                Player.Properties("MaxSpeed") /= 1.25
+                If (CurrentPlayerSpeed = 0.0) Then
+                    PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
+                Else
+                    PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
+                    PlayerMovement.Length = Player.Properties("MaxSpeed")
+                    Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
+                End If
+            End If
+        End If
 
         'Moving the player
         If (UpPressed Xor DownPressed) Or (RightPressed Xor LeftPressed) Then
             If (CurrentPlayerSpeed = 0.0) Then
-                Player.Speed.X = PlayerMovement.X * PlayerAcceleration
-                Player.Speed.Y = PlayerMovement.Y * PlayerAcceleration
-            ElseIf (CurrentPlayerSpeed < MaxPlayerSpeed - PlayerAcceleration) Then
-                Player.Speed.Length += PlayerAcceleration / 2
-            ElseIf (CurrentPlayerSpeed > MaxPlayerSpeed + PlayerAcceleration) Then
-                Player.Speed.Length -= PlayerAcceleration
-            ElseIf (CurrentPlayerSpeed <> MaxPlayerSpeed) Then
-                Player.Speed.Length = MaxPlayerSpeed
+                Player.Speed.X = PlayerMovement.X * Player.Properties("Acceleration")
+                Player.Speed.Y = PlayerMovement.Y * Player.Properties("Acceleration")
+            ElseIf (CurrentPlayerSpeed < Player.Properties("MaxSpeed") - Player.Properties("Acceleration")) Then
+                Player.Speed.Length += Player.Properties("Acceleration") / 2
+            ElseIf (CurrentPlayerSpeed > CDbl(Player.Properties("MaxSpeed")) + Player.Properties("Acceleration")) Then
+                Player.Speed.Length -= Player.Properties("Acceleration")
+            ElseIf (CurrentPlayerSpeed <> Player.Properties("MaxSpeed")) Then
+                Player.Speed.Length = Player.Properties("MaxSpeed")
             End If
         Else
-            If (CurrentPlayerSpeed > PlayerAcceleration) Then
-                Player.Speed.Length -= PlayerAcceleration
+            If (CurrentPlayerSpeed > Player.Properties("Acceleration")) Then
+                Player.Speed.Length -= Player.Properties("Acceleration")
             ElseIf (CurrentPlayerSpeed <> 0.0) Then
                 Player.Speed.Length = 0.0
             End If
@@ -296,7 +321,7 @@
                 'ToDo: If Direction is not South/North/West/East places in default (top left corner) of room
                 Select Case Player.Direction
                     Case Actor.ActorDirection.South
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -304,7 +329,7 @@
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.North
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
@@ -312,7 +337,7 @@
                             Y = Player.Position.Y + Player.Image.Height - 3
                         End If
                     Case Actor.ActorDirection.West
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         Else
@@ -320,7 +345,7 @@
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         End If
                     Case Actor.ActorDirection.East
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         Else
@@ -328,7 +353,7 @@
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         End If
                     Case Actor.ActorDirection.SouthWest
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -336,7 +361,7 @@
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.SouthEast
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -344,7 +369,7 @@
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.NorthWest
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
@@ -352,7 +377,7 @@
                             Y = Player.Position.Y + Player.Image.Height - 3
                         End If
                     Case Actor.ActorDirection.NorthEast
-                        If (Not UpPressed) Then
+                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
