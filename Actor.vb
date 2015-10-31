@@ -25,26 +25,27 @@
 
     Public Sub New(Room As Room)
         MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100)
-        Init(1, 100, 5, 45)
+        Init(1, 100, 5, 45, 100)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
         MyBase.New(Image, Room, Position, 100)
-        Init(1, 100, 5, 45)
+        Init(1, 100, 5, 45, 100)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
         MyBase.New(Image, Room, Position, Speed, 100)
-        Init(1, 100, 5, 45)
+        Init(1, 100, 5, 45, 100)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
         MyBase.New(Image, Room, Position, Speed, Health)
-        Init(1, 100, 5, 45)
+        Init(1, 100, 5, 45, 100)
     End Sub
 
-    Public Sub Init(attackCooldown As Double, attackPower As Double, attackRange As Double, attackAngle As Double)
+    Public Sub Init(attackCooldown As Double, attackPower As Double, attackRange As Double, attackAngle As Double, stamina As Double)
         HitBox = New RectangleF(0, 22, 16, 10)
+        Properties.Add("Stamina", stamina)
         Properties.Add("AttackCooldown", attackCooldown)
         Properties.Add("AttackPower", attackPower)
         Properties.Add("AttackRange", attackRange)

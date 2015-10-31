@@ -6,9 +6,13 @@
             Return Math.Sqrt(Math.Pow(X, 2) + Math.Pow(Y, 2))
         End Get
         Set(value As Double)
-            Normalize()
-            X = X * value
-            Y = Y * value
+            If (Not Length = 0.0) Then
+                Normalize()
+                X = X * value
+                Y = Y * value
+            Else
+                Throw New InvalidOperationException("Cannot change length of a zero vector.")
+            End If
         End Set
     End Property
     Public Property Direction As Double
@@ -16,15 +20,23 @@
             Return Math.Atan2(Y, X)
         End Get
         Set(value As Double)
-            Dim l As Double = Length
-            X = l * Math.Cos(value)
-            Y = l * Math.Sin(value)
+            If (Not Length = 0.0) Then
+                Dim l As Double = Length
+                X = l * Math.Cos(value)
+                Y = l * Math.Sin(value)
+            Else
+                Throw New InvalidOperationException("Cannot change direction of a zero vector.")
+            End If
         End Set
     End Property
     Public Sub Normalize()
-        Dim l As Double = Length
-        X = X / l
-        Y = Y / l
+        If (Not Length = 0.0) Then
+            Dim l As Double = Length
+            X = X / l
+            Y = Y / l
+        Else
+            Throw New InvalidOperationException("Cannot normalize a zero vector.")
+        End If
     End Sub
 
     Public Sub New(X As Double, Y As Double)
