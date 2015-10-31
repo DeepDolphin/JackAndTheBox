@@ -1,5 +1,13 @@
 <Options>
-  <Player>
-    <PlayerMovementType Type="ArcadeMovement"/>
-  </Player>
+  <Preferences>
+    <PlayerMovementType Value="ArcadeMovement" />
+    <MaxFPS Value="60" />
+  </Preferences>
+  <OIMap>
+    <Up KeyCode="87" />
+    <Down KeyCode="83" />
+    <Right KeyCode="68" />
+    <Left KeyCode="65" />
+    <Sprint KeyCode="17" />
+  </OIMap>
 </Options>

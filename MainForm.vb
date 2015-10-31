@@ -1,17 +1,9 @@
-﻿Imports System.Xml
-
-Public Class MainForm
+﻿Public Class MainForm
     Public ReadOnly Property Version As String
         Get
             Return "Version 1.0.1_00 Beta"
         End Get
     End Property
-
-    Public UpPressed As Boolean
-    Public DownPressed As Boolean
-    Public RightPressed As Boolean
-    Public LeftPressed As Boolean
-    Public ControlPressed As Boolean
 
     Public Player As Actor
     Public Mouse As PointF
@@ -21,12 +13,11 @@ Public Class MainForm
     Public ViewOffsetX As Double
     Public ViewOffsetY As Double
     Public World As World
-    Public MaxFPS As Integer = 60
-    Public Options As Dictionary(Of String, String) = New Dictionary(Of String, String)
+    Public Options As Options
 
     Public ReadOnly Property MaxTick As Double
         Get
-            Return 1 / MaxFPS
+            Return 1 / Options.Preferences("MaxFPS")
         End Get
     End Property
     Public ReadOnly Property ScreenWidth As Integer
@@ -93,21 +84,7 @@ Public Class MainForm
     End Sub
 
     Private Sub LoadFiles()
-        'Options File
-        Dim optionsDoc As New XmlDocument
-        optionsDoc.Load("options.xml")
-        Dim optionsElement As XmlElement = optionsDoc("Options")
-        For Each element As XmlElement In optionsElement
-            Select Case element.Name
-                Case "Player"
-                    For Each e As XmlElement In element
-                        Select Case e.Name
-                            Case "PlayerMovementType"
-                                Options.Add("PlayerMovementType", e.GetAttribute("Type"))
-                        End Select
-                    Next
-            End Select
-        Next
+        Options = New Options()
     End Sub
 
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
@@ -157,7 +134,7 @@ Public Class MainForm
     Public Sub UpdateWorld(t As Double)
         Dim CurrentPlayerSpeed As Double = Player.Speed.Length
         Dim PlayerMovement As Vector2
-        If ControlPressed Then
+        If Options.OIStatus("Sprint") Then
             Player.Properties("Stamina") -= 1
             Player.Properties("Acceleration") = 3
             Player.Properties("MaxSpeed") = 13
@@ -167,31 +144,31 @@ Public Class MainForm
         End If
 
         'Player arcade movement
-        If Options("PlayerMovementType") = "ArcadeMovement" Then
-            If UpPressed Then
+        If Options.Preferences("PlayerMovementType") = "ArcadeMovement" Then
+            If Options.OIStatus("Up") Then
                 PlayerMovement.Y -= 1
             End If
-            If DownPressed Then
+            If Options.OIStatus("Down") Then
                 PlayerMovement.Y += 1
             End If
-            If RightPressed Then
+            If Options.OIStatus("Right") Then
                 PlayerMovement.X += 1
             End If
-            If LeftPressed Then
+            If Options.OIStatus("Left") Then
                 PlayerMovement.X -= 1
             End If
-            If (UpPressed Or DownPressed Or RightPressed Or LeftPressed) AndAlso Not CurrentPlayerSpeed = 0.0 Then Player.Speed.Direction = PlayerMovement.Direction
+            If (Options.OIStatus("Up") Or Options.OIStatus("Down") Or Options.OIStatus("Right") Or Options.OIStatus("Left")) AndAlso Not CurrentPlayerSpeed = 0.0 Then Player.Speed.Direction = PlayerMovement.Direction
         End If
 
         'Player tank movement
-        If Options("PlayerMovementType") = "TankMovement" Then
+        If Options.Preferences("PlayerMovementType") = "TankMovement" Then
             PlayerMovement = CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF) - Player.Middle.XY
             PlayerMovement.Normalize()
-            If UpPressed Then
+            If Options.OIStatus("Up") Then
                 If (Not CurrentPlayerSpeed = 0.0) Then
                     Player.Speed.Direction = PlayerMovement.Direction
                 End If
-            ElseIf DownPressed Then
+            ElseIf Options.OIStatus("Down") Then
                 Player.Properties("Acceleration") /= 2
                 Player.Properties("MaxSpeed") /= 2
                 If (CurrentPlayerSpeed = 0.0) Then
@@ -201,7 +178,7 @@ Public Class MainForm
                 End If
             End If
 
-            If RightPressed AndAlso Not LeftPressed Then
+            If Options.OIStatus("Right") AndAlso Not Options.OIStatus("Left") Then
                 Player.Properties("Acceleration") /= 1.25
                 Player.Properties("MaxSpeed") /= 1.25
                 If (CurrentPlayerSpeed = 0.0) Then
@@ -211,7 +188,7 @@ Public Class MainForm
                     PlayerMovement.Length = Player.Properties("MaxSpeed")
                     Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
                 End If
-            ElseIf LeftPressed AndAlso Not RightPressed Then
+            ElseIf Options.OIStatus("Left") AndAlso Not Options.OIStatus("Right") Then
                 Player.Properties("Acceleration") /= 1.25
                 Player.Properties("MaxSpeed") /= 1.25
                 If (CurrentPlayerSpeed = 0.0) Then
@@ -225,7 +202,7 @@ Public Class MainForm
         End If
 
         'Moving the player
-        If (UpPressed Xor DownPressed) Or (RightPressed Xor LeftPressed) Then
+        If (Options.OIStatus("Up") Xor Options.OIStatus("Down")) Or (Options.OIStatus("Right") Xor Options.OIStatus("Left")) Then
             If (CurrentPlayerSpeed = 0.0) Then
                 Player.Speed.X = PlayerMovement.X * Player.Properties("Acceleration")
                 Player.Speed.Y = PlayerMovement.Y * Player.Properties("Acceleration")
@@ -303,25 +280,20 @@ Public Class MainForm
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.KeyCode = key) Then
+                Options.OIStatus(Options.OIMap(key)) = True
+            End If
+        Next
+
 
         Select Case e.KeyCode
-            Case Keys.W
-                UpPressed = True
-            Case Keys.S
-                DownPressed = True
-            Case Keys.A
-                LeftPressed = True
-            Case Keys.D
-                RightPressed = True
-            Case Keys.ControlKey
-                ControlPressed = True
             Case Keys.Space
                 Dim X As Integer
                 Dim Y As Integer
-                'ToDo: If Direction is not South/North/West/East places in default (top left corner) of room
                 Select Case Player.Direction
                     Case Actor.ActorDirection.South
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -329,7 +301,7 @@ Public Class MainForm
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.North
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
@@ -337,7 +309,7 @@ Public Class MainForm
                             Y = Player.Position.Y + Player.Image.Height - 3
                         End If
                     Case Actor.ActorDirection.West
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         Else
@@ -345,7 +317,7 @@ Public Class MainForm
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         End If
                     Case Actor.ActorDirection.East
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         Else
@@ -353,7 +325,7 @@ Public Class MainForm
                             Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
                         End If
                     Case Actor.ActorDirection.SouthWest
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -361,7 +333,7 @@ Public Class MainForm
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.SouthEast
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y + Player.Image.Height + 1
                         Else
@@ -369,7 +341,7 @@ Public Class MainForm
                             Y = Player.Position.Y - My.Resources.Crate.Height + 20
                         End If
                     Case Actor.ActorDirection.NorthWest
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X - My.Resources.Crate.Width - 1
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
@@ -377,7 +349,7 @@ Public Class MainForm
                             Y = Player.Position.Y + Player.Image.Height - 3
                         End If
                     Case Actor.ActorDirection.NorthEast
-                        If (Not UpPressed Or Options("PlayerMovementType") = "ArcadeMovement") Then
+                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                             X = Player.Position.X + Player.Image.Width + 1
                             Y = Player.Position.Y - My.Resources.Crate.Height + 16
                         Else
@@ -401,19 +373,11 @@ Public Class MainForm
     End Sub
 
     Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-
-        Select Case e.KeyCode
-            Case Keys.W
-                UpPressed = False
-            Case Keys.S
-                DownPressed = False
-            Case Keys.A
-                LeftPressed = False
-            Case Keys.D
-                RightPressed = False
-            Case Keys.ControlKey
-                ControlPressed = False
-        End Select
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.KeyCode = key) Then
+                Options.OIStatus(Options.OIMap(key)) = False
+            End If
+        Next
     End Sub
 
     Protected Overrides Function IsInputKey(
@@ -436,5 +400,9 @@ Public Class MainForm
         Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
         Player.Direction = Actor.ToActorDirection(direction)
         Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
+    End Sub
+
+    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Options.SaveOptions()
     End Sub
 End Class
