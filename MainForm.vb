@@ -5,7 +5,7 @@
         End Get
     End Property
 
-    Public Player As Actor
+    Public Player As Player
     Public Mouse As PointF
     Public GroundBrush As TextureBrush
     Public WallBrush As TextureBrush
@@ -103,14 +103,10 @@
             Next
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
-        e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
-        e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 100, 100)
-        e.Graphics.DrawString(Player.Properties("AttackCooldown"), SystemFonts.CaptionFont, Brushes.Red, 200, 100)
-        e.Graphics.DrawString(Player.Speed.Y, SystemFonts.CaptionFont, Brushes.Red, 0, 10)
-        e.Graphics.DrawString(Player.Speed.X, SystemFonts.CaptionFont, Brushes.Red, 0, 20)
-        e.Graphics.DrawString(Mouse.ToString, SystemFonts.CaptionFont, Brushes.Red, 0, 30)
-        e.Graphics.DrawString((Mouse - Player.Middle.XY).Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
-        e.Graphics.DrawString(CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF).ToString, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
+        e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
+        e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
+        e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
+        e.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
     End Sub
 
     Private Watch As Stopwatch
@@ -132,101 +128,14 @@
     End Sub
 
     Public Sub UpdateWorld(t As Double)
-        Dim CurrentPlayerSpeed As Double = Player.Speed.Length
-        Dim PlayerMovement As Vector2
-        If Options.OIStatus("Sprint") Then
-            Player.Properties("Stamina") -= 1
-            Player.Properties("Acceleration") = 3
-            Player.Properties("MaxSpeed") = 13
-        Else
-            Player.Properties("Acceleration") = 2
-            Player.Properties("MaxSpeed") = 8
-        End If
-
-        'Player arcade movement
-        If Options.Preferences("PlayerMovementType") = "ArcadeMovement" Then
-            If Options.OIStatus("Up") Then
-                PlayerMovement.Y -= 1
-            End If
-            If Options.OIStatus("Down") Then
-                PlayerMovement.Y += 1
-            End If
-            If Options.OIStatus("Right") Then
-                PlayerMovement.X += 1
-            End If
-            If Options.OIStatus("Left") Then
-                PlayerMovement.X -= 1
-            End If
-            If (Options.OIStatus("Up") Or Options.OIStatus("Down") Or Options.OIStatus("Right") Or Options.OIStatus("Left")) AndAlso Not CurrentPlayerSpeed = 0.0 Then Player.Speed.Direction = PlayerMovement.Direction
-        End If
-
-        'Player tank movement
-        If Options.Preferences("PlayerMovementType") = "TankMovement" Then
-            PlayerMovement = CType((Cursor.Position + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset) - Bounds.Location - New Size(8, 31)), PointF) - Player.Middle.XY
-            PlayerMovement.Normalize()
-            If Options.OIStatus("Up") Then
-                If (Not CurrentPlayerSpeed = 0.0) Then
-                    Player.Speed.Direction = PlayerMovement.Direction
-                End If
-            ElseIf Options.OIStatus("Down") Then
-                Player.Properties("Acceleration") /= 2
-                Player.Properties("MaxSpeed") /= 2
-                If (CurrentPlayerSpeed = 0.0) Then
-                    PlayerMovement.Direction = PlayerMovement.Direction + Math.PI
-                Else
-                    Player.Speed.Direction = PlayerMovement.Direction + Math.PI
-                End If
-            End If
-
-            If Options.OIStatus("Right") AndAlso Not Options.OIStatus("Left") Then
-                Player.Properties("Acceleration") /= 1.25
-                Player.Properties("MaxSpeed") /= 1.25
-                If (CurrentPlayerSpeed = 0.0) Then
-                    PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
-                Else
-                    PlayerMovement.Direction = PlayerMovement.Direction + (Math.PI / 2)
-                    PlayerMovement.Length = Player.Properties("MaxSpeed")
-                    Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
-                End If
-            ElseIf Options.OIStatus("Left") AndAlso Not Options.OIStatus("Right") Then
-                Player.Properties("Acceleration") /= 1.25
-                Player.Properties("MaxSpeed") /= 1.25
-                If (CurrentPlayerSpeed = 0.0) Then
-                    PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
-                Else
-                    PlayerMovement.Direction = PlayerMovement.Direction - (Math.PI / 2)
-                    PlayerMovement.Length = Player.Properties("MaxSpeed")
-                    Player.Speed.Direction = (PlayerMovement + Player.Speed).Direction
-                End If
-            End If
-        End If
-
-        'Moving the player
-        If (Options.OIStatus("Up") Xor Options.OIStatus("Down")) Or (Options.OIStatus("Right") Xor Options.OIStatus("Left")) Then
-            If (CurrentPlayerSpeed = 0.0) Then
-                Player.Speed.X = PlayerMovement.X * Player.Properties("Acceleration")
-                Player.Speed.Y = PlayerMovement.Y * Player.Properties("Acceleration")
-            ElseIf (CurrentPlayerSpeed < Player.Properties("MaxSpeed") - Player.Properties("Acceleration")) Then
-                Player.Speed.Length += Player.Properties("Acceleration") / 2
-            ElseIf (CurrentPlayerSpeed > CDbl(Player.Properties("MaxSpeed")) + Player.Properties("Acceleration")) Then
-                Player.Speed.Length -= Player.Properties("Acceleration")
-            ElseIf (CurrentPlayerSpeed <> Player.Properties("MaxSpeed")) Then
-                Player.Speed.Length = Player.Properties("MaxSpeed")
-            End If
-        Else
-            If (CurrentPlayerSpeed > Player.Properties("Acceleration")) Then
-                Player.Speed.Length -= Player.Properties("Acceleration")
-            ElseIf (CurrentPlayerSpeed <> 0.0) Then
-                Player.Speed.Length = 0.0
-            End If
-        End If
+        Player.UpdateMovement(t, Options.OIStatus)
 
         'Moving all objects
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
                 If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
-                    Dim newx As Double = O.Position.X + (O.Speed.X * t * O.HitBox.Width)
-                    Dim newy As Double = O.Position.Y + (O.Speed.Y * t * O.HitBox.Height)
+                    Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
+                    Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
                     Dim good As Boolean = True
                     For Each other As GameObject In r.GameObjects
                         If other.Equals(O) Then Continue For
