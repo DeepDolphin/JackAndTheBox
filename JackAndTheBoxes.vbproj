@@ -100,6 +100,7 @@
     </Compile>
     <Compile Include="Objective.vb" />
     <Compile Include="Options.vb" />
+    <Compile Include="Player.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Sprite.vb" />
     <Compile Include="Vectors.vb" />

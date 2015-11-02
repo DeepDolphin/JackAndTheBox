@@ -49,6 +49,7 @@ Public Class Options
         OIMap.Add(Keys.D, "Right")
         OIMap.Add(Keys.A, "Left")
         OIMap.Add(Keys.ControlKey, "Sprint")
+        OIMap.Add(Keys.Space, "PlaceCrate")
 
         'OIStatus:
         'Movement:
@@ -57,6 +58,7 @@ Public Class Options
         OIStatus.Add("Right", False)
         OIStatus.Add("Left", False)
         OIStatus.Add("Sprint", False)
+        OIStatus.Add("PlaceCrate", False)
     End Sub
 
     Public Sub SaveOptions()

@@ -40,7 +40,7 @@ Partial Class MainForm
         Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
         Me.MaximizeBox = False
         Me.Name = "MainForm"
-        Me.Text = "Jack And The Box"
+        Me.Text = "Jack And The Boxes"
         Me.ResumeLayout(False)
 
     End Sub

@@ -66,13 +66,13 @@
         End If
     End Sub
 
-    Public Overridable Function CollidesWith(O As GameObject, Change As Vector2) As Boolean
+    Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector2) As Boolean
         'If not on the same level it won't collide
-        If (O.Position.Z <> Position.Z) Then Return False
+        If (Other.Position.Z <> Position.Z) Then Return False
 
-        Dim otherhitbox As RectangleF = O.HitBox
-        otherhitbox.X += Change.X
-        otherhitbox.Y += Change.Y
+        Dim otherhitbox As RectangleF = Other.HitBox
+        otherhitbox.X += OtherPosition.X
+        otherhitbox.Y += OtherPosition.Y
         Dim myhitbox As RectangleF = HitBox
         myhitbox.X += Position.X
         myhitbox.Y += Position.Y
@@ -83,8 +83,8 @@
         Return myhitbox.IntersectsWith(otherhitbox)
     End Function
 
-    Public Overridable Function CollidesWith(O As GameObject, Change As Vector3) As Boolean
-        Return If(O.Position.Z <> Position.Z + Change.Z, False, CollidesWith(O, Change.XY))
+    Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector3) As Boolean
+        Return If(OtherPosition.Z <> Position.Z, False, CollidesWith(Other, OtherPosition.XY))
     End Function
 
     Public Function getDistanceTo(O As GameObject) As Double

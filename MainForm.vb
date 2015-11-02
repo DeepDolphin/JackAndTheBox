@@ -5,6 +5,8 @@
         End Get
     End Property
 
+    Public ToAddWaitlist As New Dictionary(Of GameObject, Room)
+
     Public Player As Player
     Public Mouse As PointF
     Public GroundBrush As TextureBrush
@@ -14,6 +16,8 @@
     Public ViewOffsetY As Double
     Public World As World
     Public Options As Options
+
+    Public test As Double
 
     Public ReadOnly Property MaxTick As Double
         Get
@@ -102,6 +106,7 @@
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
         e.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
+        e.Graphics.DrawString(test, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
     End Sub
 
     Private Watch As Stopwatch
@@ -123,8 +128,6 @@
     End Sub
 
     Public Sub UpdateWorld(t As Double)
-        Player.UpdateMovement(t, Options.OIStatus)
-
         'Moving all objects
         For Each r As Room In World.Rooms
             For Each O As GameObject In r.GameObjects
@@ -147,6 +150,24 @@
                     End If
                 End If
                 O.Update(t)
+            Next
+
+            'Add all objects waiting to be added
+            For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
+                Dim GameObject As GameObject = ToAddWaitlist.Keys(value)
+                If (ToAddWaitlist(GameObject).Equals(r)) Then
+                    Dim good As Boolean = True
+                    For Each o As GameObject In r.GameObjects
+                        If o.CollidesWith(GameObject, GameObject.Position) Then
+                            good = False
+                            Exit For
+                        End If
+                    Next
+                    If good Then
+                        r.AddGameObject(GameObject)
+                        ToAddWaitlist.Remove(GameObject)
+                    End If
+                End If
             Next
 
             'Delete all items flagged for deletion
@@ -189,91 +210,6 @@
                 Options.OIStatus(Options.OIMap(key)) = True
             End If
         Next
-
-
-        Select Case e.KeyCode
-            Case Keys.Space
-                Dim X As Integer
-                Dim Y As Integer
-                Select Case Player.Direction
-                    Case Actor.ActorDirection.South
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X
-                            Y = Player.Position.Y + Player.Image.Height + 1
-                        Else
-                            X = Player.Position.X
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 20
-                        End If
-                    Case Actor.ActorDirection.North
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 16
-                        Else
-                            X = Player.Position.X
-                            Y = Player.Position.Y + Player.Image.Height - 3
-                        End If
-                    Case Actor.ActorDirection.West
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
-                        Else
-                            X = Player.Position.X + Player.Image.Width
-                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
-                        End If
-                    Case Actor.ActorDirection.East
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X + Player.Image.Width + 1
-                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
-                        Else
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y + Player.Image.Height - My.Resources.Crate.Height
-                        End If
-                    Case Actor.ActorDirection.SouthWest
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y + Player.Image.Height + 1
-                        Else
-                            X = Player.Position.X + Player.Image.Width
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 20
-                        End If
-                    Case Actor.ActorDirection.SouthEast
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X + Player.Image.Width + 1
-                            Y = Player.Position.Y + Player.Image.Height + 1
-                        Else
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 20
-                        End If
-                    Case Actor.ActorDirection.NorthWest
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 16
-                        Else
-                            X = Player.Position.X + Player.Image.Width
-                            Y = Player.Position.Y + Player.Image.Height - 3
-                        End If
-                    Case Actor.ActorDirection.NorthEast
-                        If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                            X = Player.Position.X + Player.Image.Width + 1
-                            Y = Player.Position.Y - My.Resources.Crate.Height + 16
-                        Else
-                            X = Player.Position.X - My.Resources.Crate.Width - 1
-                            Y = Player.Position.Y + Player.Image.Height - 3
-                        End If
-                End Select
-                Dim newcrate As New GameObject(My.Resources.Crate, Player.Room, New Vector3(X, Y, 0), 10)
-                Dim good As Boolean = True
-
-                For Each o As GameObject In Player.Room.GameObjects
-                    If o.CollidesWith(newcrate, New Vector2(X, Y)) Then
-                        good = False
-                        Exit For
-                    End If
-                Next
-                If good Then
-                    Player.Room.AddGameObject(newcrate)
-                End If
-        End Select
     End Sub
 
     Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
@@ -308,5 +244,9 @@
 
     Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         Options.SaveOptions()
+    End Sub
+
+    Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
+        test = e.Delta / 120
     End Sub
 End Class
