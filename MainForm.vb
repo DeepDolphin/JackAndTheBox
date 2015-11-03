@@ -122,7 +122,11 @@
         While Watch.Elapsed.TotalSeconds < MaxTick
             Threading.Thread.Sleep(1)
         End While
-        UpdateWorld(Watch.Elapsed.TotalSeconds)
+        If (Not Options.OIStatus("Pause")) Then
+            UpdateWorld(Watch.Elapsed.TotalSeconds)
+        Else
+            UpdateWorld(Watch.Elapsed.TotalSeconds / 25) 'Slow down time like a boss [For testing purposes] (maybe an added feature?)
+        End If
         _tick = Watch.Elapsed.TotalSeconds
         Watch.Restart()
     End Sub
@@ -165,6 +169,8 @@
                     Next
                     If good Then
                         r.AddGameObject(GameObject)
+                        ToAddWaitlist.Remove(GameObject)
+                    Else
                         ToAddWaitlist.Remove(GameObject)
                     End If
                 End If

@@ -13,7 +13,7 @@ Public Class Options
 
 
         'Options File Import/Creation
-        If (IO.File.Exists("options.xml")) Then
+        If (IO.File.Exists("options.xml") And False) Then 'For now always init (for debugging purposes)
             Dim optionsDoc As New XmlDocument
             optionsDoc.Load("options.xml")
             Dim options As XmlElement = optionsDoc("Options")
@@ -50,6 +50,7 @@ Public Class Options
         OIMap.Add(Keys.A, "Left")
         OIMap.Add(Keys.ControlKey, "Sprint")
         OIMap.Add(Keys.Space, "PlaceCrate")
+        OIMap.Add(Keys.Enter, "Pause")
 
         'OIStatus:
         'Movement:
@@ -59,6 +60,7 @@ Public Class Options
         OIStatus.Add("Left", False)
         OIStatus.Add("Sprint", False)
         OIStatus.Add("PlaceCrate", False)
+        OIStatus.Add("Pause", False)
     End Sub
 
     Public Sub SaveOptions()
