@@ -6,7 +6,7 @@
     End Property
 
     Public ToAddWaitlist As New Dictionary(Of GameObject, Room)
-
+    Public ShadeBrush As SolidBrush
     Public Player As Player
     Public Mouse As PointF
     Public GroundBrush As TextureBrush
@@ -48,6 +48,7 @@
 
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
         WallBrush = New TextureBrush(My.Resources.WallStrip)
+        ShadeBrush = New SolidBrush(Color.FromArgb(150, 0, 0, 0))
 
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
@@ -92,14 +93,19 @@
             e.Graphics.FillRectangle(GroundBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
             e.Graphics.DrawImage(My.Resources.GradientLeft, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
             e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            If r.Equals(Player.Room) = False Then
+                e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
+            End If
         Next
         For Each r As Room In World.Rooms
-            For Each o As GameObject In r.GameObjects
-                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
-            Next
-            For Each O As GameObject In r.GameObjects
-                e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
-            Next
+            If r.Equals(Player.Room) Then
+                For Each o As GameObject In r.GameObjects
+                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                Next
+                For Each O As GameObject In r.GameObjects
+                    e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                Next
+            End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
         e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
@@ -133,8 +139,9 @@
 
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
-        For Each r As Room In World.Rooms
-            For Each O As GameObject In r.GameObjects
+        Dim r As Room = Player.Room
+
+        For Each O As GameObject In r.GameObjects
                 If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
                     Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
                     Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
@@ -187,8 +194,7 @@
                 Objective.Update(t)
             Next
 
-            r.ResortGameObjects()
-        Next
+        r.ResortGameObjects()
 
         If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
