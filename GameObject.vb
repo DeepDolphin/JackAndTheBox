@@ -99,4 +99,16 @@
         Return Math.Atan2(point.Y - Middle.Y, point.X - Middle.X)
     End Function
 
+    Public Function getNearList(range As Double) As List(Of GameObject)
+        Dim objectList As List(Of GameObject) = New List(Of GameObject)
+        Dim realRange As Double = range * HitBox.Width
+
+        For Each gameObject As GameObject In Room.GameObjects
+            If Not gameObject.Equals(Me) AndAlso getDistanceTo(gameObject) <= realRange Then
+                objectList.Add(gameObject)
+            End If
+        Next
+
+        Return objectList
+    End Function
 End Class

@@ -87,6 +87,10 @@
         Options = New Options()
     End Sub
 
+    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Options.SaveOptions()
+    End Sub
+
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
             e.Graphics.FillRectangle(WallBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
@@ -214,6 +218,8 @@
         GroundBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.FloorTile.Width), CInt(-Player.Position.Y Mod My.Resources.FloorTile.Height))
         WallBrush.ResetTransform()
         WallBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Position.Y Mod My.Resources.WallStrip.Height + 2))
+
+        test = 0
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -235,17 +241,22 @@
     Protected Overrides Function IsInputKey(
         ByVal keyData As Keys) As Boolean
         Return True
-
     End Function
 
-    Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
-        Select Case e.Button
-            Case MouseButtons.Left
-                For Each gameObject As GameObject In Player.getNearList(Player.Properties("AttackRange"), Player.Properties("AttackAngle"))
-                    Player.Hit(gameObject)
-                Next
+    Private Sub MainForm_MouseDown(sender As Object, e As MouseEventArgs) Handles MyBase.MouseDown
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.Button = key) Then
+                Options.OIStatus(Options.OIMap(key)) = True
+            End If
+        Next
+    End Sub
 
-        End Select
+    Private Sub MainForm_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.Button = key) Then
+                Options.OIStatus(Options.OIMap(key)) = False
+            End If
+        Next
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
@@ -254,11 +265,9 @@
         Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
     End Sub
 
-    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        Options.SaveOptions()
-    End Sub
-
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
         test = e.Delta / 120
     End Sub
+
+
 End Class

@@ -83,12 +83,18 @@
         If (Properties("AttackCurrentCooldown") <= 0.0) Then
             If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
                 O.Properties("Health") -= Properties("AttackPower")
-                Properties("AttackCurrentCooldown") = Properties("AttackMaxCooldown")
             End If
         End If
     End Sub
 
-    Public Function getNearList(range As Double, angle As Double) As List(Of GameObject)
+    Public Overridable Sub Hit(OList As List(Of GameObject))
+        For Each gameObject As GameObject In OList
+            Hit(gameObject)
+        Next
+        Properties("AttackCurrentCooldown") = Properties("AttackMaxCooldown")
+    End Sub
+
+    Public Overloads Function getNearList(range As Double, angle As Double) As List(Of GameObject)
         Dim objectList As List(Of GameObject) = New List(Of GameObject)
         Dim realRange As Double = range * HitBox.Width
 

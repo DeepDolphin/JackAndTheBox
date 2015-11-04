@@ -15,7 +15,7 @@
 
     End Sub
 
-    Public Sub UpdateMovement(t As Double)
+    Private Sub UpdateMovement(t As Double)
         Dim CurrentPlayerSpeed As Double = Speed.Length
         Dim PlayerMovement As Vector2
         If Options.OIStatus("Sprint") AndAlso Properties("CurrentStamina") > 0.0 Then
@@ -107,11 +107,12 @@
 
     End Sub
 
-    Public Sub UpdateActions(t As Double)
+    Private Sub UpdateActions(t As Double)
         If Options.OIStatus("PlaceCrate") Then PlaceCrate()
+        If Options.OIStatus("AttackSkill") Then AttackSkill()
     End Sub
 
-    Public Sub PlaceCrate()
+    Private Sub PlaceCrate()
         Dim X As Integer
         Dim Y As Integer
         Select Case Direction
@@ -181,6 +182,10 @@
                 End If
         End Select
 
-        MainForm.ToAddWaitlist.Add(New GameObject(My.Resources.Crate, Room, New Vector3(X, Y, 0), 10), Room)
+        MainForm.ToAddWaitlist.Add(New Crate(Room, New Vector3(X, Y, 0), 10), Room)
+    End Sub
+
+    Private Sub AttackSkill()
+        Hit(getNearList(Properties("AttackRange"), Properties("AttackAngle")))
     End Sub
 End Class
