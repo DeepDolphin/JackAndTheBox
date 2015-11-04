@@ -75,6 +75,7 @@
     <Compile Include="Actor.vb" />
     <Compile Include="Crate.vb" />
     <Compile Include="Enemy.vb" />
+    <Compile Include="EXPOrb.vb" />
     <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
     </Compile>

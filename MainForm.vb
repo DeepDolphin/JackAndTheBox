@@ -104,10 +104,10 @@
         For Each r As Room In World.Rooms
             If r.Equals(Player.Room) Then
                 For Each o As GameObject In r.GameObjects
-                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Sprite.Height - 7 - ViewOffsetY + r.YOffset), o.Sprite.Width, 10)
                 Next
                 For Each O As GameObject In r.GameObjects
-                    e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                    e.Graphics.DrawImage(O.Sprite.CurrentFrame, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Sprite.Width, O.Sprite.Height)
                 Next
             End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
