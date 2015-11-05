@@ -17,6 +17,8 @@
     Public World As World
     Public Options As Options
 
+    Public expOrb As New List(Of Bitmap)
+
     Public test As Double
 
     Public ReadOnly Property MaxTick As Double
@@ -68,13 +70,18 @@
         ' Generate the world to play in
         World = New World("DavidAndBen", rooms)
 
+        expOrb.Add(My.Resources.EXPOrb1)
+        expOrb.Add(My.Resources.EXPOrb2)
+        expOrb.Add(My.Resources.EXPOrb3)
+        expOrb.Add(My.Resources.EXPOrb4)
+
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
-        'Dim TestObject1 = New NormalEnemy(PlayerRoom, 200, 200)
+        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
         Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
         World.Rooms(0).AddGameObject(Player)
-        'World.Rooms(0).AddGameObject(TestObject1)
+        World.Rooms(0).AddGameObject(TestObject1)
         World.Rooms(0).AddGameObject(TestObject2)
 
 
