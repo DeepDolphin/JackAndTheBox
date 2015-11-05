@@ -94,12 +94,16 @@
             e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
         Next
         For Each r As Room In World.Rooms
-            For Each o As GameObject In r.GameObjects
-                If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
-            Next
-            For Each O As GameObject In r.GameObjects
-                e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
-            Next
+            If r.Equals(PlayerRoom) Then
+                For Each o As GameObject In r.GameObjects
+                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                Next
+                For Each O As GameObject In r.GameObjects
+                    e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                Next
+            Else
+
+            End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
         e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
@@ -133,8 +137,10 @@
 
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
-        For Each r As Room In World.Rooms
-            For Each O As GameObject In r.GameObjects
+        'For Each r As Room In World.Rooms
+        Dim r As Room = PlayerRoom
+
+        For Each O As GameObject In r.GameObjects
                 If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
                     Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
                     Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
@@ -188,9 +194,9 @@
             Next
 
             r.ResortGameObjects()
-        Next
+            'Next
 
-        If IsNothing(PlayerRoom) = False Then
+            If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
