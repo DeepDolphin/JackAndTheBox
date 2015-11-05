@@ -73,7 +73,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Actor.vb" />
+    <Compile Include="Crate.vb" />
     <Compile Include="Enemy.vb" />
+    <Compile Include="EXPOrb.vb" />
     <Compile Include="MainForm.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -82,7 +84,6 @@
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GameObject.vb" />
-    <Compile Include="Map.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -130,9 +131,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\smiley.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\CharacterUp1.png" />
   </ItemGroup>
   <ItemGroup>
@@ -155,6 +153,7 @@
     <None Include="Resources\EXPOrb2.png" />
     <None Include="Resources\EXPOrb3.png" />
     <None Include="Resources\EXPOrb4.png" />
+    <None Include="Resources\telepad.png" />
     <Content Include="Rooms\down.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

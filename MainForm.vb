@@ -6,7 +6,7 @@
     End Property
 
     Public ToAddWaitlist As New Dictionary(Of GameObject, Room)
-
+    Public ShadeBrush As SolidBrush
     Public Player As Player
     Public Mouse As PointF
     Public GroundBrush As TextureBrush
@@ -48,6 +48,7 @@
 
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
         WallBrush = New TextureBrush(My.Resources.WallStrip)
+        ShadeBrush = New SolidBrush(Color.FromArgb(150, 0, 0, 0))
 
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
@@ -86,23 +87,28 @@
         Options = New Options()
     End Sub
 
+    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        Options.SaveOptions()
+    End Sub
+
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
             e.Graphics.FillRectangle(WallBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
             e.Graphics.FillRectangle(GroundBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
             e.Graphics.DrawImage(My.Resources.GradientLeft, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
             e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            If r.Equals(Player.Room) = False Then
+                e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
+            End If
         Next
         For Each r As Room In World.Rooms
-            If r.Equals(PlayerRoom) Then
+            If r.Equals(Player.Room) Then
                 For Each o As GameObject In r.GameObjects
-                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Image.Height - 7 - ViewOffsetY + r.YOffset), o.Image.Width, 10)
+                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Sprite.Height - 7 - ViewOffsetY + r.YOffset), o.Sprite.Width, 10)
                 Next
                 For Each O As GameObject In r.GameObjects
-                    e.Graphics.DrawImage(O.Image, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Image.Width, O.Image.Height)
+                    e.Graphics.DrawImage(O.Sprite.CurrentFrame, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Sprite.Width, O.Sprite.Height)
                 Next
-            Else
-
             End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next
@@ -137,8 +143,7 @@
 
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
-        'For Each r As Room In World.Rooms
-        Dim r As Room = PlayerRoom
+        Dim r As Room = Player.Room
 
         For Each O As GameObject In r.GameObjects
                 If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
@@ -193,10 +198,9 @@
                 Objective.Update(t)
             Next
 
-            r.ResortGameObjects()
-            'Next
+        r.ResortGameObjects()
 
-            If IsNothing(PlayerRoom) = False Then
+        If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
@@ -214,6 +218,8 @@
         GroundBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.FloorTile.Width), CInt(-Player.Position.Y Mod My.Resources.FloorTile.Height))
         WallBrush.ResetTransform()
         WallBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Position.Y Mod My.Resources.WallStrip.Height + 2))
+
+        test = 0
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -235,17 +241,22 @@
     Protected Overrides Function IsInputKey(
         ByVal keyData As Keys) As Boolean
         Return True
-
     End Function
 
-    Private Sub MainForm_MouseClick(sender As Object, e As MouseEventArgs) Handles Me.MouseClick
-        Select Case e.Button
-            Case MouseButtons.Left
-                For Each gameObject As GameObject In Player.getNearList(Player.Properties("AttackRange"), Player.Properties("AttackAngle"))
-                    Player.Hit(gameObject)
-                Next
+    Private Sub MainForm_MouseDown(sender As Object, e As MouseEventArgs) Handles MyBase.MouseDown
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.Button = key) Then
+                Options.OIStatus(Options.OIMap(key)) = True
+            End If
+        Next
+    End Sub
 
-        End Select
+    Private Sub MainForm_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
+        For Each key As Keys In Options.OIMap.Keys
+            If (e.Button = key) Then
+                Options.OIStatus(Options.OIMap(key)) = False
+            End If
+        Next
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
@@ -254,11 +265,9 @@
         Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
     End Sub
 
-    Private Sub MainForm_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        Options.SaveOptions()
-    End Sub
-
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
         test = e.Delta / 120
     End Sub
+
+
 End Class

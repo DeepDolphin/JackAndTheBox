@@ -15,7 +15,7 @@
 
     End Sub
 
-    Public Sub UpdateMovement(t As Double)
+    Private Sub UpdateMovement(t As Double)
         Dim CurrentPlayerSpeed As Double = Speed.Length
         Dim PlayerMovement As Vector2
         If Options.OIStatus("Sprint") AndAlso Properties("CurrentStamina") > 0.0 Then
@@ -107,18 +107,19 @@
 
     End Sub
 
-    Public Sub UpdateActions(t As Double)
+    Private Sub UpdateActions(t As Double)
         If Options.OIStatus("PlaceCrate") Then PlaceCrate()
+        If Options.OIStatus("AttackSkill") Then AttackSkill()
     End Sub
 
-    Public Sub PlaceCrate()
+    Private Sub PlaceCrate()
         Dim X As Integer
         Dim Y As Integer
         Select Case Direction
             Case ActorDirection.South
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X
-                    Y = Position.Y + Image.Height + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
                     X = Position.X
                     Y = Position.Y - My.Resources.Crate.Height + 20
@@ -129,36 +130,36 @@
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
                     X = Position.X
-                    Y = Position.Y + Image.Height - 3
+                    Y = Position.Y + Sprite.Height - 3
                 End If
             Case ActorDirection.West
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 Else
-                    X = Position.X + Image.Width
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    X = Position.X + Sprite.Width
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 End If
             Case ActorDirection.East
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    X = Position.X + Sprite.Width + 1
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 End If
             Case ActorDirection.SouthWest
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
-                    X = Position.X + Image.Width
+                    X = Position.X + Sprite.Width
                     Y = Position.Y - My.Resources.Crate.Height + 20
                 End If
             Case ActorDirection.SouthEast
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
-                    Y = Position.Y + Image.Height + 1
+                    X = Position.X + Sprite.Width + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
                     Y = Position.Y - My.Resources.Crate.Height + 20
@@ -168,19 +169,23 @@
                     X = Position.X - My.Resources.Crate.Width - 1
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
-                    X = Position.X + Image.Width
-                    Y = Position.Y + Image.Height - 3
+                    X = Position.X + Sprite.Width
+                    Y = Position.Y + Sprite.Height - 3
                 End If
             Case ActorDirection.NorthEast
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
+                    X = Position.X + Sprite.Width + 1
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - 3
+                    Y = Position.Y + Sprite.Height - 3
                 End If
         End Select
 
-        MainForm.ToAddWaitlist.Add(New GameObject(My.Resources.Crate, Room, New Vector3(X, Y, 0), 10), Room)
+        MainForm.ToAddWaitlist.Add(New Crate(Room, New Vector3(X, Y, 0), 10), Room)
+    End Sub
+
+    Private Sub AttackSkill()
+        Hit(getNearList(Properties("AttackRange"), Properties("AttackAngle")))
     End Sub
 End Class
