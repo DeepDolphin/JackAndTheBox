@@ -182,7 +182,7 @@
                 End If
         End Select
 
-        MainForm.ToAddWaitlist.Add(New Crate(Room, New Vector3(X, Y, 0), 10), Room)
+        MainForm.ToAddWaitlist.Add(New Crate(Room, New Vector3(X, Y, 0)), Room)
     End Sub
 
     Private Sub AttackSkill()
