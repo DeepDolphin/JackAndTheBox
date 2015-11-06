@@ -119,7 +119,7 @@
             Case ActorDirection.South
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X
-                    Y = Position.Y + Image.Height + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
                     X = Position.X
                     Y = Position.Y - My.Resources.Crate.Height + 20
@@ -130,36 +130,36 @@
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
                     X = Position.X
-                    Y = Position.Y + Image.Height - 3
+                    Y = Position.Y + Sprite.Height - 3
                 End If
             Case ActorDirection.West
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 Else
-                    X = Position.X + Image.Width
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    X = Position.X + Sprite.Width
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 End If
             Case ActorDirection.East
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    X = Position.X + Sprite.Width + 1
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - My.Resources.Crate.Height
+                    Y = Position.Y + Sprite.Height - My.Resources.Crate.Height
                 End If
             Case ActorDirection.SouthWest
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
-                    X = Position.X + Image.Width
+                    X = Position.X + Sprite.Width
                     Y = Position.Y - My.Resources.Crate.Height + 20
                 End If
             Case ActorDirection.SouthEast
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
-                    Y = Position.Y + Image.Height + 1
+                    X = Position.X + Sprite.Width + 1
+                    Y = Position.Y + Sprite.Height + 1
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
                     Y = Position.Y - My.Resources.Crate.Height + 20
@@ -169,16 +169,16 @@
                     X = Position.X - My.Resources.Crate.Width - 1
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
-                    X = Position.X + Image.Width
-                    Y = Position.Y + Image.Height - 3
+                    X = Position.X + Sprite.Width
+                    Y = Position.Y + Sprite.Height - 3
                 End If
             Case ActorDirection.NorthEast
                 If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Position.X + Image.Width + 1
+                    X = Position.X + Sprite.Width + 1
                     Y = Position.Y - My.Resources.Crate.Height + 16
                 Else
                     X = Position.X - My.Resources.Crate.Width - 1
-                    Y = Position.Y + Image.Height - 3
+                    Y = Position.Y + Sprite.Height - 3
                 End If
         End Select
 

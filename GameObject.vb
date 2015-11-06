@@ -2,7 +2,8 @@
     Public Position As Vector3
     Public Speed As Vector2
     Public HitBox As RectangleF
-    Public Image As Bitmap
+    'Public Image As Bitmap
+    Public Sprite As Sprite
     Public CastsShadow As Boolean = True
     Public Room As Room
     Public Properties As New Dictionary(Of String, String)
@@ -15,29 +16,36 @@
     End Property
 
     Public Sub New(Image As Bitmap, Room As Room)
-        Me.Image = Image
+        Me.Sprite = New Sprite(Image)
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
         Me.Position = Position
-        Me.Image = Image
+        Me.Sprite = New Sprite(Image)
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        Me.Room = Room
+    End Sub
+
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)
+        Me.Position = Position
+        Me.Sprite = Sprite
+        HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
         Me.Room = Room
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
         Me.Position = Position
         Me.Speed = Speed
-        Me.Image = Image
+        Me.Sprite = New Sprite(Image)
         HitBox = Image.GetBounds(GraphicsUnit.Pixel)
         Me.Room = Room
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Health As Integer)
         Me.Position = Position
-        Me.Image = Image
+        Me.Sprite = New Sprite(Image)
         Me.Room = Room
 
         Init(Health)
@@ -46,18 +54,19 @@
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
         Me.Position = Position
         Me.Speed = Speed
-        Me.Image = Image
+        Me.Sprite = New Sprite(Image)
         Me.Room = Room
 
         Init(Health)
     End Sub
 
     Public Sub Init(health As Double)
-        HitBox = Image.GetBounds(GraphicsUnit.Pixel)
+        HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
         Properties.Add("Health", health)
     End Sub
 
     Public Overridable Sub Update(t As Double)
+        Sprite.Tick(t)
         'Delete if out of Health
         If Properties.Keys.Contains("Health") Then
             If Properties("Health") <= 0.0 Then
