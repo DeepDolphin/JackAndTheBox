@@ -172,17 +172,21 @@
                 O.Update(t)
             Next
 
-            'Add all objects waiting to be added
-            For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
-                Dim GameObject As GameObject = ToAddWaitlist.Keys(value)
-                If (ToAddWaitlist(GameObject).Equals(r)) Then
-                    Dim good As Boolean = True
+        'Add all objects waiting to be added
+        For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
+            Dim GameObject As GameObject = ToAddWaitlist.Keys(value)
+            If (ToAddWaitlist(GameObject).Equals(r)) Then
+                If GameObject.Position.X < 0 OrElse GameObject.Position.Y + 16 < 0 OrElse GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
+                    'ToDo: make it stop
+                End If
+
+                Dim good As Boolean = True
                     For Each o As GameObject In r.GameObjects
-                        If o.CollidesWith(GameObject, GameObject.Position) Then
-                            good = False
-                            Exit For
-                        End If
-                    Next
+                    If o.CollidesWith(GameObject, GameObject.Position) Then
+                        good = False
+                        Exit For
+                    End If
+                Next
                     If good Then
                         r.AddGameObject(GameObject)
                         ToAddWaitlist.Remove(GameObject)
@@ -190,10 +194,10 @@
                         ToAddWaitlist.Remove(GameObject)
                     End If
                 End If
-            Next
+        Next
 
-            'Delete all items flagged for deletion
-            For value As Integer = r.GameObjects.Count - 1 To 0 Step -1
+        'Delete all items flagged for deletion
+        For value As Integer = r.GameObjects.Count - 1 To 0 Step -1
                 If r.GameObjects(value).Flags.Contains("Delete") Then
                     r.GameObjects.RemoveAt(value)
                 End If

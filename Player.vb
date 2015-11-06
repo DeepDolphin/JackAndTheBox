@@ -1,6 +1,7 @@
 ﻿Public Class Player
     Inherits Actor
     Private Options As Options
+    Private Inventory As New Inventory
 
     Public Sub New(Room As Room)
         MyBase.New(Room)
