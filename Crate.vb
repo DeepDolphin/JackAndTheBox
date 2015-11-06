@@ -6,22 +6,37 @@
     End Sub
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)
-        MyBase.New(My.Resources.Crate, Room, Position, 10)
+        MyBase.New(Sprite, Room, Position, 10)
     End Sub
 
 End Class
 
 Public Class ExplosiveCrate
     Inherits Crate
+    Private timer As Double = 2.5
 
     Public Sub New(Room As Room, Position As Vector3)
         MyBase.New(Room, Position)
     End Sub
 
     Public Sub Explode()
-        Dim objects As List(Of GameObject) = getNearList(10)
+        Dim objects As List(Of GameObject) = getNearList(5)
 
+        For Each o As GameObject In objects
+            If o.Properties.ContainsKey("Health") Then o.Properties("Health") -= 10
+        Next
 
+        Flags.Add("Delete")
+    End Sub
+
+    Public Overrides Sub Update(t As Double)
+        MyBase.Update(t)
+
+        If timer <= 0.0 Then
+            Explode()
+        Else
+            timer -= t
+        End If
 
 
     End Sub

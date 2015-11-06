@@ -108,8 +108,22 @@
     End Sub
 
     Private Sub UpdateActions(t As Double)
-        If Options.OIStatus("PlaceCrate") Then PlaceCrate()
-        If Options.OIStatus("AttackSkill") Then AttackSkill()
+        If Options.OIStatus("UtilitySkill") Then
+            UtilitySkill()
+            Options.OIStatus("UtilitySkill") = False
+        End If
+        If Options.OIStatus("AttackSkill") Then
+            AttackSkill()
+            Options.OIStatus("AttackSkill") = False
+        End If
+    End Sub
+
+    Private Sub UtilitySkill()
+        PlaceCrate()
+    End Sub
+
+    Private Sub AttackSkill()
+        Hit(getNearList(Properties("AttackRange"), Properties("AttackAngle")))
     End Sub
 
     Private Sub PlaceCrate()
@@ -185,7 +199,5 @@
         MainForm.ToAddWaitlist.Add(New Crate(Room, New Vector3(X, Y, 0)), Room)
     End Sub
 
-    Private Sub AttackSkill()
-        Hit(getNearList(Properties("AttackRange"), Properties("AttackAngle")))
-    End Sub
+
 End Class

@@ -4,7 +4,7 @@
     Public FPS As Integer = 24
     Public ReadOnly Property CurrentIndex As Integer
         Get
-            Return _t / FPS
+            Return _t / (1 / FPS)
         End Get
     End Property
     Public ReadOnly Property Length As Integer
@@ -15,6 +15,9 @@
     Public ReadOnly Property CurrentFrame As Bitmap
         Get
             If Frames.Count > 0 Then
+                If CurrentIndex >= Length Then
+                    Stop
+                End If
                 Return Frames(CurrentIndex)
             Else
                 Return Nothing
@@ -41,8 +44,8 @@
     End Property
     Public Sub Tick(t As Double)
         _t += t
-        While _t > Length * (1 / FPS)
-            _t -= (Length * (1 / FPS))
+        While CurrentIndex >= Length
+                _t -= (Length * (1 / FPS))
         End While
     End Sub
 

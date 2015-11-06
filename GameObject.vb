@@ -8,6 +8,7 @@
     Public Room As Room
     Public Properties As New Dictionary(Of String, String)
     Public Flags As New List(Of String)
+    Public Colliable As Boolean = True
 
     Public ReadOnly Property Middle As Vector3
         Get
@@ -33,6 +34,14 @@
         Me.Sprite = Sprite
         HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
         Me.Room = Room
+    End Sub
+
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer)
+        Me.Position = Position
+        Me.Sprite = Sprite
+        Me.Room = Room
+
+        Init(Health)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
@@ -78,6 +87,7 @@
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector2) As Boolean
         'If not on the same level it won't collide
         If (Other.Position.Z <> Position.Z) Then Return False
+        If Not Colliable OrElse Not Other.Colliable Then Return False
 
         Dim otherhitbox As RectangleF = Other.HitBox
         otherhitbox.X += OtherPosition.X

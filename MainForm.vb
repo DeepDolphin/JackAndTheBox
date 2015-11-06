@@ -17,8 +17,6 @@
     Public World As World
     Public Options As Options
 
-    Public expOrb As New List(Of Bitmap)
-
     Public test As Double
 
     Public ReadOnly Property MaxTick As Double
@@ -70,11 +68,6 @@
         ' Generate the world to play in
         World = New World("DavidAndBen", rooms)
 
-        expOrb.Add(My.Resources.EXPOrb1)
-        expOrb.Add(My.Resources.EXPOrb2)
-        expOrb.Add(My.Resources.EXPOrb3)
-        expOrb.Add(My.Resources.EXPOrb4)
-
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
@@ -114,7 +107,12 @@
                     If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Sprite.Height - 7 - ViewOffsetY + r.YOffset), o.Sprite.Width, 10)
                 Next
                 For Each O As GameObject In r.GameObjects
-                    e.Graphics.DrawImage(O.Sprite.CurrentFrame, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Sprite.Width, O.Sprite.Height)
+                    Try
+                        e.Graphics.DrawImage(O.Sprite.CurrentFrame, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Sprite.Width, O.Sprite.Height)
+
+                    Catch ex As Exception
+                        Stop
+                    End Try
                 Next
             End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
