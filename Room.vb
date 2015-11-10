@@ -69,11 +69,11 @@ Public Class Room
             Dim b As New List(Of GameObject)
             Dim record As Integer = Integer.MaxValue
             For Each o As GameObject In GameObjects
-                If o.Position.Y - o.HitBox.Height + o.Position.Z * (10 / 16) < record Then
+                If o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16)) < record Then
                     b.Clear()
-                    record = o.Position.Y - o.HitBox.Height + o.Position.Z * (10 / 16)
+                    record = o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16))
                     b.Add(o)
-                ElseIf o.position.Y - o.HitBox.Height + o.position.Z * (10 / 16) = record
+                ElseIf o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16)) = record
                     b.Add(o)
                 End If
             Next

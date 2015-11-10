@@ -2,11 +2,11 @@
     Inherits GameObject
 
     Public Sub New(Room As Room, Position As Vector3)
-        MyBase.New(My.Resources.Crate, Room, Position, 10)
+        MyBase.New(My.Resources.Crate, Room, Position)
     End Sub
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)
-        MyBase.New(Sprite, Room, Position, 10)
+        MyBase.New(Sprite, Room, Position)
     End Sub
 
 End Class

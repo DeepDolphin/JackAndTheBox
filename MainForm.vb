@@ -70,12 +70,12 @@
 
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
-        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
+        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, -10))
         Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject1)
-        World.Rooms(0).AddGameObject(TestObject2)
+        'World.Rooms(0).AddGameObject(TestObject2)
 
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
@@ -177,7 +177,8 @@
             Dim GameObject As GameObject = ToAddWaitlist.Keys(value)
             If (ToAddWaitlist(GameObject).Equals(r)) Then
                 If GameObject.Position.X < 0 OrElse GameObject.Position.Y + 16 < 0 OrElse GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
-                    'ToDo: make it stop
+                    ToAddWaitlist.Remove(GameObject)
+                    Continue For
                 End If
 
                 Dim good As Boolean = True
