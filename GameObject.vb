@@ -9,6 +9,7 @@
     Public Properties As New Dictionary(Of String, String)
     Public Flags As New List(Of String)
     Public Colliable As Boolean = True
+    Public Visible As Boolean = True
 
     Public ReadOnly Property Middle As Vector3
         Get

@@ -155,7 +155,12 @@
                         If other.Equals(O) Then Continue For
                         If other.CollidesWith(O, New Vector2(newx, newy)) Then
                         good = False
-                        If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
+                        If (O.Flags.Contains("Actor")) Then
+                            CType(O, Actor).Hit(other)
+                        End If
+                        If (other.Flags.Contains("InventoryItem") And O.Equals(Player)) Then
+                            Player.Inventory.AddItem(other)
+                        End If
                         Exit For
                         End If
                     Next

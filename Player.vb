@@ -1,7 +1,7 @@
 ﻿Public Class Player
     Inherits Actor
     Private Options As Options
-    Private Inventory As New Inventory
+    Public Inventory As New Inventory
 
     Public Sub New(Room As Room)
         MyBase.New(Room)
@@ -42,7 +42,7 @@
             If Options.OIStatus("Left") Then
                 PlayerMovement.X -= 1
             End If
-            If (Options.OIStatus("Up") Or Options.OIStatus("Down") Or Options.OIStatus("Right") Or Options.OIStatus("Left")) AndAlso Not CurrentPlayerSpeed = 0.0 Then Speed.Direction = PlayerMovement.Direction
+            If ((Options.OIStatus("Up") Xor Options.OIStatus("Down")) Or (Options.OIStatus("Right") Xor Options.OIStatus("Left"))) AndAlso Not CurrentPlayerSpeed = 0.0 Then Speed.Direction = PlayerMovement.Direction
         End If
 
         'Player tank movement

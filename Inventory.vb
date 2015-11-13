@@ -29,6 +29,11 @@
         EquippedInit()
     End Sub
 
+    Public Sub AddItem(Item As InventoryItem)
+        Inventory.Add(New InventoryItem(Item))
+        Item.Flags.Add("Delete")
+    End Sub
+
     Private Sub EquippedInit()
         Equipped.Add("RightHand", Nothing)
         Equipped.Add("LeftHand", Nothing)
