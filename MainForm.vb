@@ -48,7 +48,7 @@
 
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
         WallBrush = New TextureBrush(My.Resources.WallStrip)
-        ShadeBrush = New SolidBrush(Color.FromArgb(150, 0, 0, 0))
+        ShadeBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
 
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
@@ -158,9 +158,9 @@
                     For Each other As GameObject In r.GameObjects
                         If other.Equals(O) Then Continue For
                         If other.CollidesWith(O, New Vector2(newx, newy)) Then
-                            good = False
-                            If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
-                            Exit For
+                        good = False
+                        If (O.Flags.Contains("Actor")) Then CType(O, Actor).Hit(other)
+                        Exit For
                         End If
                     Next
                     If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False

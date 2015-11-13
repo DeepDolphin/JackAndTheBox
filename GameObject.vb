@@ -91,13 +91,10 @@
 
         Dim otherhitbox As RectangleF = Other.HitBox
         otherhitbox.X += OtherPosition.X
-        otherhitbox.Y += OtherPosition.Y
+        otherhitbox.Y += If(Other.Position.Z <= 0, OtherPosition.Y + Other.Position.Z * (10 / 16), OtherPosition.Y)
         Dim myhitbox As RectangleF = HitBox
         myhitbox.X += Position.X
-        myhitbox.Y += Position.Y
-        If myhitbox.IntersectsWith(otherhitbox) Then
-            Dim test = True
-        End If
+        myhitbox.Y += If(Position.Z <= 0, Position.Y + Position.Z * (10 / 16), Position.Y)
 
         'ToDo: z under 0 stuff
         Return myhitbox.IntersectsWith(otherhitbox)

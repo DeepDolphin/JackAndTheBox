@@ -1,6 +1,4 @@
-﻿Imports JackAndTheBox
-
-Public MustInherit Class Objective
+﻿Public MustInherit Class Objective
     Public MustOverride Function IsComplete(Room As Room) As Boolean
     Public Overridable Sub Update(t As Double)
 
