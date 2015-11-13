@@ -1,9 +1,5 @@
 ﻿Public Class MainForm
-    Public ReadOnly Property Version As String
-        Get
-            Return "Version 1.0.1_00 Beta"
-        End Get
-    End Property
+    Public Const Version As String = "Version 1.0.1_00 Beta"
 
     Public ToAddWaitlist As New Dictionary(Of GameObject, Room)
     Public ShadeBrush As SolidBrush
@@ -70,7 +66,7 @@
 
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
-        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, -10))
+        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
         Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
 
         World.Rooms(0).AddGameObject(Player)
