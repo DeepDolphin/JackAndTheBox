@@ -93,11 +93,6 @@
             e.Graphics.FillRectangle(GroundBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
             e.Graphics.DrawImage(My.Resources.GradientLeft, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
             e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
-            If r.Equals(Player.Room) = False Then
-                e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
-            End If
-        Next
-        For Each r As Room In World.Rooms
             If r.Equals(Player.Room) Then
                 For Each o As GameObject In r.GameObjects
                     If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Sprite.Height - 7 - ViewOffsetY + r.YOffset), o.Sprite.Width, 10)
@@ -110,6 +105,8 @@
                         Stop
                     End Try
                 Next
+            Else
+                e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
             End If
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
         Next

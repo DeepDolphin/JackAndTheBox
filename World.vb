@@ -25,8 +25,7 @@
 
 
     Public Sub New(seed As Object, AvailableRoomList As List(Of Room))
-        Dim s As Integer = seed.GetHashCode()
-        Dim random As New Random(3)
+        Dim random As New Random(seed.GetHashCode())
 
         Dim CoreIndex As Integer = random.Next(AvailableRoomList.Count - 1)
         Dim CoreRoom As Room = AvailableRoomList(CoreIndex)
