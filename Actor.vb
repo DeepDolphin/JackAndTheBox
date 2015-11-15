@@ -1,5 +1,8 @@
 ﻿Public Class Actor
     Inherits GameObject
+
+    Public Inventory As New Inventory
+
     Public Enum ActorDirection As Integer
         East = 0
         SouthEast
@@ -26,28 +29,28 @@
     Public Sub New(Room As Room)
         MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100)
         GeneralInit()
-        AttackInit(1, 100, 5, 45)
+        AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
         MyBase.New(Image, Room, Position, 100)
         GeneralInit()
-        AttackInit(1, 100, 5, 45)
+        AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
         MyBase.New(Image, Room, Position, Speed, 100)
         GeneralInit()
-        AttackInit(1, 100, 5, 45)
+        AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
         MyBase.New(Image, Room, Position, Speed, Health)
         GeneralInit()
-        AttackInit(1, 100, 5, 45)
+        AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
@@ -56,12 +59,11 @@
         HitBox = New RectangleF(0, 22, 16, 10)
     End Sub
 
-    Public Sub AttackInit(attackCooldown As Double, attackPower As Double, attackRange As Double, attackAngle As Double)
-        Properties.Add("AttackCurrentCooldown", attackCooldown)
-        Properties.Add("AttackMaxCooldown", attackCooldown)
-        Properties.Add("AttackPower", attackPower)
-        Properties.Add("AttackRange", attackRange)
-        Properties.Add("AttackAngle", attackAngle)
+    Public Sub AbilityInit(activeCooldown As Double, utilityCooldown As Double)
+        Properties.Add("ActiveCurrentCooldown", activeCooldown)
+        Properties.Add("ActiveMaxCooldown", activeCooldown)
+        Properties.Add("UtilityCurrentCooldown", utilityCooldown)
+        Properties.Add("UtilityMaxCooldown", utilityCooldown)
     End Sub
 
     Public Sub MovementInit(stamina As Double, maxSpeed As Double, acceleration As Double)
@@ -75,12 +77,14 @@
         MyBase.Update(t)
 
 
-        If (Properties("AttackCurrentCooldown") > 0.0) Then Properties("AttackCurrentCooldown") -= t
+
+
+        If (Properties("ActiveCurrentCooldown") > 0.0) Then Properties("ActiveCurrentCooldown") -= t
         If (Properties("CurrentStamina") < CDbl(Properties("MaxStamina"))) Then Properties("CurrentStamina") += t
     End Sub
 
     Public Overridable Sub Hit(O As GameObject)
-        If (Properties("AttackCurrentCooldown") <= 0.0) Then
+        If (Properties("ActiveCurrentCooldown") <= 0.0) Then
             If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
                 O.Properties("Health") -= Properties("AttackPower")
             End If

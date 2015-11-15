@@ -1,19 +1,13 @@
 ﻿Public Class Inventory
-    Public Property ActiveSkill As Skill
+    Public ReadOnly Property ActiveAbility As Ability
         Get
             Return Nothing
         End Get
-        Set(value As Skill)
-
-        End Set
     End Property
-    Public Property UtilitySkill As Skill
+    Public ReadOnly Property UtilityAbility As Ability
         Get
-            Return Nothing
+            Return New PlaceCrateAbility(0)
         End Get
-        Set(value As Skill)
-
-        End Set
     End Property
 
     Public Equipped As New Dictionary(Of String, GameObject)
@@ -45,6 +39,8 @@
         Equipped.Add("Head", Nothing)
     End Sub
 
-
+    Public Sub Update(t As Double)
+        ActiveAbility.Update(t)
+    End Sub
 
 End Class

@@ -1,7 +1,7 @@
 ﻿Public Class MainForm
     Public Const Version As String = "Version 1.0.1_00 Beta"
 
-    Public ToAddWaitlist As New Dictionary(Of GameObject, Room)
+    Public ToAddWaitlist As New List(Of GameObject)
     Public ShadeBrush As SolidBrush
     Public Player As Player
     Public Mouse As PointF
@@ -175,27 +175,27 @@
 
         'Add all objects waiting to be added
         For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
-            Dim GameObject As GameObject = ToAddWaitlist.Keys(value)
-            If (ToAddWaitlist(GameObject).Equals(r)) Then
+            Dim GameObject As GameObject = ToAddWaitlist(value)
+            If (GameObject.Room.Equals(r)) Then
                 If GameObject.Position.X < 0 OrElse GameObject.Position.Y + 16 < 0 OrElse GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
                     ToAddWaitlist.Remove(GameObject)
                     Continue For
                 End If
 
                 Dim good As Boolean = True
-                    For Each o As GameObject In r.GameObjects
+                For Each o As GameObject In r.GameObjects
                     If o.CollidesWith(GameObject, GameObject.Position) Then
                         good = False
                         Exit For
                     End If
                 Next
-                    If good Then
-                        r.AddGameObject(GameObject)
-                        ToAddWaitlist.Remove(GameObject)
-                    Else
-                        ToAddWaitlist.Remove(GameObject)
-                    End If
+                If good Then
+                    r.AddGameObject(GameObject)
+                    ToAddWaitlist.Remove(GameObject)
+                Else
+                    ToAddWaitlist.Remove(GameObject)
                 End If
+            End If
         Next
 
         'Delete all items flagged for deletion

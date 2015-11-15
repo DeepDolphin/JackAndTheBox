@@ -49,9 +49,9 @@ Public Class Options
         OIMap.Add(Keys.D, "Right")
         OIMap.Add(Keys.A, "Left")
         OIMap.Add(Keys.ControlKey, "Sprint")
-        OIMap.Add(MouseButtons.Right, "UtilitySkill")
+        OIMap.Add(MouseButtons.Right, "UtilityAbility")
         OIMap.Add(Keys.Enter, "Pause")
-        OIMap.Add(MouseButtons.Left, "AttackSkill")
+        OIMap.Add(MouseButtons.Left, "ActiveAbility")
 
         'OIStatus:
         'Movement:
@@ -60,9 +60,9 @@ Public Class Options
         OIStatus.Add("Right", False)
         OIStatus.Add("Left", False)
         OIStatus.Add("Sprint", False)
-        OIStatus.Add("UtilitySkill", False)
+        OIStatus.Add("UtilityAbility", False)
         OIStatus.Add("Pause", False)
-        OIStatus.Add("AttackSkill", False)
+        OIStatus.Add("ActiveAbility", False)
     End Sub
 
     Public Sub SaveOptions()
