@@ -1,5 +1,15 @@
-﻿Public Class MainForm
-    Public Const Version As String = "Version 1.0.1_00 Beta"
+﻿#Const VersionType = "Beta"
+
+Public Class MainForm
+
+#If VersionType = "Beta" Then
+    Public Const VersionType As String = "Beta"
+#ElseIf VersionType = "Release" Then
+    Public Const VersionType As String = "Release"
+#End If
+
+    Public Const VersionNumber As String = "2015.11.19.0000"
+    Public Const Version As String = "Version: " + VersionNumber + " " + VersionType
 
     Public ToAddWaitlist As New List(Of GameObject)
     Public ShadeBrush As SolidBrush
@@ -108,13 +118,18 @@
             Else
                 e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
             End If
+#If VersionType = "Beta" Then
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
+#End If
         Next
+#If VersionType = "Beta" Then
         e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
         e.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
         e.Graphics.DrawString(test, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
+        e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
+#End If
     End Sub
 
     Private Watch As Stopwatch
@@ -144,13 +159,13 @@
         Dim r As Room = Player.Room
 
         For Each O As GameObject In r.GameObjects
-                If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
-                    Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
-                    Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
-                    Dim good As Boolean = True
-                    For Each other As GameObject In r.GameObjects
-                        If other.Equals(O) Then Continue For
-                        If other.CollidesWith(O, New Vector2(newx, newy)) Then
+            If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
+                Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
+                Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
+                Dim good As Boolean = True
+                For Each other As GameObject In r.GameObjects
+                    If other.Equals(O) Then Continue For
+                    If other.CollidesWith(O, New Vector2(newx, newy)) Then
                         good = False
                         If (O.Flags.Contains("Actor")) Then
                             CType(O, Actor).Hit(other)
@@ -159,16 +174,16 @@
                             Player.Inventory.AddItem(other)
                         End If
                         Exit For
-                        End If
-                    Next
-                    If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
-                    If good Then
-                        O.Position.X = newx
-                        O.Position.Y = newy
                     End If
+                Next
+                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
+                If good Then
+                    O.Position.X = newx
+                    O.Position.Y = newy
                 End If
-                O.Update(t)
-            Next
+            End If
+            O.Update(t)
+        Next
 
         'Add all objects waiting to be added
         For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
@@ -197,14 +212,14 @@
 
         'Delete all items flagged for deletion
         For value As Integer = r.GameObjects.Count - 1 To 0 Step -1
-                If r.GameObjects(value).Flags.Contains("Delete") Then
-                    r.GameObjects.RemoveAt(value)
-                End If
-            Next
+            If r.GameObjects(value).Flags.Contains("Delete") Then
+                r.GameObjects.RemoveAt(value)
+            End If
+        Next
 
-            For Each Objective As Objective In r.Objectives
-                Objective.Update(t)
-            Next
+        For Each Objective As Objective In r.Objectives
+            Objective.Update(t)
+        Next
 
         r.ResortGameObjects()
 
@@ -268,9 +283,9 @@
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
-        Player.Direction = Actor.ToActorDirection(direction)
-        Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
+        'Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
+        'Player.Direction = Actor.ToActorDirection(direction)
+        'Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
     End Sub
 
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel

@@ -1,10 +1,12 @@
 ﻿Public MustInherit Class Ability
     Public CurrentCooldown As Double
     Public ReadOnly MaxCooldown As Double
+    Protected Parent As GameObject
 
-    Public Sub New(Cooldown As Double)
+    Public Sub New(Cooldown As Double, Parent As GameObject)
         CurrentCooldown = Cooldown
         MaxCooldown = Cooldown
+        Me.Parent = Parent
     End Sub
 
     Public MustOverride Sub Run()
@@ -17,14 +19,17 @@
     End Sub
 End Class
 
-Public Class PlaceCrateAbility
+Public Class PlaceAbility
     Inherits Ability
 
-    Private Player As Player = MainForm.Player
+    Public Placer As Actor
+    Public InFront As Boolean
     Private Options As Options = MainForm.Options
 
-    Public Sub New(Cooldown As Double)
-        MyBase.New(Cooldown)
+    Public Sub New(Cooldown As Double, Parent As GameObject, Placer As Actor, InFront As Boolean)
+        MyBase.New(Cooldown, Parent)
+        Me.Placer = Placer
+        Me.InFront = InFront
     End Sub
 
     Public Overrides Sub Run()
@@ -32,74 +37,76 @@ Public Class PlaceCrateAbility
 
         Dim X As Integer
         Dim Y As Integer
-        Select Case Player.Direction
-            Case Player.ActorDirection.South
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X
-                    Y = Player.Position.Y + Player.Sprite.Height + 1
+        Select Case Placer.Direction
+            Case Actor.ActorDirection.South
+                If (InFront) Then
+                    X = Placer.Position.X
+                    Y = Placer.Position.Y + Placer.Sprite.Height + 1
                 Else
-                    X = Player.Position.X
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                    X = Placer.Position.X
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 20
                 End If
-            Case Player.ActorDirection.North
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 16
+            Case Actor.ActorDirection.North
+                If (InFront) Then
+                    X = Placer.Position.X
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 16
                 Else
-                    X = Player.Position.X
-                    Y = Player.Position.Y + Player.Sprite.Height - 3
+                    X = Placer.Position.X
+                    Y = Placer.Position.Y + Placer.Sprite.Height - 3
                 End If
-            Case Player.ActorDirection.West
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y + Player.Sprite.Height - My.Resources.Crate.Height
+            Case Actor.ActorDirection.West
+                If (InFront) Then
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
                 Else
-                    X = Player.Position.X + Player.Sprite.Width
-                    Y = Player.Position.Y + Player.Sprite.Height - My.Resources.Crate.Height
+                    X = Placer.Position.X + Placer.Sprite.Width
+                    Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
                 End If
-            Case Player.ActorDirection.East
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X + Player.Sprite.Width + 1
-                    Y = Player.Position.Y + Player.Sprite.Height - My.Resources.Crate.Height
+            Case Actor.ActorDirection.East
+                If (InFront) Then
+                    X = Placer.Position.X + Placer.Sprite.Width + 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
                 Else
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y + Player.Sprite.Height - My.Resources.Crate.Height
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
                 End If
-            Case Player.ActorDirection.SouthWest
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y + Player.Sprite.Height + 1
+            Case Actor.ActorDirection.SouthWest
+                If (InFront) Then
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height + 1
                 Else
-                    X = Player.Position.X + Player.Sprite.Width
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                    X = Placer.Position.X + Placer.Sprite.Width
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 20
                 End If
-            Case Player.ActorDirection.SouthEast
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X + Player.Sprite.Width + 1
-                    Y = Player.Position.Y + Player.Sprite.Height + 1
+            Case Actor.ActorDirection.SouthEast
+                If (InFront) Then
+                    X = Placer.Position.X + Placer.Sprite.Width + 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height + 1
                 Else
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 20
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 20
                 End If
-            Case Player.ActorDirection.NorthWest
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 16
+            Case Actor.ActorDirection.NorthWest
+                If (InFront) Then
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 16
                 Else
-                    X = Player.Position.X + Player.Sprite.Width
-                    Y = Player.Position.Y + Player.Sprite.Height - 3
+                    X = Placer.Position.X + Placer.Sprite.Width
+                    Y = Placer.Position.Y + Placer.Sprite.Height - 3
                 End If
-            Case Player.ActorDirection.NorthEast
-                If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
-                    X = Player.Position.X + Player.Sprite.Width + 1
-                    Y = Player.Position.Y - My.Resources.Crate.Height + 16
+            Case Actor.ActorDirection.NorthEast
+                If (InFront) Then
+                    X = Placer.Position.X + Placer.Sprite.Width + 1
+                    Y = Placer.Position.Y - My.Resources.Crate.Height + 16
                 Else
-                    X = Player.Position.X - My.Resources.Crate.Width - 1
-                    Y = Player.Position.Y + Player.Sprite.Height - 3
+                    X = Placer.Position.X - My.Resources.Crate.Width - 1
+                    Y = Placer.Position.Y + Placer.Sprite.Height - 3
                 End If
         End Select
 
-        MainForm.ToAddWaitlist.Add(New Crate(Player.Room, New Vector3(X, Y, 0)))
+        Parent.Position = New Vector3(X, Y, Parent.Position.Z)
+        MainForm.ToAddWaitlist.Add(Parent)
+        'MainForm.ToAddWaitlist.Add(New Crate(Player.Room, New Vector3(X, Y, 0)))
         CurrentCooldown = MaxCooldown
     End Sub
 End Class

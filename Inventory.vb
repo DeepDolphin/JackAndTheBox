@@ -1,4 +1,6 @@
 ﻿Public Class Inventory
+    Public Parent As Actor
+
     Public ReadOnly Property ActiveAbility As Ability
         Get
             Return Nothing
@@ -6,7 +8,7 @@
     End Property
     Public ReadOnly Property UtilityAbility As Ability
         Get
-            Return New PlaceCrateAbility(0)
+            Return New PlaceAbility(0, New Crate(MainForm.Player.Room, MainForm.Player.Position), MainForm.Player, True)
         End Get
     End Property
 
@@ -24,7 +26,7 @@
     End Sub
 
     Public Sub AddItem(Item As InventoryItem)
-        Inventory.Add(New InventoryItem(Item))
+        Inventory.Add(New InventoryItem(Item) With {.Parent = Parent})
         Item.Flags.Add("Delete")
     End Sub
 

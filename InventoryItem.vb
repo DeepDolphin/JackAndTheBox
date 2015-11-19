@@ -1,5 +1,6 @@
 ﻿Public Class InventoryItem
     Inherits GameObject
+    Public Parent As Actor
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector2)
         MyBase.New(Sprite, Room, New Vector3(Position.X, Position.Y, -10))

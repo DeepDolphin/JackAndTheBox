@@ -102,6 +102,12 @@
                 Speed.Length = 0.0
             End If
         End If
+
+        'Update Direction of the Player
+        If Options.Preferences("PlayerMovementType") = "ArcadeMovement" Then
+            Direction = ToActorDirection(Speed.Direction)
+        End If
+
     End Sub
 
     Private Sub UpdateActions(t As Double)
@@ -117,6 +123,76 @@
 
     Private Sub ActiveAbility()
         Hit(getNearList(Properties("AttackRange"), Properties("AttackAngle")))
+
+        '    Dim X As Integer
+        '    Dim Y As Integer
+        '    Select Case Placer.Direction
+        '        Case Player.ActorDirection.South
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X
+        '                Y = Placer.Position.Y + Placer.Sprite.Height + 1
+        '            Else
+        '                X = Placer.Position.X
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 20
+        '            End If
+        '        Case Player.ActorDirection.North
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 16
+        '            Else
+        '                X = Placer.Position.X
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - 3
+        '            End If
+        '        Case Player.ActorDirection.West
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
+        '            Else
+        '                X = Placer.Position.X + Placer.Sprite.Width
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
+        '            End If
+        '        Case Player.ActorDirection.East
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X + Placer.Sprite.Width + 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
+        '            Else
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - My.Resources.Crate.Height
+        '            End If
+        '        Case Player.ActorDirection.SouthWest
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height + 1
+        '            Else
+        '                X = Placer.Position.X + Placer.Sprite.Width
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 20
+        '            End If
+        '        Case Player.ActorDirection.SouthEast
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X + Placer.Sprite.Width + 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height + 1
+        '            Else
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 20
+        '            End If
+        '        Case Player.ActorDirection.NorthWest
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 16
+        '            Else
+        '                X = Placer.Position.X + Placer.Sprite.Width
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - 3
+        '            End If
+        '        Case Player.ActorDirection.NorthEast
+        '            If (Not Options.OIStatus("Up") Or Options.Preferences("PlayerMovementType") = "ArcadeMovement") Then
+        '                X = Placer.Position.X + Placer.Sprite.Width + 1
+        '                Y = Placer.Position.Y - My.Resources.Crate.Height + 16
+        '            Else
+        '                X = Placer.Position.X - My.Resources.Crate.Width - 1
+        '                Y = Placer.Position.Y + Placer.Sprite.Height - 3
+        '            End If
+        '    End Select
+
     End Sub
 
 
