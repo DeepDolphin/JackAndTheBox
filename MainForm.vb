@@ -4,11 +4,16 @@ Public Class MainForm
 
 #If VersionType = "Beta" Then
     Public Const VersionType As String = "Beta"
+    Public Const VersionTN As String = "1"
 #ElseIf VersionType = "Release" Then
     Public Const VersionType As String = "Release"
+    Public Const VersionTN As String = "0"
+#ElseIf VersionType = "Debug" Then
+    Public Const VersionType As String = "Debug"
+    Public Const VersionTN As String = "2"
 #End If
 
-    Public Const VersionNumber As String = "2015.11.19.0000"
+    Public Const VersionNumber As String = "1.0.0." + VersionTN + "000"
     Public Const Version As String = "Version: " + VersionNumber + " " + VersionType
 
     Public ToAddWaitlist As New List(Of GameObject)
@@ -118,11 +123,11 @@ Public Class MainForm
             Else
                 e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
             End If
-#If VersionType = "Beta" Then
+#If Not VersionType = "Release" Then
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
 #End If
         Next
-#If VersionType = "Beta" Then
+#If Not VersionType = "Release" Then
         e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)

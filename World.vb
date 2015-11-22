@@ -1,4 +1,6 @@
-﻿Public Class World
+﻿#Const VersionType = "Beta"
+
+Public Class World
     Public Rooms As New List(Of Room)
 
     ' These methods manufacture a new copy of one of the plug rooms.
@@ -170,6 +172,7 @@
             AvailableRoomList.Remove(r)
         End While
 
+#If Not VersionType = "Debug" Then
         For Each r As Room In Rooms
             For i As Integer = 0 To 10
                 Dim l As New GameObject(My.Resources.CeilingLight, r, New Vector3(random.Next(r.Width - My.Resources.CeilingLight.Width), random.Next(r.Height - My.Resources.CeilingLight.Height), 10))
@@ -177,6 +180,7 @@
                 r.AddGameObject(l)
             Next
         Next
+#End If
     End Sub
 
     Public Function RoomFits(r As Room) As Boolean
