@@ -4,16 +4,19 @@ Public Class Options
     Public Preferences As Dictionary(Of String, String)
     Public OIMap As Dictionary(Of String, String)
     Public OIStatus As Dictionary(Of String, Boolean)
+    Public MouseWheel As Integer
 
     Public Sub New()
         Preferences = New Dictionary(Of String, String)
         OIMap = New Dictionary(Of String, String)
         OIStatus = New Dictionary(Of String, Boolean)
+        MouseWheel = 0
 
 
 
         'Options File Import/Creation
-        If (IO.File.Exists("options.xml") And False) Then 'For now always init (for debugging purposes)
+#If VersionType = "Release" Then
+        If (IO.File.Exists("options.xml")) Then
             Dim optionsDoc As New XmlDocument
             optionsDoc.Load("options.xml")
             Dim options As XmlElement = optionsDoc("Options")
@@ -34,6 +37,10 @@ Public Class Options
             InitOptions()
             SaveOptions()
         End If
+#Else
+        InitOptions()
+        SaveOptions()
+#End If
     End Sub
 
     Public Sub InitOptions()

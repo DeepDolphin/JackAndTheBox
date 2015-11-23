@@ -7,10 +7,13 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "JackAndTheBoxes", "JackAndT
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Beta|Any CPU = Beta|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Beta|Any CPU.ActiveCfg = Beta|Any CPU
+		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Beta|Any CPU.Build.0 = Beta|Any CPU
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU

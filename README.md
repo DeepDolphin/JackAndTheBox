@@ -1,25 +1,15 @@
 # JackAndTheBox
 Jack and the boxes game
 
-Current Version: 1.0.0_4 Beta
+Current Version: 1.0.0223.1000
 
 # Known Bugs
-  - The player can walk out of rooms.
-  
+  - Crates can be placed above the wall
+  - Placing crate while direction up doesn't work
+
 # Changelog
-Version 1.0.0_4 Beta:
-  - Fixed all of the compiler errors
-
-Version 1.0.0_3 Beta:
-  - Added the world
-  - Added simple AI for enemies
-  
-Version 1.0.0_2 Beta:
-  - Added running capability
-  - Added the rooms to the world
-
-Version 1.0.0_1 Beta:
-  - Added rooms and other classes
-
-Version 1.0.0_0 Beta:
+1.0.0223.1000:
+  - Placing ability is independent from player
+  - Added debug capability
+  - Started a comprehensive readme on gitHub
   - Uploaded existing code to gitHub

@@ -1,6 +1,4 @@
-﻿#Const VersionType = "Beta"
-
-Public Class World
+﻿Public Class World
     Public Rooms As New List(Of Room)
 
     ' These methods manufacture a new copy of one of the plug rooms.

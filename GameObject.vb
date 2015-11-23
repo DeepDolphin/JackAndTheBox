@@ -2,7 +2,6 @@
     Public Position As Vector3
     Public Speed As Vector2
     Public HitBox As RectangleF
-    'Public Image As Bitmap
     Public Sprite As Sprite
     Public CastsShadow As Boolean = True
     Public Room As Room
@@ -10,6 +9,7 @@
     Public Flags As New List(Of String)
     Public Colliable As Boolean = True
     Public Visible As Boolean = True
+    Public Ability As Ability
 
     Public ReadOnly Property Middle As Vector3
         Get

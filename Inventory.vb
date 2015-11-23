@@ -8,7 +8,7 @@
     End Property
     Public ReadOnly Property UtilityAbility As Ability
         Get
-            Return New PlaceAbility(0, New Crate(MainForm.Player.Room, MainForm.Player.Position), MainForm.Player, True)
+            Return New PlaceAbility(0, New Crate(MainForm.Player.Room, MainForm.Player.Position), MainForm.Player, False)
         End Get
     End Property
 

@@ -104,7 +104,7 @@
         End If
 
         'Update Direction of the Player
-        If Options.Preferences("PlayerMovementType") = "ArcadeMovement" Then
+        If (Options.OIStatus("Up") Xor Options.OIStatus("Down")) Or (Options.OIStatus("Right") Xor Options.OIStatus("Left")) Then
             Direction = ToActorDirection(Speed.Direction)
         End If
 
@@ -119,6 +119,11 @@
             If Inventory.ActiveAbility IsNot Nothing Then Inventory.ActiveAbility.Run()
             Options.OIStatus("ActiveAbility") = False
         End If
+        If Options.MouseWheel <> 0 Then
+
+            Options.MouseWheel = 0
+        End If
+
     End Sub
 
     Private Sub ActiveAbility()

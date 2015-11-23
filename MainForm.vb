@@ -1,20 +1,14 @@
-﻿#Const VersionType = "Beta"
-
-Public Class MainForm
+﻿Public Class MainForm
 
 #If VersionType = "Beta" Then
-    Public Const VersionType As String = "Beta"
     Public Const VersionTN As String = "1"
 #ElseIf VersionType = "Release" Then
-    Public Const VersionType As String = "Release"
     Public Const VersionTN As String = "0"
 #ElseIf VersionType = "Debug" Then
-    Public Const VersionType As String = "Debug"
     Public Const VersionTN As String = "2"
 #End If
 
-    Public Const VersionNumber As String = "1.0.0." + VersionTN + "000"
-    Public Const Version As String = "Version: " + VersionNumber + " " + VersionType
+    Public Const VersionNumber As String = "1.0.0223." + VersionTN + "000"
 
     Public ToAddWaitlist As New List(Of GameObject)
     Public ShadeBrush As SolidBrush
@@ -27,8 +21,6 @@ Public Class MainForm
     Public ViewOffsetY As Double
     Public World As World
     Public Options As Options
-
-    Public test As Double
 
     Public ReadOnly Property MaxTick As Double
         Get
@@ -63,17 +55,21 @@ Public Class MainForm
 
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
+#If Not VersionType = "Debug" Then
         For Each s As String In IO.Directory.EnumerateFiles("Rooms\")
             If IO.Path.GetFileNameWithoutExtension(s) = "up" OrElse
                     IO.Path.GetFileNameWithoutExtension(s) = "down" OrElse
                     IO.Path.GetFileNameWithoutExtension(s) = "left" OrElse
-                    IO.Path.GetFileNameWithoutExtension(s) = "right" Then
+                    IO.Path.GetFileNameWithoutExtension(s) = "right" OrElse
+                    IO.Path.GetFileNameWithoutExtension(s) = "debug" Then
                 Continue For
             End If
             Dim r As New Room(s)
             rooms.Add(r)
         Next
-
+#Else
+        rooms.Add(New Room("Rooms\debug.xml"))
+#End If
         LoadFiles()
 
         ' Generate the world to play in
@@ -128,11 +124,11 @@ Public Class MainForm
 #End If
         Next
 #If Not VersionType = "Release" Then
-        e.Graphics.DrawString(Version, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
+        e.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
         e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
         e.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
-        e.Graphics.DrawString(test, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
+        e.Graphics.DrawString(Options.MouseWheel, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
         e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
     End Sub
@@ -206,6 +202,7 @@ Public Class MainForm
                         Exit For
                     End If
                 Next
+
                 If good Then
                     r.AddGameObject(GameObject)
                     ToAddWaitlist.Remove(GameObject)
@@ -246,8 +243,6 @@ Public Class MainForm
         GroundBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.FloorTile.Width), CInt(-Player.Position.Y Mod My.Resources.FloorTile.Height))
         WallBrush.ResetTransform()
         WallBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Position.Y Mod My.Resources.WallStrip.Height + 2))
-
-        test = 0
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
@@ -294,7 +289,7 @@ Public Class MainForm
     End Sub
 
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
-        test = e.Delta / 120
+        Options.MouseWheel = e.Delta / 120
     End Sub
 
 
