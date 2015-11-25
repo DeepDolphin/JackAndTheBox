@@ -177,12 +177,16 @@
                         Exit For
                     End If
                 Next
-                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then good = False
-                If good Then
-                    O.Position.X = newx
-                    O.Position.Y = newy
+
+                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then
+                    good = False
                 End If
-            End If
+
+                If good Then
+                        O.Position.X = newx
+                        O.Position.Y = newy
+                    End If
+                End If
             O.Update(t)
         Next
 
@@ -190,7 +194,10 @@
         For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
             Dim GameObject As GameObject = ToAddWaitlist(value)
             If (GameObject.Room.Equals(r)) Then
-                If GameObject.Position.X < 0 OrElse GameObject.Position.Y + 16 < 0 OrElse GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
+                If GameObject.Position.X < 0 OrElse
+                    GameObject.Position.Y + 16 < 0 OrElse
+                    GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse
+                    GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
                     ToAddWaitlist.Remove(GameObject)
                     Continue For
                 End If

@@ -7,7 +7,7 @@
     Public Room As Room
     Public Properties As New Dictionary(Of String, String)
     Public Flags As New List(Of String)
-    Public Colliable As Boolean = True
+    Public Collidable As Boolean = True
     Public Visible As Boolean = True
     Public Ability As Ability
 
@@ -88,7 +88,7 @@
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector2) As Boolean
         'If not on the same level it won't collide
         If (Other.Position.Z <> Position.Z And Not (Position.Z <= 0 And Other.Position.Z <= 0)) Then Return False
-        If Not Colliable OrElse Not Other.Colliable Then Return False
+        If Not Collidable OrElse Not Other.Collidable Then Return False
 
         Dim otherhitbox As RectangleF = Other.HitBox
         otherhitbox.X += OtherPosition.X
@@ -102,7 +102,11 @@
     End Function
 
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector3) As Boolean
-        Return If(OtherPosition.Z <> Position.Z And Not (Position.Z <= 0 And OtherPosition.Z <= 0), False, CollidesWith(Other, OtherPosition.XY))
+        If (OtherPosition.Z <> Position.Z And Not (Position.Z <= 0 And OtherPosition.Z <= 0)) Then
+            Return False
+        Else
+            Return CollidesWith(Other, OtherPosition.XY)
+        End If
     End Function
 
     Public Function getDistanceTo(O As GameObject) As Double

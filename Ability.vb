@@ -37,73 +37,36 @@ Public Class PlaceAbility
         Dim Direction As Actor.ActorDirection = User.Direction
 
 
-        Dim X As Integer
-        Dim Y As Integer
+        Dim X As Integer = User.Position.X
+        Dim Y As Integer = User.Position.Y
+
+        If Not InFront Then
+            Direction = InvertDirection(Direction)
+        End If
+
         Select Case Direction
             Case Actor.ActorDirection.South
-                If (InFront) Then
-                    X = User.Position.X
-                    Y = User.Position.Y + User.Sprite.Height + 1
-                Else
-                    X = User.Position.X
-                    Y = User.Position.Y - Parent.Sprite.Height + 20
-                End If
+                Y += User.Sprite.Height + 1
             Case Actor.ActorDirection.North
-                If (InFront) Then
-                    X = User.Position.X
-                    Y = User.Position.Y - Parent.Sprite.Height + 16
-                Else
-                    X = User.Position.X
-                    Y = User.Position.Y + User.Sprite.Height - 3
-                End If
+                Y += User.Sprite.Height - User.HitBox.Height - Parent.HitBox.Height - 1
             Case Actor.ActorDirection.West
-                If (InFront) Then
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y + User.Sprite.Height - Parent.Sprite.Height
-                Else
-                    X = User.Position.X + User.Sprite.Width
-                    Y = User.Position.Y + User.Sprite.Height - Parent.Sprite.Height
-                End If
+                X -= Parent.Sprite.Width + 1
+                Y += User.Sprite.Height - Parent.Sprite.Height
             Case Actor.ActorDirection.East
-                If (InFront) Then
-                    X = User.Position.X + User.Sprite.Width + 1
-                    Y = User.Position.Y + User.Sprite.Height - Parent.Sprite.Height
-                Else
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y + User.Sprite.Height - Parent.Sprite.Height
-                End If
+                X += User.Sprite.Width + 1
+                Y += User.Sprite.Height - Parent.Sprite.Height
             Case Actor.ActorDirection.SouthWest
-                If (InFront) Then
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y + User.Sprite.Height + 1
-                Else
-                    X = User.Position.X + User.Sprite.Width
-                    Y = User.Position.Y - Parent.Sprite.Height + 20
-                End If
+                X -= Parent.Sprite.Width + 1
+                Y += User.Sprite.Height + 1
             Case Actor.ActorDirection.SouthEast
-                If (InFront) Then
-                    X = User.Position.X + User.Sprite.Width + 1
-                    Y = User.Position.Y + User.Sprite.Height + 1
-                Else
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y - Parent.Sprite.Height + 20
-                End If
+                X += User.Sprite.Width + 1
+                Y += User.Sprite.Height + 1
             Case Actor.ActorDirection.NorthWest
-                If (InFront) Then
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y - Parent.Sprite.Height + 16
-                Else
-                    X = User.Position.X + User.Sprite.Width
-                    Y = User.Position.Y + User.Sprite.Height - 3
-                End If
+                X -= Parent.Sprite.Width + 1
+                Y += User.Sprite.Height - User.HitBox.Height - Parent.HitBox.Height - 1
             Case Actor.ActorDirection.NorthEast
-                If (InFront) Then
-                    X = User.Position.X + User.Sprite.Width + 1
-                    Y = User.Position.Y - Parent.Sprite.Height + 16
-                Else
-                    X = User.Position.X - Parent.Sprite.Width - 1
-                    Y = User.Position.Y + User.Sprite.Height - 3
-                End If
+                X += User.Sprite.Width + 1
+                Y += User.Sprite.Height - User.HitBox.Height - Parent.HitBox.Height - 1
         End Select
 
         Parent.Position = New Vector3(X, Y, Parent.Position.Z)
@@ -111,4 +74,27 @@ Public Class PlaceAbility
         MainForm.ToAddWaitlist.Add(Parent)
         CurrentCooldown = MaxCooldown
     End Sub
+
+    Private Function InvertDirection(direction As Actor.ActorDirection) As Actor.ActorDirection
+        Select Case direction
+            Case Actor.ActorDirection.South
+                Return Actor.ActorDirection.North
+            Case Actor.ActorDirection.North
+                Return Actor.ActorDirection.South
+            Case Actor.ActorDirection.West
+                Return Actor.ActorDirection.East
+            Case Actor.ActorDirection.East
+                Return Actor.ActorDirection.West
+            Case Actor.ActorDirection.SouthWest
+                Return Actor.ActorDirection.NorthEast
+            Case Actor.ActorDirection.SouthEast
+                Return Actor.ActorDirection.NorthWest
+            Case Actor.ActorDirection.NorthWest
+                Return Actor.ActorDirection.SouthEast
+            Case Actor.ActorDirection.NorthEast
+                Return Actor.ActorDirection.SouthWest
+        End Select
+        Throw New InvalidOperationException("Unexpected direction: " + direction)
+    End Function
+
 End Class
