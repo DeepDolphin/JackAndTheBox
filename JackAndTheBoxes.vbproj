@@ -119,6 +119,7 @@
     <Compile Include="Objective.vb" />
     <Compile Include="Options.vb" />
     <Compile Include="Player.vb" />
+    <Compile Include="Resources.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Ability.vb" />
     <Compile Include="Sprite.vb" />

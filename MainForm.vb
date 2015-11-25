@@ -49,10 +49,6 @@
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Me.DoubleBuffered = True
 
-        GroundBrush = New TextureBrush(My.Resources.FloorTile)
-        WallBrush = New TextureBrush(My.Resources.WallStrip)
-        ShadeBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
-
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
 #If Not VersionType = "Debug" Then
@@ -78,11 +74,15 @@
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New NormalEnemy(PlayerRoom, 100, 100)
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0)) With Collidable = false
 
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject1)
-        'World.Rooms(0).AddGameObject(TestObject2)
+        World.Rooms(0).AddGameObject(TestObject2)
+
+        GroundBrush = World.GroundBrush
+        WallBrush = World.WallBrush
+        ShadeBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
 
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
