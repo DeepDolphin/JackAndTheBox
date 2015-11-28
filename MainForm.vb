@@ -98,26 +98,38 @@
         Options.SaveOptions()
     End Sub
 
+    Private Function CIntFloor(vals() As Double) As Integer
+        Dim sum As Integer
+        For Each val As Double In vals
+            sum += CInt(Math.Floor(val))
+        Next
+        Return sum
+    End Function
+
     Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
         For Each r As Room In World.Rooms
-            e.Graphics.FillRectangle(WallBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, 32)
-            e.Graphics.FillRectangle(GroundBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset), r.Bounds.Width, r.Bounds.Height)
-            e.Graphics.DrawImage(My.Resources.GradientLeft, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
-            e.Graphics.DrawImage(My.Resources.GradientRight, CInt(-ViewOffsetX + r.XOffset + r.Width - 63), CInt(-ViewOffsetY + r.YOffset - 32), 64, 32)
+            e.Graphics.FillRectangle(WallBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), r.Bounds.Width, 32)
+            e.Graphics.FillRectangle(GroundBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset}), r.Bounds.Width, r.Bounds.Height)
+            e.Graphics.DrawImage(My.Resources.GradientLeft, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
+            e.Graphics.DrawImage(My.Resources.GradientRight, CIntFloor({-ViewOffsetX, r.XOffset, r.Width - 63}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
             If r.Equals(Player.Room) Then
                 For Each o As GameObject In r.GameObjects
-                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow, CInt(o.Position.X - ViewOffsetX + r.XOffset), CInt(o.Position.Y + o.Sprite.Height - 7 - ViewOffsetY + r.YOffset), o.Sprite.Width, 10)
+                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
+                                                               CIntFloor({o.Position.X, -ViewOffsetX, r.XOffset}),
+                                                               CIntFloor({o.Position.Y, o.Sprite.Height - 7, -ViewOffsetY, r.YOffset}), o.Sprite.Width, 10)
                 Next
                 For Each O As GameObject In r.GameObjects
                     Try
-                        e.Graphics.DrawImage(O.Sprite.CurrentFrame, CInt(O.Position.X - ViewOffsetX + r.XOffset), CInt(O.Position.Y + O.Position.Z * (10 / 16) - ViewOffsetY + r.YOffset), O.Sprite.Width, O.Sprite.Height)
+                        e.Graphics.DrawImage(O.Sprite.CurrentFrame,
+                                             CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
+                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset}), O.Sprite.Width, O.Sprite.Height)
 
                     Catch ex As Exception
                         Stop
                     End Try
                 Next
             Else
-                e.Graphics.FillRectangle(ShadeBrush, CInt(-ViewOffsetX + r.XOffset), CInt(-ViewOffsetY + r.YOffset - 32), r.Bounds.Width, r.Bounds.Height + 32)
+                e.Graphics.FillRectangle(ShadeBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), r.Bounds.Width, r.Bounds.Height + 32)
             End If
 #If Not VersionType = "Release" Then
             e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
