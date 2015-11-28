@@ -4,9 +4,9 @@ Jack and the boxes game
 Current Version: 1.0.0223.1000
 
 # Contributors
-David -> Lead Programmer
-Ben -> Programmer
-Jonathan -> Programmer
+ -  David -> Lead Programmer
+ -  Ben -> Programmer
+ -  Jonathan -> Programmer
 
 # Known Bugs
   - Crates can be placed above the wall

@@ -1,5 +1,7 @@
 ﻿Public Class World
     Public Rooms As New List(Of Room)
+    Public GroundBrush As New TextureBrush(My.Resources.FloorTile)
+    Public WallBrush As New TextureBrush(My.Resources.WallStrip)
 
     ' These methods manufacture a new copy of one of the plug rooms.
     Public ReadOnly Property LeftPlug As Room
