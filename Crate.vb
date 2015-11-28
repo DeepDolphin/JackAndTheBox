@@ -2,11 +2,11 @@
     Inherits GameObject
 
     Public Sub New(Room As Room, Position As Vector3)
-        MyBase.New(My.Resources.Crate, Room, Position)
+        MyBase.New(My.Resources.Crate, Room, Position, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
     End Sub
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)
-        MyBase.New(Sprite, Room, Position)
+        MyBase.New(Sprite, Room, Position, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
     End Sub
 
 End Class

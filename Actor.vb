@@ -27,28 +27,28 @@
     Public Direction As ActorDirection = ActorDirection.North
 
     Public Sub New(Room As Room)
-        MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100)
+        MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
         GeneralInit()
         AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
-        MyBase.New(Image, Room, Position, 100)
+        MyBase.New(Image, Room, Position, 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
         GeneralInit()
         AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
-        MyBase.New(Image, Room, Position, Speed, 100)
+        MyBase.New(Image, Room, Position, Speed, 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
         GeneralInit()
         AbilityInit(1, 1)
         MovementInit(25, 8, 2)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
-        MyBase.New(Image, Room, Position, Speed, Health)
+        MyBase.New(Image, Room, Position, Speed, Health, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
         GeneralInit()
         AbilityInit(1, 1)
         MovementInit(25, 8, 2)

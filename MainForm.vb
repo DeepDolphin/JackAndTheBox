@@ -74,7 +74,7 @@
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0)) With {.Collidable = False}
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject})
 
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject1)
@@ -113,12 +113,16 @@
             e.Graphics.DrawImage(My.Resources.GradientLeft, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
             e.Graphics.DrawImage(My.Resources.GradientRight, CIntFloor({-ViewOffsetX, r.XOffset, r.Width - 63}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
             If r.Equals(Player.Room) Then
+                ' Draw shadows first
                 For Each O As GameObject In r.GameObjects
-                    Try
-                        If O.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
+                    If O.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
                                                                CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
                                                                CIntFloor({O.Position.Y, O.Sprite.Height - 7, -ViewOffsetY, r.YOffset}), O.Sprite.Width, 10)
+                Next
 
+                ' Draw the rest of the game objects
+                For Each O As GameObject In r.GameObjects
+                    Try
                         e.Graphics.DrawImage(O.Sprite.CurrentFrame,
                                              CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
                                              CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset}),

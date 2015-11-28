@@ -175,8 +175,7 @@
 #If Not VersionType = "Debug" Then
         For Each r As Room In Rooms
             For i As Integer = 0 To 10
-                Dim l As New GameObject(My.Resources.CeilingLight, r, New Vector3(random.Next(r.Width - My.Resources.CeilingLight.Width), random.Next(r.Height - My.Resources.CeilingLight.Height), 10))
-                l.CastsShadow = False
+                Dim l As New GameObject(My.Resources.CeilingLight, r, New Vector3(random.Next(r.Width - My.Resources.CeilingLight.Width), random.Next(r.Height - My.Resources.CeilingLight.Height), 10), {})
                 r.AddGameObject(l)
             Next
         Next

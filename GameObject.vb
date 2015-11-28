@@ -4,17 +4,48 @@
     Public Speed As Vector2
     Public HitBox As RectangleF
     Public Sprite As Sprite
-    Public CastsShadow As Boolean = True
     Public Room As Room
     Public Properties As New Dictionary(Of String, String)
     Public Flags As New List(Of String)
-    Public Collidable As Boolean = True
     Public Visible As Boolean = True
-    Public Ability As Ability
+    Public Ability As Ability '
+    Private Const Health_Invulnerable = -1
+    Private TestProperties As New BitArray(GameObjectProps.Max) ' change the name of this thing
+
+    Public ReadOnly Property FloorObject As Boolean
+        Get
+            Return TestProperties.Get(GameObjectProps.FloorObject)
+        End Get
+    End Property
+
+    Public ReadOnly Property CastsShadow As Boolean
+        Get
+            Return TestProperties.Get(GameObjectProps.CastsShadow)
+        End Get
+    End Property
+
+    Public ReadOnly Property Collidable As Boolean
+        Get
+            Return TestProperties.Get(GameObjectProps.Collidable)
+        End Get
+    End Property
+
+    Public Enum GameObjectProps
+        CastsShadow
+        FloorObject
+        Collidable
+
+        Max ' Don't use, only for bounds of enum
+    End Enum
 
     Public ReadOnly Property Depth As Double
         Get
-            Return Position.Y - HitBox.Height + (Position.Z * HitBox.Height * (10 / 16))
+            Dim myDepth As Double
+            myDepth = Position.Y + (Position.Z * HitBox.Height * (10 / 16))
+            If Not (FloorObject) Then
+                myDepth += HitBox.Height + HitBox.Y
+            End If
+            Return myDepth
         End Get
     End Property
 
@@ -24,62 +55,47 @@
         End Get
     End Property
 
-    Public Sub New(Image As Bitmap, Room As Room)
-        Me.Sprite = New Sprite(Image)
-        HitBox = Image.GetBounds(GraphicsUnit.Pixel)
-        Me.Room = Room
+    Public Sub New(Image As Bitmap, Room As Room, ObjectProperties As GameObjectProps())
+        Init(New Sprite(Image), Room, Me.Position, Me.Speed, Health_Invulnerable, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
-        Me.Position = Position
-        Me.Sprite = New Sprite(Image)
-        HitBox = Image.GetBounds(GraphicsUnit.Pixel)
-        Me.Room = Room
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, ObjectProperties As GameObjectProps())
+        Init(New Sprite(Image), Room, Position, Me.Speed, Health_Invulnerable, ObjectProperties)
     End Sub
 
-    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)
-        Me.Position = Position
-        Me.Sprite = Sprite
-        HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
-        Me.Room = Room
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, ObjectProperties As GameObjectProps())
+        Init(Sprite, Room, Position, Me.Speed, Health_Invulnerable, ObjectProperties)
     End Sub
 
-    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer)
-        Me.Position = Position
-        Me.Sprite = Sprite
-        Me.Room = Room
-
-        Init(Health)
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
+        Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
-        Me.Position = Position
-        Me.Speed = Speed
-        Me.Sprite = New Sprite(Image)
-        HitBox = Image.GetBounds(GraphicsUnit.Pixel)
-        Me.Room = Room
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, ObjectProperties As GameObjectProps())
+        Init(New Sprite(Image), Room, Position, Speed, Health_Invulnerable, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Health As Integer)
-        Me.Position = Position
-        Me.Sprite = New Sprite(Image)
-        Me.Room = Room
-
-        Init(Health)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
+        Init(New Sprite(Image), Room, Position, Me.Speed, Health, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer, ObjectProperties As GameObjectProps())
+        Init(New Sprite(Image), Room, Position, Speed, Health, ObjectProperties)
+    End Sub
+
+    Public Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer, ObjectProperties As GameObjectProps())
         Me.Position = Position
         Me.Speed = Speed
-        Me.Sprite = New Sprite(Image)
+        Me.Sprite = Image
         Me.Room = Room
-
-        Init(Health)
-    End Sub
-
-    Public Sub Init(health As Double)
         HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
-        Properties.Add("Health", health)
+        If Not (Health = Health_Invulnerable) Then
+            Properties.Add("Health", Health)
+        End If
+
+        For Each ObjectProperty As GameObjectProps In ObjectProperties
+            TestProperties.Set(ObjectProperty, True)
+        Next
     End Sub
 
     Public Overridable Sub Update(t As Double)
@@ -144,6 +160,6 @@
     Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
         Dim otherObj As GameObject
         otherObj = DirectCast(obj, GameObject)
-        Return Depth < otherObj.Depth
+        Return Depth - otherObj.Depth
     End Function
 End Class
