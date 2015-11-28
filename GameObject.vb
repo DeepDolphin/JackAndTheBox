@@ -1,4 +1,5 @@
 ﻿Public Class GameObject
+    Implements IComparable
     Public Position As Vector3
     Public Speed As Vector2
     Public HitBox As RectangleF
@@ -11,6 +12,11 @@
     Public Visible As Boolean = True
     Public Ability As Ability
 
+    Public ReadOnly Property Depth As Double
+        Get
+            Return Position.Y - HitBox.Height + (Position.Z * HitBox.Height * (10 / 16))
+        End Get
+    End Property
     Public ReadOnly Property Middle As Vector3
         Get
             Return New Vector3(Position.X + (HitBox.Width / 2), Position.Y + (HitBox.Width / 2), Position.Z)
@@ -132,5 +138,12 @@
         Next
 
         Return objectList
+    End Function
+
+    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+        'o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16))
+        Dim otherObj As GameObject
+        otherObj = DirectCast(obj, GameObject)
+        Return Depth < otherObj.Depth
     End Function
 End Class

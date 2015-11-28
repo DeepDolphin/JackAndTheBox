@@ -50,42 +50,17 @@ Public Class Room
 
     Public Sub AddGameObject(O As GameObject)
         GameObjects.Add(O)
-        ResortGameObjects()
+        GameObjects.Sort()
     End Sub
 
     Public Sub RemoveGameObject(O As GameObject)
         GameObjects.Remove(O)
-        ResortGameObjects()
+        GameObjects.Sort()
     End Sub
 
     Public Sub RemoveGameObject(index As Integer)
         GameObjects.RemoveAt(index)
-        ResortGameObjects()
-    End Sub
-
-
-    Public Sub ResortGameObjects()
-        Dim l As New List(Of GameObject)
-        While GameObjects.Count > 0
-            ' find the smallest y
-            Dim b As New List(Of GameObject)
-            Dim record As Integer = Integer.MaxValue
-            For Each o As GameObject In GameObjects
-                If o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16)) < record Then
-                    b.Clear()
-                    record = o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16))
-                    b.Add(o)
-                ElseIf o.Position.Y - o.HitBox.Height + (o.Position.Z * o.HitBox.Height * (10 / 16)) = record
-                    b.Add(o)
-                End If
-            Next
-            For Each o As GameObject In b
-                GameObjects.Remove(o)
-                l.Add(o)
-            Next
-        End While
-
-        GameObjects = l
+        GameObjects.Sort()
     End Sub
 
     Public Event GameObjectChange()
