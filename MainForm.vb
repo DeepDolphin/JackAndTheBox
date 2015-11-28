@@ -113,17 +113,24 @@
             e.Graphics.DrawImage(My.Resources.GradientLeft, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
             e.Graphics.DrawImage(My.Resources.GradientRight, CIntFloor({-ViewOffsetX, r.XOffset, r.Width - 63}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
             If r.Equals(Player.Room) Then
-                For Each o As GameObject In r.GameObjects
-                    If o.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
-                                                               CIntFloor({o.Position.X, -ViewOffsetX, r.XOffset}),
-                                                               CIntFloor({o.Position.Y, o.Sprite.Height - 7, -ViewOffsetY, r.YOffset}), o.Sprite.Width, 10)
-                Next
                 For Each O As GameObject In r.GameObjects
                     Try
+                        If O.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
+                                                               CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
+                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, -ViewOffsetY, r.YOffset}), O.Sprite.Width, 10)
+
                         e.Graphics.DrawImage(O.Sprite.CurrentFrame,
                                              CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
-                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset}), O.Sprite.Width, O.Sprite.Height)
-
+                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset}),
+                                             O.Sprite.Width,
+                                             O.Sprite.Height)
+#If VersionType = "Debug" Then
+                        e.Graphics.DrawRectangle(Pens.Red,
+                                                 CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset, O.HitBox.X}),
+                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset, O.HitBox.Y}),
+                                                 O.HitBox.Width,
+                                                 O.HitBox.Height)
+#End If
                     Catch ex As Exception
                         Stop
                     End Try
