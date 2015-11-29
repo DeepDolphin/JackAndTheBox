@@ -36,6 +36,23 @@ Public Class Room
     Public Const RoomHeight As Double = 300
     Public Const RoomBuffer As Double = 48
 
+    Private _Bitmap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
+    Private _Graphics As Graphics
+
+    Public ReadOnly Property Bitmap As Bitmap
+        Get
+            Return _Bitmap
+        End Get
+    End Property
+
+    Public ReadOnly Property Graphics As Graphics
+        Get
+            If (_Graphics Is Nothing) Then
+                _Graphics = Graphics.FromImage(_Bitmap)
+            End If
+            Return _Graphics
+        End Get
+    End Property
 
     Public ReadOnly Property Width As Double
         Get

@@ -22,6 +22,11 @@
     Public World As World
     Public Options As Options
 
+    Private GLeft As New Bitmap(My.Resources.GradientLeft)
+    Private GRight As New Bitmap(My.Resources.GradientRight)
+    Private Shadow As New Bitmap(My.Resources.Shadow)
+    Private Buffer As BufferedGraphics
+
     Public ReadOnly Property MaxTick As Double
         Get
             Return 1 / Options.Preferences("MaxFPS")
@@ -47,8 +52,6 @@
     Public Loaded As Boolean = False
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Me.DoubleBuffered = True
-
         ' Load the rooms that we have.
         Dim rooms As New List(Of Room)
 #If Not VersionType = "Debug" Then
@@ -84,6 +87,7 @@
         WallBrush = World.WallBrush
         ShadeBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
 
+        Buffer = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), New Rectangle(0, 0, ScreenWidth, ScreenHeight))
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
         Watch = New Stopwatch()
@@ -106,32 +110,36 @@
         Return sum
     End Function
 
-    Private Sub MainForm_Paint(sender As Object, e As PaintEventArgs) Handles Me.Paint
+    Private Sub DrawWorld()
+        ' Take this out when we figure out how to draw only the things that
+        ' actually need to be drawn
+        Buffer.Graphics.Clear(Color.Black)
+
         For Each r As Room In World.Rooms
-            e.Graphics.FillRectangle(WallBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), r.Bounds.Width, 32)
-            e.Graphics.FillRectangle(GroundBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset}), r.Bounds.Width, r.Bounds.Height)
-            e.Graphics.DrawImage(My.Resources.GradientLeft, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
-            e.Graphics.DrawImage(My.Resources.GradientRight, CIntFloor({-ViewOffsetX, r.XOffset, r.Width - 63}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), 64, 32)
+            r.Graphics.FillRectangle(WallBrush, 0, 0, r.Bounds.Width, 32)
+            r.Graphics.FillRectangle(GroundBrush, 0, 32, r.Bounds.Width, r.Bounds.Height)
+            r.Graphics.DrawImage(GLeft, 0, 0, 64, 32)
+            r.Graphics.DrawImage(GRight, CIntFloor({r.Width - 63}), 0, 64, 32)
             If r.Equals(Player.Room) Then
                 ' Draw shadows first
                 For Each O As GameObject In r.GameObjects
-                    If O.CastsShadow Then e.Graphics.DrawImage(My.Resources.Shadow,
-                                                               CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
-                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, -ViewOffsetY, r.YOffset}), O.Sprite.Width, 10)
+                    If O.CastsShadow Then r.Graphics.DrawImage(Shadow,
+                                                               CIntFloor({O.Position.X}),
+                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, 32}), O.Sprite.Width, 10)
                 Next
 
                 ' Draw the rest of the game objects
                 For Each O As GameObject In r.GameObjects
                     Try
-                        e.Graphics.DrawImage(O.Sprite.CurrentFrame,
-                                             CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset}),
-                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset}),
+                        r.Graphics.DrawImage(O.Sprite.CurrentFrame,
+                                             CIntFloor({O.Position.X}),
+                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
                                              O.Sprite.Width,
                                              O.Sprite.Height)
 #If VersionType = "Debug" Then
-                        e.Graphics.DrawRectangle(Pens.Red,
-                                                 CIntFloor({O.Position.X, -ViewOffsetX, r.XOffset, O.HitBox.X}),
-                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), -ViewOffsetY, r.YOffset, O.HitBox.Y}),
+                        r.Graphics.DrawRectangle(Pens.Red,
+                                                 CIntFloor({O.Position.X, O.HitBox.X}),
+                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
                                                  O.HitBox.Width,
                                                  O.HitBox.Height)
 #End If
@@ -140,20 +148,25 @@
                     End Try
                 Next
             Else
-                e.Graphics.FillRectangle(ShadeBrush, CIntFloor({-ViewOffsetX, r.XOffset}), CIntFloor({-ViewOffsetY, r.YOffset - 32}), r.Bounds.Width, r.Bounds.Height + 32)
+                r.Graphics.FillRectangle(ShadeBrush, 0, 0, r.Bounds.Width, r.Bounds.Height + 32)
             End If
 #If Not VersionType = "Release" Then
-            e.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, CSng(-ViewOffsetX + r.XOffset), CSng(-ViewOffsetY + r.YOffset))
+            r.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
 #End If
+            Buffer.Graphics.DrawImage(r.Bitmap, New Point(r.XOffset - ViewOffsetX, r.YOffset - ViewOffsetY))
         Next
+
 #If Not VersionType = "Release" Then
-        e.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
-        e.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
-        e.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
-        e.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
-        e.Graphics.DrawString(Options.MouseWheel, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
-        e.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
+        Buffer.Graphics.FillRectangle(ShadeBrush, New Rectangle(0, 0, 200, 70))
+        Buffer.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
+        Buffer.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
+        Buffer.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
+        Buffer.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
+        Buffer.Graphics.DrawString(Options.MouseWheel, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
+        Buffer.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
+
+        Buffer.Render()
     End Sub
 
     Private Watch As Stopwatch
@@ -165,7 +178,7 @@
     End Property
     Private Sub Timer_Tick(sender As Object, e As EventArgs) Handles Timer.Tick
         If Loaded = False Then Exit Sub
-        Invalidate()
+        'Invalidate()
         While Watch.Elapsed.TotalSeconds < MaxTick
             Threading.Thread.Sleep(1)
         End While
@@ -174,6 +187,8 @@
         Else
             UpdateWorld(Watch.Elapsed.TotalSeconds / 25) 'Slow down time like a boss [For testing purposes] (maybe an added feature?)
         End If
+        DrawWorld()
+
         _tick = Watch.Elapsed.TotalSeconds
         Watch.Restart()
     End Sub
@@ -269,10 +284,6 @@
 
         ViewOffsetX = Player.Position.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
         ViewOffsetY = Player.Position.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
-        GroundBrush.ResetTransform()
-        GroundBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.FloorTile.Width), CInt(-Player.Position.Y Mod My.Resources.FloorTile.Height))
-        WallBrush.ResetTransform()
-        WallBrush.TranslateTransform(CInt(-Player.Position.X Mod My.Resources.WallStrip.Width - 4), CInt(-Player.Position.Y Mod My.Resources.WallStrip.Height + 2))
     End Sub
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
