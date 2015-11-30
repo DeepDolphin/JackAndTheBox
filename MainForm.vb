@@ -8,7 +8,7 @@
     Public Const VersionTN As String = "2"
 #End If
 
-    Public Const VersionNumber As String = "1.0.0223." + VersionTN + "000"
+    Public Const VersionNumber As String = "1.0.0301." + VersionTN + "000"
 
     Public ToAddWaitlist As New List(Of GameObject)
     Public ShadeBrush As SolidBrush

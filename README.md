@@ -1,7 +1,7 @@
 # JackAndTheBox
 Jack and the boxes game
 
-Current Version: 1.0.0223.1000
+Current Version: 1.0.0301.1000
 
 # Contributors
  -  David -> Lead Programmer
@@ -9,10 +9,20 @@ Current Version: 1.0.0223.1000
  -  Jonathan -> Programmer
 
 # Known Bugs
-  - Crates can be placed above the wall
-  - Placing crate while direction up doesn't work
+  - Crates can be placed "above" the wall
+  
 
 # Changelog
+1.0.0301.1000:
+	Added Capabilities:
+  - Draws hitbox during debugging
+  - Sorts GameObjects more efficiently
+  - Added properties to GameObjects in an efficient manner
+  - Moved to a custom double buffered solution as preparation for efficent drawing
+	Fixed Bugs:
+  - Placing crate while direction up doesn't work
+  - Object jitter
+
 1.0.0223.1000:
 	Added Capabilities:
   - Placing ability is independent from player
