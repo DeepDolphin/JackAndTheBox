@@ -11,20 +11,17 @@
     Public Const VersionNumber As String = "1.0.0301." + VersionTN + "000"
 
     Public ToAddWaitlist As New List(Of GameObject)
-    Public ShadeBrush As SolidBrush
     Public Player As Player
     Public Mouse As PointF
-    Public GroundBrush As TextureBrush
-    Public WallBrush As TextureBrush
     Public Random As New Random(0)
     Public ViewOffsetX As Double
     Public ViewOffsetY As Double
+
     Public World As World
     Public Options As Options
+    Public Resources As Resources
+    Public UserInterface As UserInterface
 
-    Private GLeft As New Bitmap(My.Resources.GradientLeft)
-    Private GRight As New Bitmap(My.Resources.GradientRight)
-    Private Shadow As New Bitmap(My.Resources.Shadow)
     Private Buffer As BufferedGraphics
 
     Public ReadOnly Property MaxTick As Double
@@ -83,11 +80,9 @@
         World.Rooms(0).AddGameObject(TestObject1)
         World.Rooms(0).AddGameObject(TestObject2)
 
-        GroundBrush = World.GroundBrush
-        WallBrush = World.WallBrush
-        ShadeBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
-
         Buffer = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), New Rectangle(0, 0, ScreenWidth, ScreenHeight))
+        Resources = New Resources()
+        UserInterface = New UserInterface()
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
         Watch = New Stopwatch()
@@ -102,13 +97,7 @@
         Options.SaveOptions()
     End Sub
 
-    Private Function CIntFloor(vals() As Double) As Integer
-        Dim sum As Integer
-        For Each val As Double In vals
-            sum += CInt(Math.Floor(val))
-        Next
-        Return sum
-    End Function
+
 
     Private Sub DrawWorld()
         ' Take this out when we figure out how to draw only the things that
@@ -116,48 +105,12 @@
         Buffer.Graphics.Clear(Color.Black)
 
         For Each r As Room In World.Rooms
-            r.Graphics.FillRectangle(WallBrush, 0, 0, r.Bounds.Width, 32)
-            r.Graphics.FillRectangle(GroundBrush, 0, 32, r.Bounds.Width, r.Bounds.Height)
-            r.Graphics.DrawImage(GLeft, 0, 0, 64, 32)
-            r.Graphics.DrawImage(GRight, CIntFloor({r.Width - 63}), 0, 64, 32)
-            If r.Equals(Player.Room) Then
-                ' Draw shadows first
-                For Each O As GameObject In r.GameObjects
-                    If O.CastsShadow Then r.Graphics.DrawImage(Shadow,
-                                                               CIntFloor({O.Position.X}),
-                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, 32}), O.Sprite.Width, 10)
-                Next
-
-                ' Draw the rest of the game objects
-                For Each O As GameObject In r.GameObjects
-                    Try
-                        r.Graphics.DrawImage(O.Sprite.CurrentFrame,
-                                             CIntFloor({O.Position.X}),
-                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
-                                             O.Sprite.Width,
-                                             O.Sprite.Height)
-#If VersionType = "Debug" Then
-                        r.Graphics.DrawRectangle(Pens.Red,
-                                                 CIntFloor({O.Position.X, O.HitBox.X}),
-                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
-                                                 O.HitBox.Width,
-                                                 O.HitBox.Height)
-#End If
-                    Catch ex As Exception
-                        Stop
-                    End Try
-                Next
-            Else
-                r.Graphics.FillRectangle(ShadeBrush, 0, 0, r.Bounds.Width, r.Bounds.Height + 32)
-            End If
-#If Not VersionType = "Release" Then
-            r.Graphics.DrawString(IO.Path.GetFileName(r.Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
-#End If
-            Buffer.Graphics.DrawImage(r.Bitmap, New Point(r.XOffset - ViewOffsetX, r.YOffset - ViewOffsetY))
+            r.Redraw()
+            Buffer.Graphics.DrawImage(r.GraphicsMap, New Point(r.XOffset - ViewOffsetX, r.YOffset - ViewOffsetY))
         Next
 
 #If Not VersionType = "Release" Then
-        Buffer.Graphics.FillRectangle(ShadeBrush, New Rectangle(0, 0, 200, 70))
+        Buffer.Graphics.FillRectangle(Resources.ShadeBrush, New Rectangle(0, 0, 200, 70))
         Buffer.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         Buffer.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
         Buffer.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
@@ -166,6 +119,7 @@
         Buffer.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
 
+        Buffer.Graphics.DrawImage(UserInterface.GraphicsMap, 0, 0)
         Buffer.Render()
     End Sub
 

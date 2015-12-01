@@ -36,23 +36,11 @@ Public Class Room
     Public Const RoomHeight As Double = 300
     Public Const RoomBuffer As Double = 48
 
-    Private _Bitmap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
-    Private _Graphics As Graphics
+    Public WallBrush As TextureBrush
+    Public GroundBrush As TextureBrush
 
-    Public ReadOnly Property Bitmap As Bitmap
-        Get
-            Return _Bitmap
-        End Get
-    End Property
-
-    Public ReadOnly Property Graphics As Graphics
-        Get
-            If (_Graphics Is Nothing) Then
-                _Graphics = Graphics.FromImage(_Bitmap)
-            End If
-            Return _Graphics
-        End Get
-    End Property
+    Public GraphicsMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
+    Private Graphics As Graphics
 
     Public ReadOnly Property Width As Double
         Get
@@ -110,9 +98,72 @@ Public Class Room
                     Objectives.Add(o)
             End Select
         Next
+
+        Graphics = Graphics.FromImage(GraphicsMap)
+        GroundBrush = New TextureBrush(My.Resources.FloorTile)
+        WallBrush = New TextureBrush(My.Resources.WallStrip)
     End Sub
 
     Public Overrides Function ToString() As String
         Return IO.Path.GetFileName(Filename) & " X:" & XOffset & ", Y:" & YOffset & " GameObjects:" & GameObjects.Count
     End Function
+
+    Private Function CIntFloor(vals() As Double) As Integer
+        Dim sum As Integer
+        For Each val As Double In vals
+            sum += CInt(Math.Floor(val))
+        Next
+        Return sum
+    End Function
+
+    Public Sub Redraw()
+        Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
+        Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
+        Graphics.DrawImage(MainForm.Resources.GradientLeft, 0, 0, 64, 32)
+        Graphics.DrawImage(MainForm.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+        If Me.Equals(MainForm.Player.Room) Then
+            ' Draw shadows first
+            For Each O As GameObject In GameObjects
+                If O.CastsShadow Then Graphics.DrawImage(MainForm.Resources.Shadow,
+                                                               CIntFloor({O.Position.X}),
+                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, 32}), O.Sprite.Width, 10)
+            Next
+
+            ' Draw the rest of the game objects
+            For Each O As GameObject In GameObjects
+                Try
+                    Graphics.DrawImage(O.Sprite.CurrentFrame,
+                                             CIntFloor({O.Position.X}),
+                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
+                                             O.Sprite.Width,
+                                             O.Sprite.Height)
+                    If TypeOf O Is Actor Then
+                        Graphics.DrawImage(MainForm.Resources.HealthBackground,
+                                       CIntFloor({O.Position.X, -8}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 24}))
+                        Graphics.DrawImage(MainForm.Resources.HealthBar,
+                                           CIntFloor({O.Position.X, -6}),
+                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 26}),
+                                           New RectangleF(CIntFloor({O.Position.X, -6}), CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 26}), O.Properties("Health") / 100, 4)),
+                                           GraphicsUnit.Pixel)
+                    End If
+#If VersionType = "Debug" Then
+                        r.Graphics.DrawRectangle(Pens.Red,
+                                                 CIntFloor({O.Position.X, O.HitBox.X}),
+                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
+                                                 O.HitBox.Width,
+                                                 O.HitBox.Height)
+#End If
+                Catch ex As Exception
+                    Stop
+                End Try
+            Next
+        Else
+            Graphics.FillRectangle(MainForm.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
+        End If
+#If Not VersionType = "Release" Then
+        Graphics.DrawString(IO.Path.GetFileName(Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
+#End If
+    End Sub
+
 End Class

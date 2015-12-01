@@ -126,6 +126,7 @@
     <Compile Include="Room.vb" />
     <Compile Include="Ability.vb" />
     <Compile Include="Sprite.vb" />
+    <Compile Include="UserInterface.vb" />
     <Compile Include="Vectors.vb" />
     <Compile Include="World.vb" />
   </ItemGroup>
@@ -176,6 +177,8 @@
     <None Include="Resources\EXPOrb3.png" />
     <None Include="Resources\EXPOrb4.png" />
     <None Include="Resources\telepad.png" />
+    <None Include="Resources\HealthBackground.png" />
+    <None Include="Resources\HealthBar.png" />
     <Content Include="Rooms\debug.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
