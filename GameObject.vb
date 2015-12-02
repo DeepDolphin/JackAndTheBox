@@ -99,7 +99,9 @@
         Me.Speed = Speed
         Me.Sprite = Image
         Me.Room = Room
-        HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
+        HitBox = New Rectangle(Sprite.Width / 2, Game.Resources.HealthBackground.Height + (Sprite.Height / 2) + 1, Sprite.Width, Sprite.Height / 2)
+
+
         If Not (Health = Health_Invulnerable) Then
             Properties.Add("Health", 100)
         End If
