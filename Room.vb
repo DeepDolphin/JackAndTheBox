@@ -132,21 +132,7 @@ Public Class Room
             ' Draw the rest of the game objects
             For Each O As GameObject In GameObjects
                 Try
-                    Graphics.DrawImage(O.Sprite.CurrentFrame,
-                                             CIntFloor({O.Position.X}),
-                                             CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
-                                             O.Sprite.Width,
-                                             O.Sprite.Height)
-                    If TypeOf O Is Actor Then
-                        Graphics.DrawImage(MainForm.Resources.HealthBackground,
-                                       CIntFloor({O.Position.X, -8}),
-                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 24}))
-                        Graphics.DrawImage(MainForm.Resources.HealthBar,
-                                           CIntFloor({O.Position.X, -6}),
-                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 26}),
-                                           New RectangleF(CIntFloor({O.Position.X, -6}), CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 26}), O.Properties("Health") / 100, 4)),
-                                           GraphicsUnit.Pixel)
-                    End If
+
 #If VersionType = "Debug" Then
                         r.Graphics.DrawRectangle(Pens.Red,
                                                  CIntFloor({O.Position.X, O.HitBox.X}),

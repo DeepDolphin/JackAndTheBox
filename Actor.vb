@@ -48,7 +48,7 @@
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
-        MyBase.New(Image, Room, Position, Speed, Health, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
+        MyBase.New(Image, Room, Position, Speed, Health, {GameObjectProps.CastsShadow, GameObjectProps.Collidable, GameObjectProps.Visible})
         GeneralInit()
         AbilityInit(1, 1)
         MovementInit(25, 8, 2)

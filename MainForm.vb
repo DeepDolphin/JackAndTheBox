@@ -20,7 +20,7 @@
     Public World As World
     Public Options As Options
     Public Resources As Resources
-    Public UserInterface As UserInterface
+    'Public UserInterface As UserInterface
 
     Private Buffer As BufferedGraphics
 
@@ -82,7 +82,7 @@
 
         Buffer = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), New Rectangle(0, 0, ScreenWidth, ScreenHeight))
         Resources = New Resources()
-        UserInterface = New UserInterface()
+        'UserInterface = New UserInterface()
 
         Loaded = True ' Keep the timer from firing until the game is done loading.
         Watch = New Stopwatch()
@@ -119,7 +119,7 @@
         Buffer.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
 
-        Buffer.Graphics.DrawImage(UserInterface.GraphicsMap, 0, 0)
+        'Buffer.Graphics.DrawImage(UserInterface.GraphicsMap, 0, 0)
         Buffer.Render()
     End Sub
 

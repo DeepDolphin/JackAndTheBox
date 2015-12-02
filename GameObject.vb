@@ -5,12 +5,17 @@
     Public HitBox As RectangleF
     Public Sprite As Sprite
     Public Room As Room
+
     Public Properties As New Dictionary(Of String, String)
     Public Flags As New List(Of String)
-    Public Visible As Boolean = True
+
     Public Ability As Ability '
+
+    Public GraphicsMap As Bitmap
+    Public Graphics As Graphics
+
     Private Const Health_Invulnerable = -1
-    Private TestProperties As New BitArray(GameObjectProps.Max) ' change the name of this thing
+    Private TestProperties As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -30,10 +35,24 @@
         End Get
     End Property
 
+    Public ReadOnly Property Invulnernable As Boolean
+        Get
+            Return TestProperties.Get(GameObjectProps.Invulnernable)
+        End Get
+    End Property
+
+    Public ReadOnly Property Visible As Boolean
+        Get
+            Return TestProperties.Get(GameObjectProps.Visible)
+        End Get
+    End Property
+
     Public Enum GameObjectProps
         CastsShadow
         FloorObject
         Collidable
+        Invulnernable
+        Visible
 
         Max ' Don't use, only for bounds of enum
     End Enum
@@ -55,10 +74,6 @@
         End Get
     End Property
 
-    Public Sub New(Image As Bitmap, Room As Room, ObjectProperties As GameObjectProps())
-        Init(New Sprite(Image), Room, Me.Position, Me.Speed, Health_Invulnerable, ObjectProperties)
-    End Sub
-
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, ObjectProperties As GameObjectProps())
         Init(New Sprite(Image), Room, Position, Me.Speed, Health_Invulnerable, ObjectProperties)
     End Sub
@@ -69,10 +84,6 @@
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
         Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
-    End Sub
-
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, ObjectProperties As GameObjectProps())
-        Init(New Sprite(Image), Room, Position, Speed, Health_Invulnerable, ObjectProperties)
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
@@ -90,8 +101,11 @@
         Me.Room = Room
         HitBox = New Rectangle(0, 0, Sprite.Width, Sprite.Height)
         If Not (Health = Health_Invulnerable) Then
-            Properties.Add("Health", Health)
+            Properties.Add("Health", 100)
         End If
+
+        GraphicsMap = New Bitmap(Sprite.Width * 2, 18 + Sprite.Height)
+        Graphics = Graphics.FromImage(GraphicsMap)
 
         For Each ObjectProperty As GameObjectProps In ObjectProperties
             TestProperties.Set(ObjectProperty, True)
@@ -162,4 +176,30 @@
         otherObj = DirectCast(obj, GameObject)
         Return Depth - otherObj.Depth
     End Function
+
+    Private Function CIntFloor(vals() As Double) As Integer
+        Dim sum As Integer
+        For Each val As Double In vals
+            sum += CInt(Math.Floor(val))
+        Next
+        Return sum
+    End Function
+
+    Public Sub Redraw()
+        Graphics.DrawImage(Sprite.CurrentFrame,
+                                             CIntFloor({Position.X}),
+                                             CIntFloor({Position.Y, Position.Z * (10 / 16), 32}),
+                                             Sprite.Width,
+                                             Sprite.Height)
+        If TypeOf Me Is Actor Then
+            Graphics.DrawImage(MainForm.Resources.HealthBackground,
+                           CIntFloor({Position.X, -8}),
+                           CIntFloor({Position.Y, Position.Z * (10 / 16), 24}),
+                               Sprite.Width * 2, MainForm.Resources.HealthBackground.Height)
+            Graphics.DrawImage(MainForm.Resources.HealthBar,
+                               New Rectangle(CIntFloor({Position.X, -6}), CIntFloor({Position.Y, Position.Z * (10 / 16), 26}), MainForm.Resources.HealthBar.Width * (Properties("Health") / 100), MainForm.Resources.HealthBar.Height),
+                               New Rectangle(0, 0, MainForm.Resources.HealthBar.Width * (Properties("Health") / 100), MainForm.Resources.HealthBar.Height),
+                               GraphicsUnit.Pixel)
+        End If
+    End Sub
 End Class
