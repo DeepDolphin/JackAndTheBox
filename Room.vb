@@ -122,16 +122,12 @@ Public Class Room
         Graphics.DrawImage(MainForm.Resources.GradientLeft, 0, 0, 64, 32)
         Graphics.DrawImage(MainForm.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
         If Me.Equals(MainForm.Player.Room) Then
-            ' Draw shadows first
-            For Each O As GameObject In GameObjects
-                If O.CastsShadow Then Graphics.DrawImage(MainForm.Resources.Shadow,
-                                                               CIntFloor({O.Position.X}),
-                                                               CIntFloor({O.Position.Y, O.Sprite.Height - 7, 32}), O.Sprite.Width, 10)
-            Next
 
             ' Draw the rest of the game objects
             For Each O As GameObject In GameObjects
                 Try
+                    O.Redraw()
+                    Graphics.DrawImage(O.GraphicsMap, CIntFloor({O.Position.X}), CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}))
 
 #If VersionType = "Debug" Then
                         r.Graphics.DrawRectangle(Pens.Red,

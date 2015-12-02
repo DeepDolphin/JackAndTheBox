@@ -24,6 +24,8 @@
 
     Private Buffer As BufferedGraphics
 
+    Private test As Boolean
+
     Public ReadOnly Property MaxTick As Double
         Get
             Return 1 / Options.Preferences("MaxFPS")

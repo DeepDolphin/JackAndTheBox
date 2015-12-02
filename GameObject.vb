@@ -12,7 +12,7 @@
     Public Ability As Ability '
 
     Public GraphicsMap As Bitmap
-    Public Graphics As Graphics
+    Private Graphics As Graphics
 
     Private Const Health_Invulnerable = -1
     Private TestProperties As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
@@ -104,12 +104,12 @@
             Properties.Add("Health", 100)
         End If
 
-        GraphicsMap = New Bitmap(Sprite.Width * 2, 18 + Sprite.Height)
-        Graphics = Graphics.FromImage(GraphicsMap)
+
 
         For Each ObjectProperty As GameObjectProps In ObjectProperties
             TestProperties.Set(ObjectProperty, True)
         Next
+
     End Sub
 
     Public Overridable Sub Update(t As Double)
@@ -186,20 +186,42 @@
     End Function
 
     Public Sub Redraw()
-        Graphics.DrawImage(Sprite.CurrentFrame,
-                                             CIntFloor({Position.X}),
-                                             CIntFloor({Position.Y, Position.Z * (10 / 16), 32}),
-                                             Sprite.Width,
-                                             Sprite.Height)
-        If TypeOf Me Is Actor Then
-            Graphics.DrawImage(MainForm.Resources.HealthBackground,
-                           CIntFloor({Position.X, -8}),
-                           CIntFloor({Position.Y, Position.Z * (10 / 16), 24}),
-                               Sprite.Width * 2, MainForm.Resources.HealthBackground.Height)
-            Graphics.DrawImage(MainForm.Resources.HealthBar,
-                               New Rectangle(CIntFloor({Position.X, -6}), CIntFloor({Position.Y, Position.Z * (10 / 16), 26}), MainForm.Resources.HealthBar.Width * (Properties("Health") / 100), MainForm.Resources.HealthBar.Height),
-                               New Rectangle(0, 0, MainForm.Resources.HealthBar.Width * (Properties("Health") / 100), MainForm.Resources.HealthBar.Height),
-                               GraphicsUnit.Pixel)
+        If Graphics Is Nothing Then
+            GraphicsMap = New Bitmap(Sprite.Width * 2, 18 + Sprite.Height)
+            Graphics = Graphics.FromImage(GraphicsMap)
+
+            If CastsShadow Then
+                Graphics.DrawImage(MainForm.Resources.Shadow,
+                                   Sprite.Width \ 2,
+                                   MainForm.Resources.HealthBackground.Height + Sprite.Height - 7,
+                                   Sprite.Width,
+                                   10)
+            End If
+
+            Graphics.DrawImage(Sprite.CurrentFrame,
+                               Sprite.Width \ 2,
+                               MainForm.Resources.HealthBackground.Height + 1,
+                               Sprite.Width,
+                               Sprite.Height)
+
+            If TypeOf Me Is Actor Then
+                Graphics.DrawImage(MainForm.Resources.HealthBackground,
+                                   0,
+                                   0,
+                                   Sprite.Width * 2,
+                                   MainForm.Resources.HealthBackground.Height)
+
+                Graphics.DrawImage(MainForm.Resources.HealthBar,
+                                   New Rectangle(2,
+                                                 2,
+                                                 MainForm.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 MainForm.Resources.HealthBar.Height),
+                                   New Rectangle(0,
+                                                 0,
+                                                 MainForm.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 MainForm.Resources.HealthBar.Height),
+                                   GraphicsUnit.Pixel)
+            End If
         End If
     End Sub
 End Class
