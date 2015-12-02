@@ -94,6 +94,7 @@
     <Compile Include="Crate.vb" />
     <Compile Include="Enemy.vb" />
     <Compile Include="EXPOrb.vb" />
+    <Compile Include="Game.vb" />
     <Compile Include="Inventory.vb" />
     <Compile Include="InventoryItem.vb" />
     <Compile Include="MainForm.vb">

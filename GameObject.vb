@@ -191,35 +191,35 @@
             Graphics = Graphics.FromImage(GraphicsMap)
 
             If CastsShadow Then
-                Graphics.DrawImage(MainForm.Resources.Shadow,
+                Graphics.DrawImage(Game.Resources.Shadow,
                                    Sprite.Width \ 2,
-                                   MainForm.Resources.HealthBackground.Height + Sprite.Height - 7,
+                                   Game.Resources.HealthBackground.Height + Sprite.Height - 7,
                                    Sprite.Width,
                                    10)
             End If
 
             Graphics.DrawImage(Sprite.CurrentFrame,
                                Sprite.Width \ 2,
-                               MainForm.Resources.HealthBackground.Height + 1,
+                               Game.Resources.HealthBackground.Height + 1,
                                Sprite.Width,
                                Sprite.Height)
 
             If TypeOf Me Is Actor Then
-                Graphics.DrawImage(MainForm.Resources.HealthBackground,
+                Graphics.DrawImage(Game.Resources.HealthBackground,
                                    0,
                                    0,
                                    Sprite.Width * 2,
-                                   MainForm.Resources.HealthBackground.Height)
+                                   Game.Resources.HealthBackground.Height)
 
-                Graphics.DrawImage(MainForm.Resources.HealthBar,
+                Graphics.DrawImage(Game.Resources.HealthBar,
                                    New Rectangle(2,
                                                  2,
-                                                 MainForm.Resources.HealthBar.Width * (Properties("Health") / 100),
-                                                 MainForm.Resources.HealthBar.Height),
+                                                 Game.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 Game.Resources.HealthBar.Height),
                                    New Rectangle(0,
                                                  0,
-                                                 MainForm.Resources.HealthBar.Width * (Properties("Health") / 100),
-                                                 MainForm.Resources.HealthBar.Height),
+                                                 Game.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 Game.Resources.HealthBar.Height),
                                    GraphicsUnit.Pixel)
             End If
         End If

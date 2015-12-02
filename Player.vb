@@ -1,6 +1,6 @@
 ﻿Public Class Player
     Inherits Actor
-    Private Options As Options = MainForm.Options
+    Private Options As Options = Game.Options
 
     Public Sub New(Room As Room)
         MyBase.New(Room)
@@ -44,7 +44,7 @@
 
         'Player tank movement
         If Options.Preferences("PlayerMovementType") = "TankMovement" Then
-            PlayerMovement = CType((Cursor.Position + New Size(MainForm.ViewOffsetX, MainForm.ViewOffsetY) - New Size(Room.XOffset, Room.YOffset) - MainForm.Bounds.Location - New Size(8, 31)), PointF) - Middle.XY
+            PlayerMovement = CType((Cursor.Position + New Size(Game.ViewOffsetX, Game.ViewOffsetY) - New Size(Room.XOffset, Room.YOffset) - MainForm.Bounds.Location - New Size(8, 31)), PointF) - Middle.XY
             PlayerMovement.Normalize()
             If Options.OIStatus("Up") Then
                 If (Not CurrentPlayerSpeed = 0.0) Then

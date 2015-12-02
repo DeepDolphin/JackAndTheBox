@@ -22,7 +22,7 @@ Public Class NormalEnemy
         MyBase.Update(t)
 
         'Gets directly to player
-        Dim toPlayer As Vector2 = MainForm.Player.Middle.XY - Middle.XY
+        Dim toPlayer As Vector2 = Game.Player.Middle.XY - Middle.XY
         'If Player is outside of detection range then stop
         If (toPlayer.Length >= 150.0) Then
             If Not Speed.Length = 0 Then Speed.Length = 0
@@ -50,7 +50,7 @@ Public Class SmartEnemy
         MyBase.Update(t)
 
         'Gets directly to player
-        Dim toPlayer As Vector2 = MainForm.Player.Middle.XY - Middle.XY
+        Dim toPlayer As Vector2 = Game.Player.Middle.XY - Middle.XY
         'If Player is outside of detection range then stop
         If (toPlayer.Length >= 150.0) Then
             If Not Speed.Length = 0 Then Speed.Length = 0

@@ -119,29 +119,31 @@ Public Class Room
     Public Sub Redraw()
         Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
         Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
-        Graphics.DrawImage(MainForm.Resources.GradientLeft, 0, 0, 64, 32)
-        Graphics.DrawImage(MainForm.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
-        If Me.Equals(MainForm.Player.Room) Then
+        Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
+        Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+        If Me.Equals(Game.Player.Room) Then
 
             ' Draw the rest of the game objects
             For Each O As GameObject In GameObjects
                 Try
                     O.Redraw()
-                    Graphics.DrawImage(O.GraphicsMap, CIntFloor({O.Position.X}), CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}))
+                    Graphics.DrawImage(O.GraphicsMap,
+                                       CIntFloor({O.Position.X}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}))
 
 #If VersionType = "Debug" Then
-                        r.Graphics.DrawRectangle(Pens.Red,
-                                                 CIntFloor({O.Position.X, O.HitBox.X}),
-                                                 CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
-                                                 O.HitBox.Width,
-                                                 O.HitBox.Height)
+                    Graphics.DrawRectangle(Pens.Red,
+                                           CIntFloor({O.Position.X, O.HitBox.X}),
+                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
+                                           O.HitBox.Width,
+                                           O.HitBox.Height)
 #End If
                 Catch ex As Exception
                     Stop
                 End Try
             Next
         Else
-            Graphics.FillRectangle(MainForm.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
+            Graphics.FillRectangle(Game.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
         End If
 #If Not VersionType = "Release" Then
         Graphics.DrawString(IO.Path.GetFileName(Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)
