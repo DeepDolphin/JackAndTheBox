@@ -8,23 +8,20 @@
     Public Const VersionTN As String = "2"
 #End If
 
-    Public Const VersionNumber As String = "1.0.0301." + VersionTN + "000"
+    Public Const VersionNumber As String = "1.0.0302." + VersionTN + "000"
 
     Public Shared ToAddWaitlist As New List(Of GameObject)
     Public Shared Player As Player
-    Public Mouse As PointF
-    Public Random As New Random(0)
     Public Shared ViewOffsetX As Double
     Public Shared ViewOffsetY As Double
 
     Public Shared World As World
     Public Shared Options As Options
-    Public Shared Resources As New Resources()
-    'Public UserInterface As UserInterface
+    Public Shared Resources As New Resources
+    'Public Shared UserInterface As UserInterface
 
     Private Buffer As BufferedGraphics
     Private gameLoopStarted As Boolean = False
-    Private test As Boolean
     Private ScreenWidth As Integer
     Private ScreenHeight As Integer
     Private GameRunning As Boolean = True

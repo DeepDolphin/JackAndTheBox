@@ -44,7 +44,7 @@
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        g.MouseMove(e)
+        'g.MouseMove(e)
     End Sub
 
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel

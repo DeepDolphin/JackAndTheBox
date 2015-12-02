@@ -5,12 +5,14 @@ Public Class Options
     Public OIMap As Dictionary(Of String, String)
     Public OIStatus As Dictionary(Of String, Boolean)
     Public MouseWheel As Integer
+    Public MouseLocation As PointF
 
     Public Sub New()
         Preferences = New Dictionary(Of String, String)
         OIMap = New Dictionary(Of String, String)
         OIStatus = New Dictionary(Of String, Boolean)
         MouseWheel = 0
+        MouseLocation = New PointF
 
 
 

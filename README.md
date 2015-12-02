@@ -1,7 +1,7 @@
 # JackAndTheBox
 Jack and the boxes game
 
-Current Version: 1.0.0301.1000
+Current Version: 1.0.0302.1000
 
 # Contributors
  -  David -> Lead Programmer
@@ -10,9 +10,17 @@ Current Version: 1.0.0301.1000
 
 # Known Bugs
   - Crates can be placed "above" the wall
+  - Hitboxes are placed incorrectly
   
 
 # Changelog
+1.0.0302.1000:
+	Added Capabilities:
+  - Made a more efficient game loop by seperating the winForm from the rest of the game
+  - Draws healthbars correctly
+  - Rooms draw themselves
+  - GameObjects draw themselves
+
 1.0.0301.1000:
 	Added Capabilities:
   - Draws hitbox during debugging
