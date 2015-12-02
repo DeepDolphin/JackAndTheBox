@@ -12,6 +12,7 @@
     End Sub
 
     Public MustOverride Sub Run()
+
     Public Overridable Sub Update(t As Double)
         If CurrentCooldown > 0.0 Then
             CurrentCooldown -= t

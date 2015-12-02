@@ -26,8 +26,8 @@
     End Sub
 
     Public Sub AddItem(Item As InventoryItem)
-        Inventory.Add(New InventoryItem(Item, {}) With {.Parent = Parent})
-        Item.Flags.Add("Delete")
+        Inventory.Add(New InventoryItem(Item) With {.Parent = Parent})
+        Item.Dead = True
     End Sub
 
     Private Sub EquippedInit()

@@ -7,44 +7,50 @@
     Public Room As Room
 
     Public Properties As New Dictionary(Of String, String)
-    Public Flags As New List(Of String)
-
     Public Ability As Ability '
 
     Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
-    Private Const Health_Invulnerable = -1
-    Private TestProperties As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
+    Protected Flags As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
 
     Public ReadOnly Property FloorObject As Boolean
         Get
-            Return TestProperties.Get(GameObjectProps.FloorObject)
+            Return Flags.Get(GameObjectProps.FloorObject)
         End Get
     End Property
 
     Public ReadOnly Property CastsShadow As Boolean
         Get
-            Return TestProperties.Get(GameObjectProps.CastsShadow)
+            Return Flags.Get(GameObjectProps.CastsShadow)
         End Get
     End Property
 
     Public ReadOnly Property Collidable As Boolean
         Get
-            Return TestProperties.Get(GameObjectProps.Collidable)
+            Return Flags.Get(GameObjectProps.Collidable)
         End Get
     End Property
 
     Public ReadOnly Property Invulnernable As Boolean
         Get
-            Return TestProperties.Get(GameObjectProps.Invulnernable)
+            Return Flags.Get(GameObjectProps.Invulnernable)
         End Get
     End Property
 
     Public ReadOnly Property Visible As Boolean
         Get
-            Return TestProperties.Get(GameObjectProps.Visible)
+            Return Flags.Get(GameObjectProps.Visible)
         End Get
+    End Property
+
+    Public Property Dead As Boolean
+        Get
+            Return Flags.Get(GameObjectProps.Dead)
+        End Get
+        Set(Parameter As Boolean)
+            Flags.Set(GameObjectProps.Dead, Parameter)
+        End Set
     End Property
 
     Public Enum GameObjectProps
@@ -53,6 +59,7 @@
         Collidable
         Invulnernable
         Visible
+        Dead
 
         Max ' Don't use, only for bounds of enum
     End Enum
@@ -74,14 +81,6 @@
         End Get
     End Property
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, ObjectProperties As GameObjectProps())
-        Init(New Sprite(Image), Room, Position, Me.Speed, Health_Invulnerable, ObjectProperties)
-    End Sub
-
-    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, ObjectProperties As GameObjectProps())
-        Init(Sprite, Room, Position, Me.Speed, Health_Invulnerable, ObjectProperties)
-    End Sub
-
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
         Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
     End Sub
@@ -99,27 +98,40 @@
         Me.Speed = Speed
         Me.Sprite = Image
         Me.Room = Room
-        HitBox = New Rectangle(Sprite.Width / 2, Game.Resources.HealthBackground.Height + (Sprite.Height / 2) + 1, Sprite.Width, Sprite.Height / 2) '
 
 
-        If Not (Health = Health_Invulnerable) Then
-            Properties.Add("Health", 100)
-        End If
+
+
+        Properties.Add("Health", Health)
+        Properties.Add("MaxHealth", Health)
+
 
 
 
         For Each ObjectProperty As GameObjectProps In ObjectProperties
-            TestProperties.Set(ObjectProperty, True)
+            Flags.Set(ObjectProperty, True)
         Next
+
+        Dim x As Integer = Sprite.Width / 2
+        Dim y As Integer = Game.Resources.HealthBackground.Height + 1
+        Dim width As Integer = Sprite.Width
+        Dim height As Integer = Sprite.Height
+
+        If (Not FloorObject) Then
+            y += Sprite.Height * (10 / 16)
+            height = (height / 2) * (10 / 16)
+        End If
+
+        HitBox = New Rectangle(x, y, width, height)
 
     End Sub
 
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)
         'Delete if out of Health
-        If Properties.Keys.Contains("Health") Then
+        If Not Invulnernable Then
             If Properties("Health") <= 0.0 Then
-                Flags.Add("Delete")
+                Flags.Set(GameObjectProps.Dead, True)
             End If
         End If
     End Sub
@@ -189,24 +201,26 @@
 
     Public Sub Redraw()
         If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(Sprite.Width * 2, 18 + Sprite.Height)
-            Graphics = Graphics.FromImage(GraphicsMap)
+            If Graphics Is Nothing Then
+                GraphicsMap = New Bitmap(Sprite.Width * 2, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+                Graphics = Graphics.FromImage(GraphicsMap)
+            End If
 
             If CastsShadow Then
-                Graphics.DrawImage(Game.Resources.Shadow,
+                    Graphics.DrawImage(Game.Resources.Shadow,
                                    Sprite.Width \ 2,
                                    Game.Resources.HealthBackground.Height + Sprite.Height - 7,
                                    Sprite.Width,
                                    10)
-            End If
+                End If
 
-            Graphics.DrawImage(Sprite.CurrentFrame,
+                Graphics.DrawImage(Sprite.CurrentFrame,
                                Sprite.Width \ 2,
                                Game.Resources.HealthBackground.Height + 1,
                                Sprite.Width,
                                Sprite.Height)
 
-            If TypeOf Me Is Actor Then
+            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") Then
                 Graphics.DrawImage(Game.Resources.HealthBackground,
                                    0,
                                    0,
@@ -216,11 +230,11 @@
                 Graphics.DrawImage(Game.Resources.HealthBar,
                                    New Rectangle(2,
                                                  2,
-                                                 Game.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 Sprite.Width * (Properties("Health") / Properties("MaxHealth")) * 2,
                                                  Game.Resources.HealthBar.Height),
                                    New Rectangle(0,
                                                  0,
-                                                 Game.Resources.HealthBar.Width * (Properties("Health") / 100),
+                                                 Game.Resources.HealthBar.Width * (Properties("Health") / Properties("MaxHealth")),
                                                  Game.Resources.HealthBar.Height),
                                    GraphicsUnit.Pixel)
             End If

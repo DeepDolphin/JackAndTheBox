@@ -1,6 +1,8 @@
-﻿Public Class UserInterface
+﻿
 
-    Public GraphicsMap As New Bitmap(MainForm.ScreenWidth, MainForm.ScreenHeight)
+Public Class UserInterface
+
+    Public GraphicsMap As New Bitmap(Game.ScreenWidth, Game.ScreenHeight)
     Private Graphics As Graphics
 
 

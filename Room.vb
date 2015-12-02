@@ -137,6 +137,11 @@ Public Class Room
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
                                            O.HitBox.Width,
                                            O.HitBox.Height)
+                    Graphics.DrawRectangle(Pens.Blue,
+                                           CIntFloor({O.Position.X}),
+                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
+                                           O.GraphicsMap.Width,
+                                           O.GraphicsMap.Height)
 #End If
                 Catch ex As Exception
                     Stop

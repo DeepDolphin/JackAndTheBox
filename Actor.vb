@@ -55,7 +55,6 @@
     End Sub
 
     Public Sub GeneralInit()
-        Flags.Add("Actor")
         'HitBox = New RectangleF(8, 0, 16, 10)
     End Sub
 

@@ -15,16 +15,16 @@
     Public Shared ViewOffsetX As Double
     Public Shared ViewOffsetY As Double
 
+    Public Shared ScreenWidth As Integer
+    Public Shared ScreenHeight As Integer
+
     Public Shared World As World
     Public Shared Options As Options
     Public Shared Resources As New Resources
-    'Public Shared UserInterface As UserInterface
+    Public Shared UserInterface As UserInterface
 
     Private Buffer As BufferedGraphics
-    Private gameLoopStarted As Boolean = False
-    Private ScreenWidth As Integer
-    Private ScreenHeight As Integer
-    Private GameRunning As Boolean = True
+    Private GameRunning As Boolean
 
     Public ReadOnly Property MaxTick As Double
         Get
@@ -37,8 +37,6 @@
             Return World.RoomAt(Player.Middle.X + Player.Room.XOffset, Player.Middle.Y + Player.Room.YOffset)
         End Get
     End Property
-
-    Public Loaded As Boolean = False
 
     Public Sub New(Buffer As BufferedGraphics, ScreenWidth As Integer, ScreenHeight As Integer)
         Me.Buffer = Buffer
@@ -77,16 +75,16 @@
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject})
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), -1, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnernable})
 
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject1)
         World.Rooms(0).AddGameObject(TestObject2)
 
         Resources = New Resources()
-        'UserInterface = New UserInterface()
+        UserInterface = New UserInterface()
 
-        Loaded = True ' Keep the timer from firing until the game is done loading.
+        GameRunning = True
         Watch = New Stopwatch()
         Watch.Start()
     End Sub
@@ -168,10 +166,10 @@
                     If other.Equals(O) Then Continue For
                     If other.CollidesWith(O, New Vector2(newx, newy)) Then
                         good = False
-                        If (O.Flags.Contains("Actor")) Then
+                        If TypeOf O Is Actor Then
                             CType(O, Actor).Hit(other)
                         End If
-                        If (other.Flags.Contains("InventoryItem") And O.Equals(Player)) Then
+                        If TypeOf other Is InventoryItem And TypeOf O Is Player Then
                             Player.Inventory.AddItem(other)
                         End If
                         Exit For
@@ -221,7 +219,7 @@
 
         'Delete all items flagged for deletion
         For value As Integer = r.GameObjects.Count - 1 To 0 Step -1
-            If r.GameObjects(value).Flags.Contains("Delete") Then
+            If r.GameObjects(value).Dead Then
                 r.GameObjects.RemoveAt(value)
             End If
         Next

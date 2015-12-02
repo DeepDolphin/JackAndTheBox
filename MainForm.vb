@@ -28,27 +28,39 @@
     End Function
 
     Private Sub MainForm_KeyDown(sender As Object, e As KeyEventArgs) Handles Me.KeyDown
-        g.KeyDown(e)
+        If g IsNot Nothing Then
+            g.KeyDown(e)
+        End If
     End Sub
 
     Private Sub MainForm_KeyUp(sender As Object, e As KeyEventArgs) Handles Me.KeyUp
-        g.KeyUp(e)
+        If g IsNot Nothing Then
+            g.KeyUp(e)
+        End If
     End Sub
 
     Private Sub MainForm_MouseDown(sender As Object, e As MouseEventArgs) Handles MyBase.MouseDown
-        g.MouseDown(e)
+        If g IsNot Nothing Then
+            g.MouseDown(e)
+        End If
     End Sub
 
     Private Sub MainForm_MouseUp(sender As Object, e As MouseEventArgs) Handles Me.MouseUp
-        g.MouseUp(e)
+        If g IsNot Nothing Then
+            g.MouseUp(e)
+        End If
     End Sub
 
     Private Sub MainForm_MouseMove(sender As Object, e As MouseEventArgs) Handles Me.MouseMove
-        'g.MouseMove(e)
+        If g IsNot Nothing Then
+            g.MouseMove(e)
+        End If
     End Sub
 
     Private Sub MainForm_MouseWheel(sender As Object, e As MouseEventArgs) Handles Me.MouseWheel
-        g.MouseWheel(e)
+        If g IsNot Nothing Then
+            g.MouseWheel(e)
+        End If
     End Sub
 
     Private Sub StartGame()

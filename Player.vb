@@ -4,7 +4,6 @@
 
     Public Sub New(Room As Room)
         MyBase.New(Room)
-        Flags.Add("Player")
     End Sub
 
     Public Overrides Sub Update(t As Double)
