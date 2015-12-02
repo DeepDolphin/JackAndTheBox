@@ -129,7 +129,7 @@ Public Class Room
                     O.Redraw()
                     Graphics.DrawImage(O.GraphicsMap,
                                        CIntFloor({O.Position.X}),
-                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}))
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
 
 #If VersionType = "Debug" Then
                     Graphics.DrawRectangle(Pens.Red,

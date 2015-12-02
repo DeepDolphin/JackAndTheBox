@@ -56,7 +56,7 @@
 
     Public Sub GeneralInit()
         Flags.Add("Actor")
-        HitBox = New RectangleF(8, 0, 16, 10)
+        'HitBox = New RectangleF(8, 0, 16, 10)
     End Sub
 
     Public Sub AbilityInit(activeCooldown As Double, utilityCooldown As Double)
