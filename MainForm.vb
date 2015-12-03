@@ -1,15 +1,4 @@
 ﻿Public Class MainForm
-
-#If VersionType = "Beta" Then
-    Public Const VersionTN As String = "1"
-#ElseIf VersionType = "Release" Then
-    Public Const VersionTN As String = "0"
-#ElseIf VersionType = "Debug" Then
-    Public Const VersionTN As String = "2"
-#End If
-
-    Public Const VersionNumber As String = "1.0.0301." + VersionTN + "000"
-
     Dim g As Game
     Private Buffer As BufferedGraphics
 

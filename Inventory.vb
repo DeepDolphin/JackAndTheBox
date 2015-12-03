@@ -8,7 +8,7 @@
     End Property
     Public ReadOnly Property UtilityAbility As Ability
         Get
-            Return New PlaceAbility(0, New GameObject(My.Resources.CeilingLight, Game.Player.Room, New Vector3(Game.Player.Position.X, Game.Player.Position.Y, 10), 100, {}), Game.Player, False)
+            Return New PlaceAbility(0, New Crate(Game.Player.Room, Game.Player.Position), Game.Player, False)
         End Get
     End Property
 

@@ -7,12 +7,13 @@
     Public Room As Room
 
     Public Properties As New Dictionary(Of String, String)
-    Public Ability As Ability '
+    Public Ability As Ability
 
     Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
-    Protected Flags As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
+#Region "Flags Enum"
+    Protected Flags As New BitArray(GameObjectProps.Max)
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -63,7 +64,9 @@
 
         Max ' Don't use, only for bounds of enum
     End Enum
+#End Region
 
+#Region "Sorting Algorithim"
     Public ReadOnly Property Depth As Double
         Get
             Dim myDepth As Double
@@ -75,11 +78,21 @@
         End Get
     End Property
 
+    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+        Dim otherObj As GameObject
+        otherObj = DirectCast(obj, GameObject)
+        Return Depth - otherObj.Depth
+    End Function
+
+#End Region
+
     Public ReadOnly Property Middle As Vector3
         Get
             Return New Vector3(Position.X + (HitBox.Width / 2), Position.Y + (HitBox.Width / 2), Position.Z)
         End Get
     End Property
+
+#Region "Constructors"
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
         Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
@@ -125,6 +138,8 @@
 
     End Sub
 
+#End Region
+
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)
         'Delete if out of Health
@@ -147,8 +162,12 @@
         myhitbox.X += Position.X
         myhitbox.Y += If(Position.Z <= 0, Position.Y + Position.Z * (10 / 16), Position.Y)
 
-        'ToDo: z under 0 stuff
-        Return myhitbox.IntersectsWith(otherhitbox)
+        If (myhitbox.IntersectsWith(otherhitbox)) Then
+            Return True
+        Else
+            Return False
+        End If
+
     End Function
 
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector3) As Boolean
@@ -184,11 +203,6 @@
         Return objectList
     End Function
 
-    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-        Dim otherObj As GameObject
-        otherObj = DirectCast(obj, GameObject)
-        Return Depth - otherObj.Depth
-    End Function
 
     Private Function CIntFloor(vals() As Double) As Integer
         Dim sum As Integer
