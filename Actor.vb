@@ -83,11 +83,13 @@
     End Sub
 
     Public Overridable Sub Hit(O As GameObject)
-        If (Properties("ActiveCurrentCooldown") <= 0.0) Then
-            If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
-                O.Properties("Health") -= Properties("AttackPower")
-            End If
-        End If
+        'If (Properties("ActiveCurrentCooldown") <= 0.0) Then
+        '    If O.Properties.Keys.Contains("Health") AndAlso O.Properties("Health") >= 0.0 Then
+        '        O.Properties("Health") -= Properties("AttackPower")
+        '    End If
+        'End If
+
+        'ToDo: make hit an ability or something
     End Sub
 
     Public Overridable Sub Hit(OList As List(Of GameObject))

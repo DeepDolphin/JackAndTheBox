@@ -7,12 +7,13 @@
     Public Room As Room
 
     Public Properties As New Dictionary(Of String, String)
-    Public Ability As Ability '
+    Public Ability As Ability
 
     Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
-    Protected Flags As New BitArray(GameObjectProps.Max) 'ToDo: change the name of this thing
+#Region "Flags Enum"
+    Protected Flags As New BitArray(GameObjectProps.Max)
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -63,7 +64,9 @@
 
         Max ' Don't use, only for bounds of enum
     End Enum
+#End Region
 
+#Region "Sorting Algorithim"
     Public ReadOnly Property Depth As Double
         Get
             Dim myDepth As Double
@@ -75,11 +78,21 @@
         End Get
     End Property
 
+    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
+        Dim otherObj As GameObject
+        otherObj = DirectCast(obj, GameObject)
+        Return Depth - otherObj.Depth
+    End Function
+
+#End Region
+
     Public ReadOnly Property Middle As Vector3
         Get
             Return New Vector3(Position.X + (HitBox.Width / 2), Position.Y + (HitBox.Width / 2), Position.Z)
         End Get
     End Property
+
+#Region "Constructors"
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
         Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
@@ -99,8 +112,7 @@
         Me.Sprite = Image
         Me.Room = Room
 
-
-
+        If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
 
         Properties.Add("Health", Health)
         Properties.Add("MaxHealth", Health)
@@ -112,7 +124,7 @@
             Flags.Set(ObjectProperty, True)
         Next
 
-        Dim x As Integer = Sprite.Width / 2
+        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4
         Dim y As Integer = Game.Resources.HealthBackground.Height + 1
         Dim width As Integer = Sprite.Width
         Dim height As Integer = Sprite.Height
@@ -125,6 +137,8 @@
         HitBox = New Rectangle(x, y, width, height)
 
     End Sub
+
+#End Region
 
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)
@@ -148,8 +162,12 @@
         myhitbox.X += Position.X
         myhitbox.Y += If(Position.Z <= 0, Position.Y + Position.Z * (10 / 16), Position.Y)
 
-        'ToDo: z under 0 stuff
-        Return myhitbox.IntersectsWith(otherhitbox)
+        If (myhitbox.IntersectsWith(otherhitbox)) Then
+            Return True
+        Else
+            Return False
+        End If
+
     End Function
 
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector3) As Boolean
@@ -185,11 +203,6 @@
         Return objectList
     End Function
 
-    Public Function CompareTo(obj As Object) As Integer Implements IComparable.CompareTo
-        Dim otherObj As GameObject
-        otherObj = DirectCast(obj, GameObject)
-        Return Depth - otherObj.Depth
-    End Function
 
     Private Function CIntFloor(vals() As Double) As Integer
         Dim sum As Integer
@@ -202,41 +215,52 @@
     Public Sub Redraw()
         If Graphics Is Nothing Then
             If Graphics Is Nothing Then
-                GraphicsMap = New Bitmap(Sprite.Width * 2, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+                GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
                 Graphics = Graphics.FromImage(GraphicsMap)
             End If
 
             If CastsShadow Then
-                    Graphics.DrawImage(Game.Resources.Shadow,
-                                   Sprite.Width \ 2,
+                Graphics.DrawImage(Game.Resources.Shadow,
+                                   (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4,
                                    Game.Resources.HealthBackground.Height + Sprite.Height - 7,
                                    Sprite.Width,
                                    10)
-                End If
+            End If
 
-                Graphics.DrawImage(Sprite.CurrentFrame,
-                               Sprite.Width \ 2,
+            Graphics.DrawImage(Sprite.CurrentFrame,
+                               (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4,
                                Game.Resources.HealthBackground.Height + 1,
                                Sprite.Width,
                                Sprite.Height)
 
-            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") Then
-                Graphics.DrawImage(Game.Resources.HealthBackground,
+            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") AndAlso Not Invulnernable Then
+                Dim numBars As Integer = Math.Ceiling(Properties("MaxHealth") / 100)
+                Dim index As Integer = 0
+                Dim health As Integer = Properties("Health")
+                Dim maxHealth As Integer = Properties("MaxHealth")
+
+
+                While index < numBars
+                    Graphics.DrawImage(Game.Resources.HealthBackground,
+                                   (((Sprite.Width * 2) \ numBars) + 1) * index,
                                    0,
-                                   0,
-                                   Sprite.Width * 2,
+                                   (Sprite.Width * 2) \ numBars,
                                    Game.Resources.HealthBackground.Height)
 
-                Graphics.DrawImage(Game.Resources.HealthBar,
-                                   New Rectangle(2,
-                                                 2,
-                                                 Sprite.Width * (Properties("Health") / Properties("MaxHealth")) * 2,
-                                                 Game.Resources.HealthBar.Height),
-                                   New Rectangle(0,
-                                                 0,
-                                                 Game.Resources.HealthBar.Width * (Properties("Health") / Properties("MaxHealth")),
-                                                 Game.Resources.HealthBar.Height),
-                                   GraphicsUnit.Pixel)
+                    Graphics.DrawImage(Game.Resources.HealthBar,
+                                       New Rectangle(((((Sprite.Width * 2) \ numBars) + 1) * index) + 2,
+                                                     2,
+                                                     ((Sprite.Width * 2) \ numBars - 4) * (Math.Min(health, 100) / 100),
+                                                     Game.Resources.HealthBar.Height),
+                                       New Rectangle(0,
+                                                     0,
+                                                     Game.Resources.HealthBar.Width * (Math.Min(health, 100) / 100),
+                                                     Game.Resources.HealthBar.Height),
+                                       GraphicsUnit.Pixel)
+                    index += 1
+                    health -= 100
+                    maxHealth -= 100
+                End While
             End If
         End If
     End Sub
