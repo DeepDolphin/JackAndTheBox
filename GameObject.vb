@@ -233,7 +233,7 @@
                                Sprite.Width,
                                Sprite.Height)
 
-            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") AndAlso Not Invulnernable Then
+            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") AndAlso Not Invulnerable Then
                 Dim numBars As Integer = Math.Ceiling(Properties("MaxHealth") / 100)
                 Dim index As Integer = 0
                 Dim health As Integer = Properties("Health")
