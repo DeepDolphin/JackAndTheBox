@@ -121,8 +121,8 @@ Public Class Room
         Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
         Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
         Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
-        If Equals(Game.Player.Room) Then
 
+        If Equals(Game.Player.Room) Then
             ' Draw the rest of the game objects
             For Each O As GameObject In GameObjects
                 Try

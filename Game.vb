@@ -15,9 +15,6 @@
     Public Shared ViewOffsetX As Double
     Public Shared ViewOffsetY As Double
 
-    Public Shared ScreenWidth As Integer
-    Public Shared ScreenHeight As Integer
-
     Public Shared World As World
     Public Shared Options As Options
     Public Shared Resources As New Resources
@@ -25,6 +22,8 @@
 
     Private Buffer As BufferedGraphics
     Private GameRunning As Boolean
+    Private ScreenWidth As Integer
+    Private ScreenHeight As Integer
 
     Public ReadOnly Property MaxTick As Double
         Get
@@ -75,14 +74,14 @@
         ' Load the player and testing stuff
         Player = New Player(World.RoomAt(150, 150))
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), -1, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnernable})
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), -1, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnerable})
 
         World.Rooms(0).AddGameObject(Player)
         World.Rooms(0).AddGameObject(TestObject1)
         World.Rooms(0).AddGameObject(TestObject2)
 
         Resources = New Resources()
-        UserInterface = New UserInterface()
+        UserInterface = New UserInterface(ScreenWidth, ScreenHeight)
 
         GameRunning = True
         Watch = New Stopwatch()
@@ -120,7 +119,7 @@
     Private Sub DrawWorld()
         ' Take this out when we figure out how to draw only the things that
         ' actually need to be drawn
-        Buffer.Graphics.Clear(Color.Blue)
+        Buffer.Graphics.Clear(Color.Black)
 
         For Each r As Room In World.Rooms
             r.Redraw()
@@ -151,7 +150,6 @@
             Return _tick
         End Get
     End Property
-
 
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
@@ -189,31 +187,30 @@
         Next
 
         'Add all objects waiting to be added
-        For value As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
-            Dim GameObject As GameObject = ToAddWaitlist(value)
-            If (GameObject.Room.Equals(r)) Then
-                If GameObject.Position.X < 0 OrElse
-                    GameObject.Position.Y + 16 < 0 OrElse
-                    GameObject.Position.X + GameObject.HitBox.Width > r.Width OrElse
-                    GameObject.Position.Y + GameObject.HitBox.Height > r.Height Then
-                    ToAddWaitlist.Remove(GameObject)
+        For iWaitList As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
+            Dim CurGameObject As GameObject = ToAddWaitlist(iWaitList)
+            If (CurGameObject.Room.Equals(r)) Then
+                If CurGameObject.Position.X < 0 OrElse
+                    CurGameObject.Position.Y + 16 < 0 OrElse
+                    CurGameObject.Position.X + CurGameObject.HitBox.Width > r.Width OrElse
+                    CurGameObject.Position.Y + CurGameObject.HitBox.Height > r.Height Then
+                    ToAddWaitlist.Remove(CurGameObject)
                     Continue For
                 End If
 
-                Dim good As Boolean = True
+                Dim IsValidLocation As Boolean = True
                 For Each o As GameObject In r.GameObjects
-                    If o.CollidesWith(GameObject, GameObject.Position) Then
-                        good = False
+                    If o.CollidesWith(CurGameObject, CurGameObject.Position) Then
+                        IsValidLocation = False
                         Exit For
                     End If
                 Next
 
-                If good Then
-                    r.AddGameObject(GameObject)
-                    ToAddWaitlist.Remove(GameObject)
-                Else
-                    ToAddWaitlist.Remove(GameObject)
+                If IsValidLocation Then
+                    r.AddGameObject(CurGameObject)
                 End If
+
+                ToAddWaitlist.Remove(CurGameObject)
             End If
         Next
 

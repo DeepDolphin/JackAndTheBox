@@ -32,9 +32,9 @@
         End Get
     End Property
 
-    Public ReadOnly Property Invulnernable As Boolean
+    Public ReadOnly Property Invulnerable As Boolean
         Get
-            Return Flags.Get(GameObjectProps.Invulnernable)
+            Return Flags.Get(GameObjectProps.Invulnerable)
         End Get
     End Property
 
@@ -57,7 +57,7 @@
         CastsShadow
         FloorObject
         Collidable
-        Invulnernable
+        Invulnerable
         Visible
         Dead
 
@@ -129,7 +129,7 @@
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)
         'Delete if out of Health
-        If Not Invulnernable Then
+        If Not Invulnerable Then
             If Properties("Health") <= 0.0 Then
                 Flags.Set(GameObjectProps.Dead, True)
             End If

@@ -1,12 +1,9 @@
-﻿
-
-Public Class UserInterface
-
-    Public GraphicsMap As New Bitmap(Game.ScreenWidth, Game.ScreenHeight)
+﻿Public Class UserInterface
+    Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
-
-    Public Sub New()
+    Public Sub New(ScreenWidth As Integer, ScreenHeight As Integer)
+        GraphicsMap = New Bitmap(ScreenWidth, ScreenHeight)
         Graphics = Graphics.FromImage(GraphicsMap)
     End Sub
 
