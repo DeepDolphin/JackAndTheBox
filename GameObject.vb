@@ -12,8 +12,16 @@
     Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
+    Public CollidedWith As New List(Of GameObject)
+
 #Region "Flags Enum"
     Protected Flags As New BitArray(GameObjectProps.Max)
+
+    Public ReadOnly Property IsMoving As Boolean
+        Get
+            Return (Not Speed.X = 0 OrElse Not Speed.Y = 0)
+        End Get
+    End Property
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -54,6 +62,24 @@
         End Set
     End Property
 
+    Public Property Collided As Boolean
+        Get
+            Return Flags.Get(GameObjectProps.Collided)
+        End Get
+        Set(value As Boolean)
+            Flags.Set(GameObjectProps.Collided, value)
+        End Set
+    End Property
+
+    Public Property Dirty As Boolean
+        Get
+            Return Flags.Get(GameObjectProps.Dirty)
+        End Get
+        Set(value As Boolean)
+            Flags.Set(GameObjectProps.Dirty, value)
+        End Set
+    End Property
+
     Public Enum GameObjectProps
         CastsShadow
         FloorObject
@@ -61,6 +87,8 @@
         Invulnerable
         Visible
         Dead
+        Collided
+        Dirty
 
         Max ' Don't use, only for bounds of enum
     End Enum

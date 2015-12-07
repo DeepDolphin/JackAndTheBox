@@ -77,8 +77,8 @@
         Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), 100, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnerable})
 
         World.Rooms(0).AddGameObject(Player)
-        World.Rooms(0).AddGameObject(TestObject1)
-        World.Rooms(0).AddGameObject(TestObject2)
+        'World.Rooms(0).AddGameObject(TestObject1)
+        'World.Rooms(0).AddGameObject(TestObject2)
 
         Resources = New Resources()
         UserInterface = New UserInterface(ScreenWidth, ScreenHeight)
@@ -151,55 +151,70 @@
         End Get
     End Property
 
+    Private Function CalcNewX(GameObject As GameObject, t As Double) As Double
+        Dim retval As Double = GameObject.Position.X + (GameObject.Speed.X * t * If(GameObject.HitBox.Width > GameObject.HitBox.Height, GameObject.HitBox.Width, GameObject.HitBox.Height))
+
+        Return retval
+    End Function
+
+    Private Function CalcNewY(GameObject As GameObject, t As Double) As Double
+        Dim retval As Double = GameObject.Position.Y + (GameObject.Speed.Y * t * If(GameObject.HitBox.Width > GameObject.HitBox.Height, GameObject.HitBox.Width, GameObject.HitBox.Height))
+
+        Return retval
+    End Function
+
+#Const CollisionType = "New"
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
-        Dim r As Room = Player.Room
+        Dim CurRoom As Room = Player.Room
 
-        For Each O As GameObject In r.GameObjects
-            If (Not (O.Speed.X = 0 AndAlso O.Speed.Y = 0)) Then
-                Dim newx As Double = O.Position.X + (O.Speed.X * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
-                Dim newy As Double = O.Position.Y + (O.Speed.Y * t * If(O.HitBox.Width > O.HitBox.Height, O.HitBox.Width, O.HitBox.Height))
-                Dim good As Boolean = True
-                For Each other As GameObject In r.GameObjects
-                    If other.Equals(O) Then Continue For
-                    If other.CollidesWith(O, New Vector2(newx, newy)) Then
-                        good = False
-                        If TypeOf O Is Actor Then
-                            CType(O, Actor).Hit(other)
+        For Each CurGameObject As GameObject In CurRoom.GameObjects
+            If (CurGameObject.IsMoving) Then
+                Dim newx As Double = CurGameObject.Position.X + (CurGameObject.Speed.X * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
+                Dim newy As Double = CurGameObject.Position.Y + (CurGameObject.Speed.Y * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
+                Dim Collided As Boolean = False
+                For Each other As GameObject In CurRoom.GameObjects
+                    If other.Equals(CurGameObject) Then Continue For
+                    If other.CollidesWith(CurGameObject, New Vector2(newx, newy)) Then
+                        Collided = True
+                        CurGameObject.Collided = True
+                        other.Collided = True
+                        If TypeOf CurGameObject Is Actor Then
+                            CType(CurGameObject, Actor).Hit(other)
                         End If
-                        If TypeOf other Is InventoryItem And TypeOf O Is Player Then
+                        If TypeOf other Is InventoryItem And TypeOf CurGameObject Is Player Then
                             Player.Inventory.AddItem(other)
                         End If
                         Exit For
                     End If
                 Next
 
-                If New RectangleF(0, 0, r.Width, r.Height).Contains(New RectangleF(newx + O.HitBox.X, newy + O.HitBox.Y, O.HitBox.Width, O.HitBox.Height)) = False Then
-                    good = False
+                If New RectangleF(0, 0, CurRoom.Width, CurRoom.Height).Contains(New RectangleF(newx + CurGameObject.HitBox.X, newy + CurGameObject.HitBox.Y, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height)) = False Then
+                    Collided = True
                 End If
 
-                If good Then
-                    O.Position.X = newx
-                    O.Position.Y = newy
+                If Not Collided Then
+                    CurGameObject.Position.X = newx
+                    CurGameObject.Position.Y = newy
                 End If
             End If
-            O.Update(t)
+            CurGameObject.Update(t)
         Next
 
         'Add all objects waiting to be added
         For iWaitList As Integer = ToAddWaitlist.Count - 1 To 0 Step -1
             Dim CurGameObject As GameObject = ToAddWaitlist(iWaitList)
-            If (CurGameObject.Room.Equals(r)) Then
+            If (CurGameObject.Room.Equals(CurRoom)) Then
                 If CurGameObject.Position.X < 0 OrElse
                     CurGameObject.Position.Y + 16 < 0 OrElse
-                    CurGameObject.Position.X + CurGameObject.HitBox.Width > r.Width OrElse
-                    CurGameObject.Position.Y + CurGameObject.HitBox.Height > r.Height Then
+                    CurGameObject.Position.X + CurGameObject.HitBox.Width > CurRoom.Width OrElse
+                    CurGameObject.Position.Y + CurGameObject.HitBox.Height > CurRoom.Height Then
                     ToAddWaitlist.Remove(CurGameObject)
                     Continue For
                 End If
 
                 Dim IsValidLocation As Boolean = True
-                For Each o As GameObject In r.GameObjects
+                For Each o As GameObject In CurRoom.GameObjects
                     If o.CollidesWith(CurGameObject, CurGameObject.Position) Then
                         IsValidLocation = False
                         Exit For
@@ -207,7 +222,7 @@
                 Next
 
                 If IsValidLocation Then
-                    r.AddGameObject(CurGameObject)
+                    CurRoom.AddGameObject(CurGameObject)
                 End If
 
                 ToAddWaitlist.Remove(CurGameObject)
@@ -215,17 +230,17 @@
         Next
 
         'Delete all items flagged for deletion
-        For value As Integer = r.GameObjects.Count - 1 To 0 Step -1
-            If r.GameObjects(value).Dead Then
-                r.GameObjects.RemoveAt(value)
+        For value As Integer = CurRoom.GameObjects.Count - 1 To 0 Step -1
+            If CurRoom.GameObjects(value).Dead Then
+                CurRoom.GameObjects.RemoveAt(value)
             End If
         Next
 
-        For Each Objective As Objective In r.Objectives
+        For Each Objective As Objective In CurRoom.Objectives
             Objective.Update(t)
         Next
 
-        r.GameObjects.Sort()
+        CurRoom.GameObjects.Sort()
 
         If IsNothing(PlayerRoom) = False Then
             If Player.Room.Equals(PlayerRoom) = False Then

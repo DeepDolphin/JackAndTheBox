@@ -178,6 +178,15 @@
                 r.AddGameObject(l)
             Next
         Next
+#Else
+        'For Each r As Room In Rooms
+        '    For x As Integer = 0 To r.Width Step My.Resources.Crate.Width
+        '        For y As Integer = 0 To r.Height Step My.Resources.Crate.Height
+        '            Dim crate As New Crate(r, New Vector3(x, y, 0))
+        '            r.AddGameObject(crate)
+        '        Next
+        '    Next
+        'Next
 #End If
     End Sub
 

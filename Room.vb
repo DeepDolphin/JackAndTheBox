@@ -132,7 +132,12 @@ Public Class Room
                                        CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
 
 #If VersionType = "Debug" Then
-                    Graphics.DrawRectangle(Pens.Red,
+                    Dim hitboxPen As Pen = Pens.Red
+                    If (O.Collided) Then
+                        hitboxPen = Pens.Magenta
+                        O.Collided = False
+                    End If
+                    Graphics.DrawRectangle(hitboxPen,
                                            CIntFloor({O.Position.X, O.HitBox.X}),
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
                                            O.HitBox.Width,
