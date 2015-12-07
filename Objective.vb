@@ -29,9 +29,9 @@ Public Class KillAllEnemiesObjective
 
     Public Overrides Function IsComplete(Room As Room) As Boolean
         For Each o As GameObject In Room.GameObjects
-            If TypeOf o Is Enemy Then
-                Return False
-            End If
+            'If TypeOf o Is Enemy Then
+            '    Return False
+            'End If
         Next
         Return True
     End Function

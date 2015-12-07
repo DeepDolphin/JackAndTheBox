@@ -6,7 +6,14 @@
     Public Sprite As Sprite
     Public Room As Room
 
-    Public Properties As New Dictionary(Of String, String)
+    Protected _Properties As GameObjectProperties
+    Public ReadOnly Property Properties As GameObjectProperties
+        Get
+            Return _Properties
+        End Get
+    End Property
+
+
     Public Ability As Ability
 
     Public GraphicsMap As Bitmap
@@ -14,92 +21,12 @@
 
     Public CollidedWith As New List(Of GameObject)
 
-#Region "Flags Enum"
-    Protected Flags As New BitArray(GameObjectProps.Max)
-
-    Public ReadOnly Property IsMoving As Boolean
-        Get
-            Return (Not Speed.X = 0 OrElse Not Speed.Y = 0)
-        End Get
-    End Property
-
-    Public ReadOnly Property FloorObject As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.FloorObject)
-        End Get
-    End Property
-
-    Public ReadOnly Property CastsShadow As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.CastsShadow)
-        End Get
-    End Property
-
-    Public ReadOnly Property Collidable As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Collidable)
-        End Get
-    End Property
-
-    Public ReadOnly Property Invulnerable As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Invulnerable)
-        End Get
-    End Property
-
-    Public ReadOnly Property Visible As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Visible)
-        End Get
-    End Property
-
-    Public Property Dead As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Dead)
-        End Get
-        Set(Parameter As Boolean)
-            Flags.Set(GameObjectProps.Dead, Parameter)
-        End Set
-    End Property
-
-    Public Property Collided As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Collided)
-        End Get
-        Set(value As Boolean)
-            Flags.Set(GameObjectProps.Collided, value)
-        End Set
-    End Property
-
-    Public Property Dirty As Boolean
-        Get
-            Return Flags.Get(GameObjectProps.Dirty)
-        End Get
-        Set(value As Boolean)
-            Flags.Set(GameObjectProps.Dirty, value)
-        End Set
-    End Property
-
-    Public Enum GameObjectProps
-        CastsShadow
-        FloorObject
-        Collidable
-        Invulnerable
-        Visible
-        Dead
-        Collided
-        Dirty
-
-        Max ' Don't use, only for bounds of enum
-    End Enum
-#End Region
-
 #Region "Sorting Algorithim"
     Public ReadOnly Property Depth As Double
         Get
             Dim myDepth As Double
             myDepth = Position.Y + (Position.Z * HitBox.Height * (10 / 16))
-            If Not (FloorObject) Then
+            If Not (Properties.FloorObject) Then
                 myDepth += HitBox.Height + HitBox.Y
             End If
             Return myDepth
@@ -122,47 +49,42 @@
 
 #Region "Constructors"
 
-    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
-        Init(Sprite, Room, Position, Me.Speed, Health, ObjectProperties)
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+        Init(Sprite, Room, Position, Me.Speed, PropertyArray, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Health As Integer, ObjectProperties As GameObjectProps())
-        Init(New Sprite(Image), Room, Position, Me.Speed, Health, ObjectProperties)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+        Init(New Sprite(Image), Room, Position, Me.Speed, PropertyArray, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer, ObjectProperties As GameObjectProps())
-        Init(New Sprite(Image), Room, Position, Speed, Health, ObjectProperties)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+        Init(New Sprite(Image), Room, Position, Speed, PropertyArray, ObjectProperties)
     End Sub
 
-    Public Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer, ObjectProperties As GameObjectProps())
+    Public Overridable Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
         Me.Position = Position
         Me.Speed = Speed
         Me.Sprite = Image
         Me.Room = Room
 
-        If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
+        'If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
 
-        Properties.Add("Health", Health)
-        Properties.Add("MaxHealth", Health)
-
+        _Properties = New GameObjectProperties(Me, ObjectProperties, PropertyArray)
 
 
 
-        For Each ObjectProperty As GameObjectProps In ObjectProperties
-            Flags.Set(ObjectProperty, True)
-        Next
-
-        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4
+        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
         Dim y As Integer = Game.Resources.HealthBackground.Height + 1
         Dim width As Integer = Sprite.Width
         Dim height As Integer = Sprite.Height
 
-        If (Not FloorObject) Then
+        If (Not Properties.FloorObject) Then
             y += Sprite.Height * (10 / 16)
             height = (height / 2) * (10 / 16)
         End If
 
         HitBox = New Rectangle(x, y, width, height)
+        Properties.Dirty = True
 
     End Sub
 
@@ -171,17 +93,12 @@
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)
         'Delete if out of Health
-        If Not Invulnerable Then
-            If Properties("Health") <= 0.0 Then
-                Flags.Set(GameObjectProps.Dead, True)
-            End If
-        End If
     End Sub
 
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector2) As Boolean
         'If not on the same level it won't collide
         If (Other.Position.Z <> Position.Z And Not (Position.Z <= 0 And Other.Position.Z <= 0)) Then Return False
-        If Not Collidable OrElse Not Other.Collidable Then Return False
+        If Not Properties.Collidable OrElse Not Other.Properties.Collidable Then Return False
 
         Dim otherhitbox As RectangleF = Other.HitBox
         otherhitbox.X += OtherPosition.X
@@ -241,31 +158,34 @@
     End Function
 
     Public Sub Redraw()
-        If Graphics Is Nothing Then
+        If Properties.Dirty Then
             If Graphics Is Nothing Then
-                GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+                GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
                 Graphics = Graphics.FromImage(GraphicsMap)
+            Else
+                Graphics.Clear(Color.Transparent)
             End If
 
-            If CastsShadow Then
+
+            If Properties.CastsShadow Then
                 Graphics.DrawImage(Game.Resources.Shadow,
-                                   (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4,
+                                   (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
                                    Game.Resources.HealthBackground.Height + Sprite.Height - 7,
                                    Sprite.Width,
                                    10)
             End If
 
             Graphics.DrawImage(Sprite.CurrentFrame,
-                               (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4,
+                               (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
                                Game.Resources.HealthBackground.Height + 1,
                                Sprite.Width,
                                Sprite.Height)
 
-            If Not TypeOf Me Is Player AndAlso Properties("Health") <> Properties("MaxHealth") AndAlso Not Invulnerable Then
-                Dim numBars As Integer = Math.Ceiling(Properties("MaxHealth") / 100)
+            If Not TypeOf Me Is Player AndAlso Properties.Health <> Properties.MaxHealth AndAlso Not Properties.Invulnerable Then
+                Dim numBars As Integer = Math.Ceiling(Properties.MaxHealth / 100)
                 Dim index As Integer = 0
-                Dim health As Integer = Properties("Health")
-                Dim maxHealth As Integer = Properties("MaxHealth")
+                Dim health As Integer = Properties.Health
+                Dim maxHealth As Integer = Properties.MaxHealth
 
 
                 While index < numBars
@@ -290,6 +210,8 @@
                     maxHealth -= 100
                 End While
             End If
+
+            Properties.Dirty = False
         End If
     End Sub
 End Class

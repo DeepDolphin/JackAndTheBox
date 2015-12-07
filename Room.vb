@@ -39,6 +39,9 @@ Public Class Room
     Public WallBrush As TextureBrush
     Public GroundBrush As TextureBrush
 
+    Public WallMap As New Bitmap(CInt(RoomWidth), 32)
+    Public GroundMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight))
+
     Public GraphicsMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
     Private Graphics As Graphics
 
@@ -133,16 +136,22 @@ Public Class Room
 
 #If VersionType = "Debug" Then
                     Dim hitboxPen As Pen = Pens.Red
-                    If (O.Collided) Then
-                        hitboxPen = Pens.Magenta
-                        O.Collided = False
+                    Dim bitmapPen As Pen = Pens.Blue
+                    If (O.Properties.Collided) Then
+                        hitboxPen = Pens.PaleVioletRed
+                        O.Properties.Collided = False
                     End If
+                    If (O.Properties.Dirty) Then
+                        bitmapPen = Pens.PaleTurquoise
+                        O.Properties.Dirty = False
+                    End If
+
                     Graphics.DrawRectangle(hitboxPen,
                                            CIntFloor({O.Position.X, O.HitBox.X}),
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
                                            O.HitBox.Width,
                                            O.HitBox.Height)
-                    Graphics.DrawRectangle(Pens.Blue,
+                    Graphics.DrawRectangle(bitmapPen,
                                            CIntFloor({O.Position.X}),
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
                                            O.GraphicsMap.Width,

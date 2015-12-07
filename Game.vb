@@ -72,9 +72,9 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Player(World.RoomAt(150, 150))
+        Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), {100, 100, 100, 8, 2})
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), 100, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnerable})
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {100}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.FloorObject, GameObjectProperties.FlagsEnum.Invulnerable})
 
         World.Rooms(0).AddGameObject(Player)
         'World.Rooms(0).AddGameObject(TestObject1)
@@ -130,8 +130,8 @@
         Buffer.Graphics.FillRectangle(Resources.ShadeBrush, New Rectangle(0, 0, 200, 70))
         Buffer.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         Buffer.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
-        Buffer.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
-        Buffer.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
+        Buffer.Graphics.DrawString(Player.Properties.Health, SystemFonts.CaptionFont, Brushes.Red, 0, 20)
+        Buffer.Graphics.DrawString(Player.Properties.Stamina, SystemFonts.CaptionFont, Brushes.Red, 0, 30)
         Buffer.Graphics.DrawString(Options.MouseWheel, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
         Buffer.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
@@ -169,7 +169,7 @@
         Dim CurRoom As Room = Player.Room
 
         For Each CurGameObject As GameObject In CurRoom.GameObjects
-            If (CurGameObject.IsMoving) Then
+            If (CurGameObject.Properties.IsMoving) Then
                 Dim newx As Double = CurGameObject.Position.X + (CurGameObject.Speed.X * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
                 Dim newy As Double = CurGameObject.Position.Y + (CurGameObject.Speed.Y * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
                 Dim Collided As Boolean = False
@@ -177,8 +177,8 @@
                     If other.Equals(CurGameObject) Then Continue For
                     If other.CollidesWith(CurGameObject, New Vector2(newx, newy)) Then
                         Collided = True
-                        CurGameObject.Collided = True
-                        other.Collided = True
+                        CurGameObject.Properties.Collided = True
+                        other.Properties.Collided = True
                         If TypeOf CurGameObject Is Actor Then
                             CType(CurGameObject, Actor).Hit(other)
                         End If
@@ -231,7 +231,7 @@
 
         'Delete all items flagged for deletion
         For value As Integer = CurRoom.GameObjects.Count - 1 To 0 Step -1
-            If CurRoom.GameObjects(value).Dead Then
+            If CurRoom.GameObjects(value).Properties.Dead Then
                 CurRoom.GameObjects.RemoveAt(value)
             End If
         Next

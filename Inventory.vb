@@ -27,7 +27,7 @@
 
     Public Sub AddItem(Item As InventoryItem)
         Inventory.Add(New InventoryItem(Item) With {.Parent = Parent})
-        Item.Dead = True
+        Item.Properties.Health = 0.0
     End Sub
 
     Private Sub EquippedInit()

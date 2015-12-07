@@ -3,6 +3,12 @@
 
     Public Inventory As New Inventory
 
+    Public Shadows ReadOnly Property Properties As ActorProperties
+        Get
+            Return CType(_Properties, ActorProperties)
+        End Get
+    End Property
+
     Public Enum ActorDirection As Integer
         East = 0
         SouthEast
@@ -26,60 +32,43 @@
 
     Public Direction As ActorDirection = ActorDirection.North
 
-    Public Sub New(Room As Room)
-        MyBase.New(My.Resources.CharacterUp1, Room, New Vector3(Room.XOffset + Room.Width / 2, Room.YOffset + Room.Height / 2, 0), 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
-        GeneralInit()
-        AbilityInit(1, 1)
-        MovementInit(25, 8, 2)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String())
+        MyBase.New(Image, Room, Position, PropertyArray, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.Collidable})
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3)
-        MyBase.New(Image, Room, Position, 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
-        GeneralInit()
-        AbilityInit(1, 1)
-        MovementInit(25, 8, 2)
+    Public Overrides Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+        Me.Position = Position
+        Me.Speed = Speed
+        Me.Sprite = Image
+        Me.Room = Room
+
+        'If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
+
+        _Properties = New ActorProperties(Me, ObjectProperties, PropertyArray)
+
+
+
+        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
+        Dim y As Integer = Game.Resources.HealthBackground.Height + 1
+        Dim width As Integer = Sprite.Width
+        Dim height As Integer = Sprite.Height
+
+        If (Not Properties.FloorObject) Then
+            y += Sprite.Height * (10 / 16)
+            height = (height / 2) * (10 / 16)
+        End If
+
+        HitBox = New Rectangle(x, y, width, height)
+        Properties.Dirty = True
+
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2)
-        MyBase.New(Image, Room, Position, Speed, 100, {GameObjectProps.CastsShadow, GameObjectProps.Collidable})
-        GeneralInit()
-        AbilityInit(1, 1)
-        MovementInit(25, 8, 2)
-    End Sub
-
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, Health As Integer)
-        MyBase.New(Image, Room, Position, Speed, Health, {GameObjectProps.CastsShadow, GameObjectProps.Collidable, GameObjectProps.Visible})
-        GeneralInit()
-        AbilityInit(1, 1)
-        MovementInit(25, 8, 2)
-    End Sub
-
-    Public Sub GeneralInit()
-        'HitBox = New RectangleF(8, 0, 16, 10)
-    End Sub
-
-    Public Sub AbilityInit(activeCooldown As Double, utilityCooldown As Double)
-        Properties.Add("ActiveCurrentCooldown", activeCooldown)
-        Properties.Add("ActiveMaxCooldown", activeCooldown)
-        Properties.Add("UtilityCurrentCooldown", utilityCooldown)
-        Properties.Add("UtilityMaxCooldown", utilityCooldown)
-    End Sub
-
-    Public Sub MovementInit(stamina As Double, maxSpeed As Double, acceleration As Double)
-        Properties.Add("MaxStamina", stamina)
-        Properties.Add("CurrentStamina", stamina)
-        Properties.Add("MaxSpeed", maxSpeed)
-        Properties.Add("Acceleration", acceleration)
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String())
+        MyBase.New(Image, Room, Position, Speed, PropertyArray, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.Collidable})
     End Sub
 
     Public Overrides Sub Update(t As Double)
         MyBase.Update(t)
-
-
-
-
-        If (Properties("ActiveCurrentCooldown") > 0.0) Then Properties("ActiveCurrentCooldown") -= t
-        If (Properties("CurrentStamina") < CDbl(Properties("MaxStamina"))) Then Properties("CurrentStamina") += t
     End Sub
 
     Public Overridable Sub Hit(O As GameObject)
@@ -93,10 +82,10 @@
     End Sub
 
     Public Overridable Sub Hit(OList As List(Of GameObject))
-        For Each gameObject As GameObject In OList
-            Hit(gameObject)
-        Next
-        Properties("AttackCurrentCooldown") = Properties("AttackMaxCooldown")
+        'For Each gameObject As GameObject In OList
+        '    Hit(gameObject)
+        'Next
+        'Properties("AttackCurrentCooldown") = Properties("AttackMaxCooldown")
     End Sub
 
     Public Overloads Function getNearList(range As Double, angle As Double) As List(Of GameObject)
