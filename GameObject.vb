@@ -145,12 +145,11 @@
         Properties.Add("Health", Health)
         Properties.Add("MaxHealth", Health)
 
-
-
-
         For Each ObjectProperty As GameObjectProps In ObjectProperties
             Flags.Set(ObjectProperty, True)
         Next
+
+        Me.Dirty = True
 
         Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties("MaxHealth") / 100)) + 1) * CInt(Math.Ceiling(Properties("MaxHealth") / 100)) - 1) \ 4
         Dim y As Integer = Game.Resources.HealthBackground.Height + 1
@@ -177,6 +176,13 @@
             End If
         End If
     End Sub
+
+    Public Function SpriteIntersects(Other As GameObject) As Boolean
+        Dim MyRect As New RectangleF(Position.X, Position.Y + Position.Z * (10 / 16), GraphicsMap.Width, GraphicsMap.Height)
+        Dim otherRect As New RectangleF(Other.Position.X, Other.Position.Y + Other.Position.Z * (10 / 16), Other.GraphicsMap.Width, Other.GraphicsMap.Height)
+
+        Return MyRect.IntersectsWith(otherRect)
+    End Function
 
     Public Overridable Function CollidesWith(Other As GameObject, OtherPosition As Vector2) As Boolean
         'If not on the same level it won't collide
@@ -266,7 +272,6 @@
                 Dim index As Integer = 0
                 Dim health As Integer = Properties("Health")
                 Dim maxHealth As Integer = Properties("MaxHealth")
-
 
                 While index < numBars
                     Graphics.DrawImage(Game.Resources.HealthBackground,

@@ -25,6 +25,8 @@
     Private ScreenWidth As Integer
     Private ScreenHeight As Integer
 
+    Private UpdateCompleteEvent As New System.Threading.AutoResetEvent(False)
+
     Public ReadOnly Property MaxTick As Double
         Get
             Return 1 / Options.Preferences("MaxFPS")
@@ -98,13 +100,26 @@
     End Sub
 
     Private Sub GameLoop()
+        Dim tick As Double
+        If (Not Options.OIStatus("Pause")) Then
+            tick = MaxTick
+        Else
+            tick = (MaxTick / 25) 'Slow down time like a boss [For testing purposes] (maybe an added feature?)
+        End If
+
+        Dim UpdateAction As Action(Of Double)
+        UpdateAction = AddressOf UpdateWorld
+
         While GameRunning
-            If (Not Options.OIStatus("Pause")) Then
-                UpdateWorld(MaxTick)
-            Else
-                UpdateWorld(MaxTick / 25) 'Slow down time like a boss [For testing purposes] (maybe an added feature?)
-            End If
-            DrawWorld()
+            Dim DrawTask As Task = Task.Run(New Action(AddressOf DrawWorld))
+            Dim UpdateTask As Task = Task.Run(New Action(
+                                              Sub()
+                                                  UpdateWorld(_tick)
+                                              End Sub))
+
+            UpdateTask.Wait()
+            UpdateCompleteEvent.Set()
+            DrawTask.Wait()
 
             Dim sleepSeconds As Double = MaxTick - Watch.Elapsed.TotalSeconds
             If (sleepSeconds > 0) Then
@@ -119,10 +134,16 @@
     Private Sub DrawWorld()
         ' Take this out when we figure out how to draw only the things that
         ' actually need to be drawn
-        Buffer.Graphics.Clear(Color.Black)
+        'Buffer.Graphics.Clear(Color.Black)
 
         For Each r As Room In World.Rooms
-            r.Redraw()
+            r.DrawBackground()
+        Next
+
+        UpdateCompleteEvent.WaitOne()
+
+        For Each r As Room In World.Rooms
+            r.Redraw(r.Equals(Game.Player.Room))
             Buffer.Graphics.DrawImage(r.GraphicsMap, New Point(r.XOffset - ViewOffsetX, r.YOffset - ViewOffsetY))
         Next
 
@@ -175,6 +196,8 @@
                 Dim Collided As Boolean = False
                 For Each other As GameObject In CurRoom.GameObjects
                     If other.Equals(CurGameObject) Then Continue For
+
+                    ' Test Position Collision
                     If other.CollidesWith(CurGameObject, New Vector2(newx, newy)) Then
                         Collided = True
                         CurGameObject.Collided = True
@@ -187,6 +210,11 @@
                         End If
                         Exit For
                     End If
+
+                    ' Test Sprite Collision
+                    If other.SpriteIntersects(CurGameObject) Then
+                        other.Dirty = True
+                    End If
                 Next
 
                 If New RectangleF(0, 0, CurRoom.Width, CurRoom.Height).Contains(New RectangleF(newx + CurGameObject.HitBox.X, newy + CurGameObject.HitBox.Y, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height)) = False Then
@@ -196,6 +224,7 @@
                 If Not Collided Then
                     CurGameObject.Position.X = newx
                     CurGameObject.Position.Y = newy
+                    CurGameObject.Dirty = True
                 End If
             End If
             CurGameObject.Update(t)

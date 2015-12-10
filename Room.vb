@@ -116,41 +116,45 @@ Public Class Room
         Return sum
     End Function
 
-    Public Sub Redraw()
+    Public Sub DrawBackground()
         Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
         Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
         Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
         Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+    End Sub
 
-        If Equals(Game.Player.Room) Then
-            ' Draw the rest of the game objects
+    ''' <summary>
+    ''' Draw the room
+    ''' </summary>
+    ''' <param name="DrawRoom">True if we should draw the room contents, false if we should draw the room shaded</param>
+    Public Sub Redraw(DrawRoom As Boolean)
+        If DrawRoom Then
             For Each O As GameObject In GameObjects
-                Try
+                If O.Dirty Then
                     O.Redraw()
                     Graphics.DrawImage(O.GraphicsMap,
-                                       CIntFloor({O.Position.X}),
-                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
+                                           CIntFloor({O.Position.X}),
+                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
+                    O.Dirty = False
+                End If
 
 #If VersionType = "Debug" Then
-                    Dim hitboxPen As Pen = Pens.Red
-                    If (O.Collided) Then
-                        hitboxPen = Pens.Magenta
-                        O.Collided = False
-                    End If
-                    Graphics.DrawRectangle(hitboxPen,
+                Dim hitboxPen As Pen = Pens.Red
+                If (O.Collided) Then
+                    hitboxPen = Pens.Magenta
+                    O.Collided = False
+                End If
+                Graphics.DrawRectangle(hitboxPen,
                                            CIntFloor({O.Position.X, O.HitBox.X}),
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
                                            O.HitBox.Width,
                                            O.HitBox.Height)
-                    Graphics.DrawRectangle(Pens.Blue,
+                Graphics.DrawRectangle(Pens.Blue,
                                            CIntFloor({O.Position.X}),
                                            CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
                                            O.GraphicsMap.Width,
                                            O.GraphicsMap.Height)
 #End If
-                Catch ex As Exception
-                    Stop
-                End Try
             Next
         Else
             Graphics.FillRectangle(Game.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
