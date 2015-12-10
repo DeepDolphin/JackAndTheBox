@@ -39,6 +39,9 @@ Public Class Room
     Public WallBrush As TextureBrush
     Public GroundBrush As TextureBrush
 
+    Public WallMap As New Bitmap(CInt(RoomWidth), 32)
+    Public GroundMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight))
+
     Public GraphicsMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
     Private Graphics As Graphics
 
@@ -102,6 +105,18 @@ Public Class Room
         Graphics = Graphics.FromImage(GraphicsMap)
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
         WallBrush = New TextureBrush(My.Resources.WallStrip)
+
+        Dim WallGraphics As Graphics = Graphics.FromImage(WallMap)
+        Dim GroundGraphics As Graphics = Graphics.FromImage(GroundMap)
+
+        WallGraphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
+        WallGraphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
+        WallGraphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+
+        GroundGraphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
+
+        Graphics.DrawImage(WallMap, 0, 0)
+        Graphics.DrawImage(GroundMap, 0, 32)
     End Sub
 
     Public Overrides Function ToString() As String
@@ -116,11 +131,18 @@ Public Class Room
         Return sum
     End Function
 
-    Public Sub DrawBackground()
-        Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
-        Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
-        Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
-        Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+    Public Sub DrawBackground(Rect As Rectangle)
+
+        If (Rect.Y <= 32) Then
+            Graphics.DrawImage(WallMap, Rect, Rect, GraphicsUnit.Pixel)
+        End If
+
+        Graphics.DrawImage(GroundMap, Rect, Rect, GraphicsUnit.Pixel)
+
+        'Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
+        'Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
+        'Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
+        'Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
     End Sub
 
     ''' <summary>
@@ -130,30 +152,47 @@ Public Class Room
     Public Sub Redraw(DrawRoom As Boolean)
         If DrawRoom Then
             For Each O As GameObject In GameObjects
-                If O.Dirty Then
+                ' Draw the background behind the last position
+                If O.Properties.Dirty Then
                     O.Redraw()
+                End If
+
+                Dim LastRect As New Rectangle(CIntFloor({O.LastPosition.X}),
+                                       CIntFloor({O.LastPosition.Y, O.LastPosition.Z * (10 / 16), 32}),
+                                       O.GraphicsMap.Width + 1,
+                                       O.GraphicsMap.Height + 1)
+                DrawBackground(LastRect)
+
+                ' Draw the object at the current position
+                If O.Properties.Dirty Then
                     Graphics.DrawImage(O.GraphicsMap,
-                                           CIntFloor({O.Position.X}),
-                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
-                    O.Dirty = False
+                                       CIntFloor({O.Position.X}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
+                    O.Properties.Dirty = False
                 End If
 
 #If VersionType = "Debug" Then
                 Dim hitboxPen As Pen = Pens.Red
-                If (O.Collided) Then
-                    hitboxPen = Pens.Magenta
-                    O.Collided = False
+                Dim bitmapPen As Pen = Pens.Blue
+                If (O.Properties.Collided) Then
+                    hitboxPen = Pens.PaleVioletRed
+                    O.Properties.Collided = False
                 End If
+                If (O.Properties.Dirty) Then
+                    bitmapPen = Pens.PaleTurquoise
+                    O.Properties.Dirty = False
+                End If
+
                 Graphics.DrawRectangle(hitboxPen,
-                                           CIntFloor({O.Position.X, O.HitBox.X}),
-                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
-                                           O.HitBox.Width,
-                                           O.HitBox.Height)
-                Graphics.DrawRectangle(Pens.Blue,
-                                           CIntFloor({O.Position.X}),
-                                           CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
-                                           O.GraphicsMap.Width,
-                                           O.GraphicsMap.Height)
+                                       CIntFloor({O.Position.X, O.HitBox.X}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
+                                       O.HitBox.Width,
+                                       O.HitBox.Height)
+                Graphics.DrawRectangle(bitmapPen,
+                                       CIntFloor({O.Position.X}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}),
+                                       O.GraphicsMap.Width,
+                                       O.GraphicsMap.Height)
 #End If
             Next
         Else

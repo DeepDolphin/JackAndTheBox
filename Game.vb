@@ -74,9 +74,9 @@
         World = New World("DavidAndBen", rooms)
 
         ' Load the player and testing stuff
-        Player = New Player(World.RoomAt(150, 150))
+        Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), {100, 100, 100, 8, 2})
         Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector2(200, 200))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), 100, {GameObject.GameObjectProps.CastsShadow, GameObject.GameObjectProps.FloorObject, GameObject.GameObjectProps.Invulnerable})
+        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {100}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.FloorObject, GameObjectProperties.FlagsEnum.Invulnerable})
 
         World.Rooms(0).AddGameObject(Player)
         'World.Rooms(0).AddGameObject(TestObject1)
@@ -110,6 +110,10 @@
         Dim UpdateAction As Action(Of Double)
         UpdateAction = AddressOf UpdateWorld
 
+        For Each r As Room In World.Rooms
+            r.DrawBackground(New Rectangle(New Point(0, 0), r.GraphicsMap.Size))
+        Next
+
         While GameRunning
             Dim DrawTask As Task = Task.Run(New Action(AddressOf DrawWorld))
             Dim UpdateTask As Task = Task.Run(New Action(
@@ -134,11 +138,7 @@
     Private Sub DrawWorld()
         ' Take this out when we figure out how to draw only the things that
         ' actually need to be drawn
-        'Buffer.Graphics.Clear(Color.Black)
-
-        For Each r As Room In World.Rooms
-            r.DrawBackground()
-        Next
+        Buffer.Graphics.Clear(Color.Black)
 
         UpdateCompleteEvent.WaitOne()
 
@@ -151,8 +151,8 @@
         Buffer.Graphics.FillRectangle(Resources.ShadeBrush, New Rectangle(0, 0, 200, 70))
         Buffer.Graphics.DrawString("Version: " + VersionNumber, SystemFonts.CaptionFont, Brushes.Red, 0, 0)
         Buffer.Graphics.DrawString(CInt(1 / Tick), SystemFonts.CaptionFont, Brushes.Red, 0, 10)
-        Buffer.Graphics.DrawString(Player.Properties("Health"), SystemFonts.CaptionFont, Brushes.Red, 0, 20)
-        Buffer.Graphics.DrawString(Player.Properties("CurrentStamina"), SystemFonts.CaptionFont, Brushes.Red, 0, 30)
+        Buffer.Graphics.DrawString(Player.Properties.Health, SystemFonts.CaptionFont, Brushes.Red, 0, 20)
+        Buffer.Graphics.DrawString(Player.Properties.Stamina, SystemFonts.CaptionFont, Brushes.Red, 0, 30)
         Buffer.Graphics.DrawString(Options.MouseWheel, SystemFonts.CaptionFont, Brushes.Red, 0, 40)
         Buffer.Graphics.DrawString(Player.Direction, SystemFonts.CaptionFont, Brushes.Red, 0, 50)
 #End If
@@ -190,18 +190,19 @@
         Dim CurRoom As Room = Player.Room
 
         For Each CurGameObject As GameObject In CurRoom.GameObjects
-            If (CurGameObject.IsMoving) Then
+            If (CurGameObject.Properties.IsMoving) Then
                 Dim newx As Double = CurGameObject.Position.X + (CurGameObject.Speed.X * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
                 Dim newy As Double = CurGameObject.Position.Y + (CurGameObject.Speed.Y * t * If(CurGameObject.HitBox.Width > CurGameObject.HitBox.Height, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height))
+                Dim NewPosition As New Vector3(newx, newy, CurGameObject.Position.Z)
                 Dim Collided As Boolean = False
                 For Each other As GameObject In CurRoom.GameObjects
                     If other.Equals(CurGameObject) Then Continue For
 
                     ' Test Position Collision
-                    If other.CollidesWith(CurGameObject, New Vector2(newx, newy)) Then
+                    If other.CollidesWith(CurGameObject, New Vector2(NewPosition.X, NewPosition.Y)) Then
                         Collided = True
-                        CurGameObject.Collided = True
-                        other.Collided = True
+                        CurGameObject.Properties.Collided = True
+                        other.Properties.Collided = True
                         If TypeOf CurGameObject Is Actor Then
                             CType(CurGameObject, Actor).Hit(other)
                         End If
@@ -213,18 +214,17 @@
 
                     ' Test Sprite Collision
                     If other.SpriteIntersects(CurGameObject) Then
-                        other.Dirty = True
+                        other.Properties.Dirty = True
                     End If
                 Next
 
-                If New RectangleF(0, 0, CurRoom.Width, CurRoom.Height).Contains(New RectangleF(newx + CurGameObject.HitBox.X, newy + CurGameObject.HitBox.Y, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height)) = False Then
+                If New RectangleF(0, 0, CurRoom.Width, CurRoom.Height).Contains(New RectangleF(NewPosition.X + CurGameObject.HitBox.X, NewPosition.Y + CurGameObject.HitBox.Y, CurGameObject.HitBox.Width, CurGameObject.HitBox.Height)) = False Then
                     Collided = True
                 End If
 
                 If Not Collided Then
-                    CurGameObject.Position.X = newx
-                    CurGameObject.Position.Y = newy
-                    CurGameObject.Dirty = True
+                    CurGameObject.Position = NewPosition
+                    CurGameObject.Properties.Dirty = True
                 End If
             End If
             CurGameObject.Update(t)
@@ -260,7 +260,7 @@
 
         'Delete all items flagged for deletion
         For value As Integer = CurRoom.GameObjects.Count - 1 To 0 Step -1
-            If CurRoom.GameObjects(value).Dead Then
+            If CurRoom.GameObjects(value).Properties.Dead Then
                 CurRoom.GameObjects.RemoveAt(value)
             End If
         Next
@@ -275,8 +275,11 @@
             If Player.Room.Equals(PlayerRoom) = False Then
                 Dim oldroom As Room = Player.Room
                 Dim newroom As Room = PlayerRoom
-                Player.Position.X += (oldroom.XOffset - newroom.XOffset)
-                Player.Position.Y += (oldroom.YOffset - newroom.YOffset)
+                Dim NewPosition As New Vector3(
+                    Player.Position.X + oldroom.XOffset - newroom.XOffset,
+                    Player.Position.Y + oldroom.YOffset - newroom.YOffset,
+                    Player.Position.Z)
+                Player.Position = NewPosition
                 oldroom.GameObjects.Remove(Player)
                 newroom.GameObjects.Add(Player)
                 Player.Room = newroom
