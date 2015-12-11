@@ -56,13 +56,13 @@
             Dim e As Room = Nothing
             Select Case p.OpenDirection
                 Case Room.DoorDirection.Up
-                    e = RoomAt(p.OpenRoom.XOffset + Room.RoomWidth / 2, p.OpenRoom.YOffset - Room.RoomHeight / 2)
+                    e = RoomAt(p.OpenRoom.XOffset + p.OpenRoom.RoomWidth / 2, p.OpenRoom.YOffset - p.OpenRoom.RoomHeight / 2)
                 Case Room.DoorDirection.Down
-                    e = RoomAt(p.OpenRoom.XOffset + Room.RoomWidth / 2, p.OpenRoom.YOffset + 3 * Room.RoomHeight / 2)
+                    e = RoomAt(p.OpenRoom.XOffset + p.OpenRoom.RoomWidth / 2, p.OpenRoom.YOffset + 3 * p.OpenRoom.RoomHeight / 2)
                 Case Room.DoorDirection.Left
-                    e = RoomAt(p.OpenRoom.XOffset - Room.RoomWidth / 2, p.OpenRoom.YOffset + Room.RoomHeight / 2)
+                    e = RoomAt(p.OpenRoom.XOffset - p.OpenRoom.RoomWidth / 2, p.OpenRoom.YOffset + p.OpenRoom.RoomHeight / 2)
                 Case Room.DoorDirection.Right
-                    e = RoomAt(p.OpenRoom.XOffset + Room.RoomWidth / 2 * 3, p.OpenRoom.YOffset + Room.RoomHeight / 2)
+                    e = RoomAt(p.OpenRoom.XOffset + p.OpenRoom.RoomWidth / 2 * 3, p.OpenRoom.YOffset + p.OpenRoom.RoomHeight / 2)
             End Select
             If IsNothing(e) = False Then
                 r = e

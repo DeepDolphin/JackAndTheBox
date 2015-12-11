@@ -1,2 +1,2 @@
-<Room DoorUp="False" DoorDown="False" DoorLeft="False" DoorRight="False">
+<Room DoorUp="False" DoorDown="False" DoorLeft="False" DoorRight="False" Width="500" Height="300">
 </Room>

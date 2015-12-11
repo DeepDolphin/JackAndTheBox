@@ -1,4 +1,4 @@
-<Room DoorUp="False" DoorDown="False" DoorLeft="True" DoorRight="False">
+<Room DoorUp="False" DoorDown="False" DoorLeft="True" DoorRight="False" Width="500" Height="300">
   <Crate X="250" Y="200"/>
   <SurvivalTime Time="10"/>
   <KillAllEnemies/>

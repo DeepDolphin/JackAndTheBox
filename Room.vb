@@ -32,17 +32,17 @@ Public Class Room
     Public XOffset As Double = 0
     Public YOffset As Double = 0
 
-    Public Const RoomWidth As Double = 500
-    Public Const RoomHeight As Double = 300
+    Public RoomWidth As Double
+    Public RoomHeight As Double
     Public Const RoomBuffer As Double = 48
 
     Public WallBrush As TextureBrush
     Public GroundBrush As TextureBrush
 
-    Public WallMap As New Bitmap(CInt(RoomWidth), 32)
-    Public GroundMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight))
+    Public WallMap As Bitmap
+    Public GroundMap As Bitmap
 
-    Public GraphicsMap As New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
+    Public GraphicsMap As Bitmap
     Private Graphics As Graphics
 
     Public ReadOnly Property Width As Double
@@ -83,11 +83,16 @@ Public Class Room
         Me.Filename = Filename
         Dim doc As New XmlDocument
         doc.Load(Filename)
+
         Dim RoomElement As XmlElement = doc("Room")
         DoorUp = IIf(RoomElement.GetAttribute("DoorUp"), DoorState.Closed, DoorState.None)
         DoorDown = IIf(RoomElement.GetAttribute("DoorDown"), DoorState.Closed, DoorState.None)
         DoorLeft = IIf(RoomElement.GetAttribute("DoorLeft"), DoorState.Closed, DoorState.None)
         DoorRight = IIf(RoomElement.GetAttribute("DoorRight"), DoorState.Closed, DoorState.None)
+
+        RoomWidth = RoomElement.GetAttribute("Width")
+        RoomHeight = RoomElement.GetAttribute("Height")
+
         For Each e As XmlElement In RoomElement
             Select Case e.Name
                 Case "Crate"
@@ -101,6 +106,10 @@ Public Class Room
                     Objectives.Add(o)
             End Select
         Next
+
+        WallMap = New Bitmap(CInt(RoomWidth), 32)
+        GroundMap = New Bitmap(CInt(RoomWidth), CInt(RoomHeight))
+        GraphicsMap = New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
 
         Graphics = Graphics.FromImage(GraphicsMap)
         GroundBrush = New TextureBrush(My.Resources.FloorTile)
