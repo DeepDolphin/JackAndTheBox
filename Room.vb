@@ -133,11 +133,16 @@ Public Class Room
 
     Public Sub DrawBackground(Rect As Rectangle)
 
+        'ToDo: weird drawing glitch
+
         If (Rect.Y <= 32) Then
             Graphics.DrawImage(WallMap, Rect, Rect, GraphicsUnit.Pixel)
+            Graphics.DrawImage(GroundMap, Rect, Rect, GraphicsUnit.Pixel)
+        Else
+            Graphics.DrawImage(GroundMap, Rect, New Rectangle(Rect.X, Rect.Y - 32, Rect.Width, Rect.Height), GraphicsUnit.Pixel)
         End If
 
-        Graphics.DrawImage(GroundMap, Rect, Rect, GraphicsUnit.Pixel)
+
 
         'Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
         'Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
