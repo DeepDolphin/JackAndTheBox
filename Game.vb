@@ -215,6 +215,9 @@
                     ' Test Sprite Collision
                     If other.SpriteIntersects(CurGameObject) Then
                         other.Properties.Dirty = True
+
+                        ' TODO: If we dirty one sprite, how do we handle sprites that *this* sprite
+                        ' collides with?
                     End If
                 Next
 

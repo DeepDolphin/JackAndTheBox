@@ -46,8 +46,6 @@
 
         _Properties = New ActorProperties(Me, ObjectProperties, PropertyArray)
 
-
-
         Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
         Dim y As Integer = Game.Resources.HealthBackground.Height + 1
         Dim width As Integer = Sprite.Width
@@ -61,6 +59,12 @@
         HitBox = New Rectangle(x, y, width, height)
         Properties.Dirty = True
 
+        If Graphics Is Nothing Then
+            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+            Graphics = Graphics.FromImage(GraphicsMap)
+        End If
+
+        Redraw()
     End Sub
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String())

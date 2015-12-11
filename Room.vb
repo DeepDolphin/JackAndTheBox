@@ -142,8 +142,6 @@ Public Class Room
             Graphics.DrawImage(GroundMap, Rect, New Rectangle(Rect.X, Rect.Y - 32, Rect.Width, Rect.Height), GraphicsUnit.Pixel)
         End If
 
-
-
         'Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
         'Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
         'Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)

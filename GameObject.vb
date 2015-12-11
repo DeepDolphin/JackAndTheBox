@@ -34,7 +34,7 @@
     Public Ability As Ability
 
     Public GraphicsMap As Bitmap
-    Private Graphics As Graphics
+    Protected Graphics As Graphics
 
     Public CollidedWith As New List(Of GameObject)
 
@@ -80,6 +80,7 @@
 
     Public Overridable Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
         Me.Position = Position
+        Me._LastPosition = Position
         Me.Speed = Speed
         Me.Sprite = Image
         Me.Room = Room
@@ -100,6 +101,13 @@
 
         HitBox = New Rectangle(x, y, width, height)
         Properties.Dirty = True
+
+        If Graphics Is Nothing Then
+            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+            Graphics = Graphics.FromImage(GraphicsMap)
+        End If
+
+        Redraw()
     End Sub
 
 #End Region
@@ -179,13 +187,7 @@
     End Function
 
     Public Sub Redraw()
-        If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
-            Graphics = Graphics.FromImage(GraphicsMap)
-        Else
-            Graphics.Clear(Color.Transparent)
-        End If
-
+        Graphics.Clear(Color.Transparent)
         If Properties.CastsShadow Then
             Graphics.DrawImage(Game.Resources.Shadow,
                                (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
