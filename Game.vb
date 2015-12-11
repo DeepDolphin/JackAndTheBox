@@ -71,7 +71,7 @@
         LoadFiles()
 
         ' Generate the world to play in
-        World = New World("DavidAndBen", rooms)
+        World = New World("DavidBenAndJonathan", rooms)
 
         ' Load the player and testing stuff
         Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), {100, 100, 100, 8, 2})
@@ -184,7 +184,6 @@
         Return retval
     End Function
 
-#Const CollisionType = "New"
     Public Sub UpdateWorld(t As Double)
         'Moving all objects
         Dim CurRoom As Room = Player.Room
@@ -333,5 +332,11 @@
 
     Public Sub MouseWheel(e As MouseEventArgs)
         Options.MouseWheel = e.Delta / 120
+    End Sub
+
+    Public Sub Resize(sender As Control)
+        'ToDo: make sure bitmap resizes and the objects redraw | User interface has to be updated as well
+        ScreenWidth = sender.Width
+        ScreenHeight = sender.Height
     End Sub
 End Class

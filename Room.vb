@@ -113,7 +113,7 @@ Public Class Room
         WallGraphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
         WallGraphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
 
-        GroundGraphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
+        GroundGraphics.FillRectangle(GroundBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}))
 
         Graphics.DrawImage(WallMap, 0, 0)
         Graphics.DrawImage(GroundMap, 0, 32)
@@ -137,7 +137,7 @@ Public Class Room
 
         If (Rect.Y <= 32) Then
             Graphics.DrawImage(WallMap, Rect, Rect, GraphicsUnit.Pixel)
-            Graphics.DrawImage(GroundMap, Rect, Rect, GraphicsUnit.Pixel)
+            Graphics.DrawImage(GroundMap, Rect, New Rectangle(Rect.X, Rect.Y - 32, Rect.Width, Rect.Height), GraphicsUnit.Pixel)
         Else
             Graphics.DrawImage(GroundMap, Rect, New Rectangle(Rect.X, Rect.Y - 32, Rect.Width, Rect.Height), GraphicsUnit.Pixel)
         End If
@@ -168,13 +168,6 @@ Public Class Room
 
             For Each O As GameObject In GameObjects
                 ' Draw the object at the current position
-                If O.Properties.Dirty Then
-                    Graphics.DrawImage(O.GraphicsMap,
-                                       CIntFloor({O.Position.X}),
-                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
-                    O.Properties.Dirty = False
-                End If
-
 #If VersionType = "Debug" Then
                 Dim hitboxPen As Pen = Pens.Red
                 Dim bitmapPen As Pen = Pens.Blue
@@ -183,10 +176,18 @@ Public Class Room
                     O.Properties.Collided = False
                 End If
                 If (O.Properties.Dirty) Then
-                    bitmapPen = Pens.PaleTurquoise
+                    bitmapPen = Pens.LightBlue
+                End If
+#End If
+
+                If O.Properties.Dirty Then
+                    Graphics.DrawImage(O.GraphicsMap,
+                                       CIntFloor({O.Position.X}),
+                                       CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), 32}))
                     O.Properties.Dirty = False
                 End If
 
+#If VersionType = "Debug" Then
                 Graphics.DrawRectangle(hitboxPen,
                                        CIntFloor({O.Position.X, O.HitBox.X}),
                                        CIntFloor({O.Position.Y, O.Position.Z * (10 / 16), O.HitBox.Y, 32}),
@@ -200,7 +201,11 @@ Public Class Room
 #End If
             Next
         Else
-            Graphics.FillRectangle(Game.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
+
+            'ToDo: draw room only once if it's shaded
+            'Graphics.DrawImage(WallMap, 0, 0)
+            'Graphics.DrawImage(GroundMap, 0, 32)
+            'Graphics.FillRectangle(Game.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
         End If
 #If Not VersionType = "Release" Then
         Graphics.DrawString(IO.Path.GetFileName(Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)

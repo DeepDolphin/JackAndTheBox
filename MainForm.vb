@@ -52,6 +52,12 @@
         End If
     End Sub
 
+    Private Sub MainForm_Resize(sender As Object, e As EventArgs) Handles Me.Resize
+        If g IsNot Nothing Then
+            g.Resize(sender)
+        End If
+    End Sub
+
     Private Sub StartGame()
         Buffer = BufferedGraphicsManager.Current.Allocate(CreateGraphics(), New Rectangle(0, 0, ClientSize.Width, ClientSize.Height))
         g = New Game(Buffer, ClientSize.Width, ClientSize.Height)

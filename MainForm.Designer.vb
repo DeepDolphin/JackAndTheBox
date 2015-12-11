@@ -26,13 +26,11 @@ Partial Class MainForm
         '
         'MainForm
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 16.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.BackColor = System.Drawing.Color.Black
-        Me.ClientSize = New System.Drawing.Size(1375, 804)
-        Me.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle
-        Me.Margin = New System.Windows.Forms.Padding(4)
-        Me.MaximizeBox = False
+        Me.ClientSize = New System.Drawing.Size(1031, 653)
+        Me.Cursor = System.Windows.Forms.Cursors.Default
         Me.Name = "MainForm"
         Me.Text = "Jack And The Boxes"
         Me.ResumeLayout(False)
