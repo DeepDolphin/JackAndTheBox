@@ -151,18 +151,19 @@ Public Class Room
     ''' <param name="DrawRoom">True if we should draw the room contents, false if we should draw the room shaded</param>
     Public Sub Redraw(DrawRoom As Boolean)
         If DrawRoom Then
+            ' Draw the background behind the last position
             For Each O As GameObject In GameObjects
-                ' Draw the background behind the last position
                 If O.Properties.Dirty Then
                     O.Redraw()
-                End If
-
-                Dim LastRect As New Rectangle(CIntFloor({O.LastPosition.X}),
+                    Dim LastRect As New Rectangle(CIntFloor({O.LastPosition.X}),
                                        CIntFloor({O.LastPosition.Y, O.LastPosition.Z * (10 / 16), 32}),
                                        O.GraphicsMap.Width + 1,
                                        O.GraphicsMap.Height + 1)
-                DrawBackground(LastRect)
+                    DrawBackground(LastRect)
+                End If
+            Next
 
+            For Each O As GameObject In GameObjects
                 ' Draw the object at the current position
                 If O.Properties.Dirty Then
                     Graphics.DrawImage(O.GraphicsMap,
