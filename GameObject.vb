@@ -78,6 +78,44 @@
         Init(New Sprite(Image), Room, Position, Speed, PropertyArray, ObjectProperties)
     End Sub
 
+    Public Sub New(Room As Room, Position As Vector3, Speed As Vector2, Path As String)
+        Dim Reader As New IO.BinaryReader(New IO.FileStream(Path, IO.FileMode.Open))
+
+        Dim imageCount As Integer = Reader.ReadInt32()
+        Dim bitmaps As New List(Of Bitmap)
+        Dim imageConverter As New ImageConverter()
+
+        For value As Integer = 0 To imageCount - 1
+            Dim byteCount As Integer = Reader.ReadInt32()
+            Dim bitmap As Bitmap = imageConverter.ConvertFrom(Reader.ReadBytes(byteCount))
+            bitmaps.Add(bitmap)
+        Next
+
+        Dim propertyCount As Integer = Reader.ReadInt32()
+        Dim propertyArray(propertyCount) As String
+
+        For value As Integer = 0 To propertyCount - 1
+            Dim gottenProperty As String = Reader.ReadString()
+            propertyArray(value) = gottenProperty
+        Next
+
+        Dim objectPropertyCount As Integer = Reader.ReadInt32()
+        Dim objectPropertyArray(objectPropertyCount) As GameObjectProperties.FlagsEnum
+
+        For value As Integer = 0 To propertyCount - 1
+            Dim gottenProperty As GameObjectProperties.FlagsEnum = Reader.ReadInt32
+            objectPropertyArray(value) = gottenProperty
+        Next
+
+        Reader.Dispose()
+        Init(New Sprite(bitmaps), Room, Position, Speed, propertyArray, objectPropertyArray)
+    End Sub
+
+    Public Sub New(Gameobject As GameObject)
+        Init(Gameobject.Sprite, Gameobject.Room, Gameobject.Position, Gameobject.Speed, {}, {If(_Properties.Visible, GameObjectProperties.FlagsEnum.Visible, Nothing)})
+        _Properties = New GameObjectProperties(Gameobject.Properties)
+    End Sub
+
     Public Overridable Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
         Me.Position = Position
         Me._LastPosition = Position
@@ -107,7 +145,7 @@
             Graphics = Graphics.FromImage(GraphicsMap)
         End If
 
-        Redraw()
+        If Properties.Visible Then Redraw()
     End Sub
 
 #End Region

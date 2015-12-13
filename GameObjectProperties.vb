@@ -8,8 +8,16 @@
             Flags.Set(ObjectProperty, True)
         Next
 
-        Properties("MaxHealth") = PropertiesArray(0)
-        Properties("Health") = PropertiesArray(0)
+        If PropertiesArray.Length > 0 Then
+            Properties("MaxHealth") = PropertiesArray(0)
+            Properties("Health") = PropertiesArray(0)
+        End If
+    End Sub
+
+    Public Sub New(GameObjectProperties As GameObjectProperties)
+        Parent = GameObjectProperties.Parent
+        Properties = GameObjectProperties.Properties
+        Flags = GameObjectProperties.Flags
     End Sub
 
     Public ReadOnly Property IsMoving As Boolean
@@ -43,8 +51,6 @@
 
 #Region "Flags Enum"
     Protected Flags As New BitArray(FlagsEnum.Max)
-
-
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -121,12 +127,18 @@ Public Class ActorProperties
     Public Sub New(GameObject As GameObject, ObjectProperties As FlagsEnum(), PropertiesArray As String())
         MyBase.New(GameObject, ObjectProperties, PropertiesArray)
 
-        Properties("MaxStamina") = PropertiesArray(1)
-        Properties("Stamina") = PropertiesArray(1)
-        Properties("MaxMana") = PropertiesArray(2)
-        Properties("Mana") = PropertiesArray(2)
-        Properties("MaxSpeed") = PropertiesArray(3)
-        Properties("Acceleration") = PropertiesArray(4)
+        If PropertiesArray.Length > 0 Then
+            Properties("MaxStamina") = PropertiesArray(1)
+            Properties("Stamina") = PropertiesArray(1)
+            Properties("MaxMana") = PropertiesArray(2)
+            Properties("Mana") = PropertiesArray(2)
+            Properties("MaxSpeed") = PropertiesArray(3)
+            Properties("Acceleration") = PropertiesArray(4)
+        End If
+    End Sub
+
+    Public Sub New(ActorProperties As ActorProperties)
+        MyBase.New(ActorProperties)
     End Sub
 
 #Region "Properties Dictionary"
