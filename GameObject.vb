@@ -83,12 +83,15 @@
 
         Dim imageCount As Integer = Reader.ReadInt32()
         Dim bitmaps As New List(Of Bitmap)
-        Dim imageConverter As New ImageConverter()
+        'Dim imageConverter As New ImageConverter()
 
         For value As Integer = 0 To imageCount - 1
             Dim byteCount As Integer = Reader.ReadInt32()
-            Dim bitmap As Bitmap = imageConverter.ConvertFrom(Reader.ReadBytes(byteCount))
+            Dim ms As New IO.MemoryStream()
+            ms.Write(Reader.ReadBytes(byteCount), 0, byteCount)
+            Dim bitmap As New Bitmap(ms)
             bitmaps.Add(bitmap)
+            ms.Dispose()
         Next
 
         Dim propertyCount As Integer = Reader.ReadInt32()
@@ -103,7 +106,7 @@
         Dim objectPropertyArray(objectPropertyCount) As GameObjectProperties.FlagsEnum
 
         For value As Integer = 0 To propertyCount - 1
-            Dim gottenProperty As GameObjectProperties.FlagsEnum = Reader.ReadInt32
+            Dim gottenProperty As GameObjectProperties.FlagsEnum = Reader.ReadInt32()
             objectPropertyArray(value) = gottenProperty
         Next
 
