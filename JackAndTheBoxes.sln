@@ -5,6 +5,10 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "JackAndTheBoxes", "JackAndTheBoxes.vbproj", "{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}"
 EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "JackToolbox", "JackToolbox\JackToolbox.vbproj", "{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}"
+EndProject
+Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "JackPhysics", "JackPhysics\JackPhysics.vbproj", "{D78B9126-E501-4616-9C5B-1D38C98DE04F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Beta|Any CPU = Beta|Any CPU
@@ -18,6 +22,18 @@ Global
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E520F4D2-BA15-4706-AF4D-5A6E48E1FFFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Beta|Any CPU.ActiveCfg = Release|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Beta|Any CPU.Build.0 = Release|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7CC4030-AB07-4DEB-9A7C-DC26877DE8BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Beta|Any CPU.ActiveCfg = Release|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Beta|Any CPU.Build.0 = Release|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D78B9126-E501-4616-9C5B-1D38C98DE04F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

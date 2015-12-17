@@ -1,26 +1,28 @@
-﻿Public Class World
+﻿Imports JackPhysics
+
+Public Class World
     Public Rooms As New List(Of Room)
 
 
     ' These methods manufacture a new copy of one of the plug rooms.
     Public ReadOnly Property LeftPlug As Room
         Get
-            Return New Room("Rooms\left.xml")
+            Return New Room("resources\rooms\left.xml")
         End Get
     End Property
     Public ReadOnly Property RightPlug As Room
         Get
-            Return New Room("Rooms\right.xml")
+            Return New Room("resources\rooms\right.xml")
         End Get
     End Property
     Public ReadOnly Property UpPlug As Room
         Get
-            Return New Room("Rooms\up.xml")
+            Return New Room("resources\rooms\up.xml")
         End Get
     End Property
     Public ReadOnly Property DownPlug As Room
         Get
-            Return New Room("Rooms\down.xml")
+            Return New Room("resources\rooms\down.xml")
         End Get
     End Property
 

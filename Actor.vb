@@ -1,4 +1,6 @@
-﻿Public Class Actor
+﻿Imports JackPhysics
+
+Public Class Actor
     Inherits GameObject
 
     Public Inventory As New Inventory
@@ -47,7 +49,7 @@
         _Properties = New ActorProperties(Me, ObjectProperties, PropertyArray)
 
         Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
-        Dim y As Integer = Game.Resources.HealthBackground.Height + 1
+        Dim y As Integer = Resources.HealthBackground.Height + 1
         Dim width As Integer = Sprite.Width
         Dim height As Integer = Sprite.Height
 
@@ -60,7 +62,7 @@
         Properties.Dirty = True
 
         If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Resources.HealthBackground.Height + 4)
             Graphics = Graphics.FromImage(GraphicsMap)
         End If
 

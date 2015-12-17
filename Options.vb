@@ -1,13 +1,13 @@
 ﻿Imports System.Xml
 
-Public Class Options
+Public Module Options
     Public Preferences As Dictionary(Of String, String)
     Public OIMap As Dictionary(Of String, String)
     Public OIStatus As Dictionary(Of String, Boolean)
     Public MouseWheel As Integer
     Public MouseLocation As PointF
 
-    Public Sub New()
+    Public Sub Import()
         Preferences = New Dictionary(Of String, String)
         OIMap = New Dictionary(Of String, String)
         OIStatus = New Dictionary(Of String, Boolean)
@@ -101,4 +101,4 @@ Public Class Options
 
         optionsDoc.Save("options.xml")
     End Sub
-End Class
+End Module

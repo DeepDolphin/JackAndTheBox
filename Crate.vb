@@ -1,4 +1,6 @@
-﻿Public Class Crate
+﻿Imports JackPhysics
+
+Public Class Crate
     Inherits GameObject
 
     Public Sub New(Room As Room, Position As Vector3)

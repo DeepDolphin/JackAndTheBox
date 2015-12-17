@@ -1,4 +1,6 @@
-﻿Public Class InventoryItem
+﻿Imports JackPhysics
+
+Public Class InventoryItem
     Inherits GameObject
     Public Parent As Actor
 

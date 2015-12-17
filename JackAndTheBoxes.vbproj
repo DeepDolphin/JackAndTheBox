@@ -13,6 +13,21 @@
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -63,6 +78,15 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignManifests>false</SignManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Box Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -129,7 +153,6 @@
     <Compile Include="Ability.vb" />
     <Compile Include="Sprite.vb" />
     <Compile Include="UserInterface.vb" />
-    <Compile Include="Vectors.vb" />
     <Compile Include="World.vb" />
   </ItemGroup>
   <ItemGroup>
@@ -144,6 +167,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="My Project\app.manifest" />
     <None Include="My Project\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.vb</LastGenOutput>
@@ -156,58 +180,87 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CharacterUp1.png" />
+    <None Include="resources\CharacterUp1.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Crate.png" />
+    <None Include="resources\Crate.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\FloorTile.png" />
+    <None Include="resources\FloorTile.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Shadow.png" />
+    <None Include="resources\Shadow.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\CeilingLight.png" />
+    <None Include="resources\CeilingLight.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\WallStrip.png" />
-    <None Include="Resources\GradientLeft.png" />
-    <None Include="Resources\GradientRight.png" />
-    <None Include="Resources\EXPOrb1.png" />
-    <None Include="Resources\EXPOrb2.png" />
-    <None Include="Resources\EXPOrb3.png" />
-    <None Include="Resources\EXPOrb4.png" />
-    <None Include="Resources\telepad.png" />
-    <None Include="Resources\HealthBackground.png" />
-    <None Include="Resources\HealthBar.png" />
-    <Content Include="Rooms\debug.xml">
+    <None Include="resources\WallStrip.png" />
+    <None Include="resources\GradientLeft.png" />
+    <None Include="resources\GradientRight.png" />
+    <None Include="resources\EXPOrb1.png" />
+    <None Include="resources\EXPOrb2.png" />
+    <None Include="resources\EXPOrb3.png" />
+    <None Include="resources\EXPOrb4.png" />
+    <None Include="resources\telepad.png" />
+    <None Include="resources\HealthBackground.png" />
+    <None Include="resources\HealthBar.png" />
+    <Content Include="Box Icon.ico" />
+    <Content Include="options.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\down.xml">
+    <Content Include="resources\dummy.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\left.xml">
+    <Content Include="resources\rooms\debug.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\right.xml">
+    <Content Include="resources\rooms\down.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\room5.xml">
+    <Content Include="resources\rooms\left.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\room2.xml">
+    <Content Include="resources\rooms\right.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\room1.xml">
+    <Content Include="resources\rooms\room5.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\testroom.xml">
+    <Content Include="resources\rooms\room2.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Rooms\up.xml">
+    <Content Include="resources\rooms\room1.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="resources\rooms\testroom.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="resources\rooms\up.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="JackPhysics\JackPhysics.vbproj">
+      <Project>{d78b9126-e501-4616-9c5b-1d38c98de04f}</Project>
+      <Name>JackPhysics</Name>
+    </ProjectReference>
+    <ProjectReference Include="JackToolbox\JackToolbox.vbproj">
+      <Project>{f7cc4030-ab07-4deb-9a7c-dc26877de8be}</Project>
+      <Name>JackToolbox</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

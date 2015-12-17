@@ -1,4 +1,5 @@
 ﻿Imports System.Xml
+Imports JackPhysics
 
 Public Class Room
     Public Enum DoorState
@@ -119,8 +120,8 @@ Public Class Room
         Dim GroundGraphics As Graphics = Graphics.FromImage(GroundMap)
 
         WallGraphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
-        WallGraphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
-        WallGraphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+        WallGraphics.DrawImage(Resources.GradientLeft, 0, 0, 64, 32)
+        WallGraphics.DrawImage(Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
 
         GroundGraphics.FillRectangle(GroundBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}))
 
@@ -160,8 +161,8 @@ Public Class Room
 
         'Graphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
         'Graphics.FillRectangle(GroundBrush, 0, 32, CIntFloor({Width}), CIntFloor({Height}))
-        'Graphics.DrawImage(Game.Resources.GradientLeft, 0, 0, 64, 32)
-        'Graphics.DrawImage(Game.Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+        'Graphics.DrawImage(Resources.GradientLeft, 0, 0, 64, 32)
+        'Graphics.DrawImage(Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
     End Sub
 
     ''' <summary>
@@ -221,7 +222,7 @@ Public Class Room
             'ToDo: draw room only once if it's shaded
             'Graphics.DrawImage(WallMap, 0, 0)
             'Graphics.DrawImage(GroundMap, 0, 32)
-            'Graphics.FillRectangle(Game.Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
+            'Graphics.FillRectangle(Resources.ShadeBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}) + 32)
         End If
 #If Not VersionType = "Release" Then
         Graphics.DrawString(IO.Path.GetFileName(Filename), SystemFonts.CaptionFont, Brushes.Red, 0, 0)

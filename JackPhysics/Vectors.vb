@@ -1,4 +1,6 @@
-﻿Public Structure Vector2
+﻿Imports System.Drawing
+
+Public Structure Vector2
     Public X As Double
     Public Y As Double
     Public Property Length As Double

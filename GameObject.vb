@@ -1,4 +1,6 @@
-﻿Public Class GameObject
+﻿Imports JackPhysics
+
+Public Class GameObject
     Implements IComparable
     Public Speed As Vector2
     Public HitBox As RectangleF
@@ -119,24 +121,24 @@
         _Properties = New GameObjectProperties(Gameobject.Properties)
     End Sub
 
-    Public Overridable Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+    Public Overridable Sub Init(Sprite As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
         Me.Position = Position
         Me._LastPosition = Position
         Me.Speed = Speed
-        Me.Sprite = Image
+        Me.Sprite = Sprite
         Me.Room = Room
 
         'If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
 
         _Properties = New GameObjectProperties(Me, ObjectProperties, PropertyArray)
 
-        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
-        Dim y As Integer = Game.Resources.HealthBackground.Height + 1
-        Dim width As Integer = Sprite.Width
-        Dim height As Integer = Sprite.Height
+        Dim x As Integer = (((Me.Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
+        Dim y As Integer = Resources.HealthBackground.Height + 1
+        Dim width As Integer = Me.Sprite.Width
+        Dim height As Integer = Me.Sprite.Height
 
         If (Not Properties.FloorObject) Then
-            y += Sprite.Height * (10 / 16)
+            y += Me.Sprite.Height * (10 / 16)
             height = (height / 2) * (10 / 16)
         End If
 
@@ -144,12 +146,44 @@
         Properties.Dirty = True
 
         If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Game.Resources.HealthBackground.Height + 4)
+            GraphicsMap = New Bitmap(((Me.Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Me.Sprite.Height + Resources.HealthBackground.Height + 4)
             Graphics = Graphics.FromImage(GraphicsMap)
         End If
 
         If Properties.Visible Then Redraw()
     End Sub
+
+    Public Shared Function fromBytes(reader As IO.BinaryReader) As GameObject
+        Dim imageCount As Integer = reader.ReadInt32()
+        Dim bitmaps As New List(Of Bitmap)
+
+        For value As Integer = 0 To imageCount - 1
+            Dim byteCount As Integer = reader.ReadInt32()
+            Dim ms As New IO.MemoryStream()
+            ms.Write(reader.ReadBytes(byteCount), 0, byteCount)
+            Dim bitmap As New Bitmap(ms)
+            bitmaps.Add(bitmap)
+            ms.Dispose()
+        Next
+
+        Dim propertyCount As Integer = reader.ReadInt32()
+        Dim propertyArray(propertyCount) As String
+
+        For value As Integer = 0 To propertyCount - 1
+            Dim gottenProperty As String = reader.ReadString()
+            propertyArray(value) = gottenProperty
+        Next
+
+        Dim objectPropertyCount As Integer = reader.ReadInt32()
+        Dim objectPropertyArray(objectPropertyCount) As GameObjectProperties.FlagsEnum
+
+        For value As Integer = 0 To propertyCount - 1
+            Dim gottenProperty As GameObjectProperties.FlagsEnum = reader.ReadInt32()
+            objectPropertyArray(value) = gottenProperty
+        Next
+
+        Return New GameObject(New Sprite(bitmaps), Nothing, Nothing, propertyArray, objectPropertyArray)
+    End Function
 
 #End Region
 
@@ -230,16 +264,16 @@
     Public Sub Redraw()
         Graphics.Clear(Color.Transparent)
         If Properties.CastsShadow Then
-            Graphics.DrawImage(Game.Resources.Shadow,
+            Graphics.DrawImage(Resources.Shadow,
                                (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
-                               Game.Resources.HealthBackground.Height + Sprite.Height - 7,
+                               Resources.HealthBackground.Height + Sprite.Height - 7,
                                Sprite.Width,
                                10)
         End If
 
         Graphics.DrawImage(Sprite.CurrentFrame,
                            (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
-                           Game.Resources.HealthBackground.Height + 1,
+                           Resources.HealthBackground.Height + 1,
                            Sprite.Width,
                            Sprite.Height)
 
@@ -250,21 +284,21 @@
             Dim maxHealth As Integer = Properties.MaxHealth
 
             While index < numBars
-                Graphics.DrawImage(Game.Resources.HealthBackground,
+                Graphics.DrawImage(Resources.HealthBackground,
                                    (((Sprite.Width * 2) \ numBars) + 1) * index,
                                    0,
                                    (Sprite.Width * 2) \ numBars,
-                                   Game.Resources.HealthBackground.Height)
+                                   Resources.HealthBackground.Height)
 
-                Graphics.DrawImage(Game.Resources.HealthBar,
+                Graphics.DrawImage(Resources.HealthBar,
                                        New Rectangle(((((Sprite.Width * 2) \ numBars) + 1) * index) + 2,
                                                      2,
                                                      ((Sprite.Width * 2) \ numBars - 4) * (Math.Min(health, 100) / 100),
-                                                     Game.Resources.HealthBar.Height),
+                                                     Resources.HealthBar.Height),
                                        New Rectangle(0,
                                                      0,
-                                                     Game.Resources.HealthBar.Width * (Math.Min(health, 100) / 100),
-                                                     Game.Resources.HealthBar.Height),
+                                                     Resources.HealthBar.Width * (Math.Min(health, 100) / 100),
+                                                     Resources.HealthBar.Height),
                                        GraphicsUnit.Pixel)
                 index += 1
                 health -= 100

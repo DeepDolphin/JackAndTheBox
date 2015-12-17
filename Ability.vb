@@ -1,4 +1,6 @@
-﻿Public MustInherit Class Ability
+﻿Imports JackPhysics
+
+Public MustInherit Class Ability
     Public CurrentCooldown As Double
     Public ReadOnly MaxCooldown As Double
     Public Parent As GameObject

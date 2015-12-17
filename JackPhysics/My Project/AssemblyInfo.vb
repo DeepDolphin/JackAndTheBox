@@ -8,17 +8,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("JackToolbox")> 
+<Assembly: AssemblyTitle("JackPhysics")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("JackToolbox")> 
+<Assembly: AssemblyProduct("JackPhysics")> 
 <Assembly: AssemblyCopyright("Copyright ©  2015")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("818a33a0-3c2a-43f3-9e0a-a8395344ce0a")> 
+<Assembly: Guid("61701bd0-ffb3-456d-ab3b-73f7c77dc372")> 
 
 ' Version information for an assembly consists of the following four values:
 '

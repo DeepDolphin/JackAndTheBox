@@ -1,4 +1,6 @@
-﻿Public Class EXPOrb
+﻿Imports JackPhysics
+
+Public Class EXPOrb
     Inherits InventoryItem
     Public EXP As Integer = 0
 

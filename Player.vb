@@ -1,6 +1,7 @@
-﻿Public Class Player
+﻿Imports JackPhysics
+
+Public Class Player
     Inherits Actor
-    Private Options As Options = Game.Options
 
     Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String())
         MyBase.New(Image, Room, Position, PropertyArray)

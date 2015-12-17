@@ -1,0 +1,2 @@
+﻿This is a dummy text to make sure this folder is created.
+I have completed my job. Yay!

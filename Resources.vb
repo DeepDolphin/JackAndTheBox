@@ -1,12 +1,6 @@
 ﻿Imports System.IO
 
-Public Class Resources
-    Public Shared ReadOnly Property getInstance As Resources
-        Get
-            Return Resources
-        End Get
-    End Property
-    Private Shared Resources As Resources
+Public Module Resources
     Private ResourceBitmaps As Dictionary(Of String, Bitmap)
     Private ResourceGameObjects As Dictionary(Of String, GameObject)
     Private ResourceRooms As Dictionary(Of String, Room)
@@ -22,14 +16,13 @@ Public Class Resources
     Public HealthBackground As Bitmap
     Public HealthBar As Bitmap
 
-    Public Sub New()
-        Resources = Me
+    Public Sub Import()
 
         For Each file As FileInfo In New DirectoryInfo("resources").GetFiles
-            If file.Extension.Equals("jbrp") Then
+            If file.Extension.Equals(".jbrp") Then
                 Dim Reader As New BinaryReader(New FileStream(file.FullName, FileMode.Open))
-                Dim imageCount As Integer = Reader.ReadInt32()
 
+                Dim imageCount As Integer = Reader.ReadInt32()
                 For value As Integer = 0 To imageCount - 1
                     Dim name As String = Reader.ReadString
                     Dim byteCount As Integer = Reader.ReadInt32()
@@ -40,20 +33,11 @@ Public Class Resources
                     ms.Dispose()
                 Next
 
-                Dim propertyCount As Integer = Reader.ReadInt32()
-                Dim propertyArray(propertyCount) As String
-
-                For value As Integer = 0 To propertyCount - 1
-                    Dim gottenProperty As String = Reader.ReadString()
-                    propertyArray(value) = gottenProperty
-                Next
-
-                Dim objectPropertyCount As Integer = Reader.ReadInt32()
-                Dim objectPropertyArray(objectPropertyCount) As GameObjectProperties.FlagsEnum
-
-                For value As Integer = 0 To propertyCount - 1
-                    Dim gottenProperty As GameObjectProperties.FlagsEnum = Reader.ReadInt32()
-                    objectPropertyArray(value) = gottenProperty
+                Dim gameObjectCount As Integer = Reader.ReadInt32()
+                For value As Integer = 0 To imageCount - 1
+                    Dim name As String = Reader.ReadString
+                    Dim gameObject As GameObject = GameObject.fromBytes(Reader)
+                    ResourceGameObjects.Add(name, gameObject)
                 Next
 
                 Reader.Dispose()
@@ -69,4 +53,9 @@ Public Class Resources
         HealthBar = New Bitmap(My.Resources.HealthBar)
 
     End Sub
-End Class
+
+    Public Sub Export()
+
+    End Sub
+
+End Module

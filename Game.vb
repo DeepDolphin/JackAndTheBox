@@ -1,4 +1,6 @@
-﻿Public Class Game
+﻿Imports JackPhysics
+
+Public Class Game
 
 #If VersionType = "Beta" Then
     Public Const VersionTN As String = "1"
@@ -16,8 +18,6 @@
     Public Shared ViewOffsetY As Double
 
     Public Shared World As World
-    Public Shared Options As Options
-    Public Shared Resources As New Resources
     Public Shared UserInterface As UserInterface
 
     Private Buffer As BufferedGraphics
@@ -52,9 +52,13 @@
 
     Private Sub Init()
         ' Load the rooms that we have.
+
+        Options.import()
+        Resources.Import()
+
         Dim rooms As New List(Of Room)
 #If Not VersionType = "Debug" Then
-        For Each s As String In IO.Directory.EnumerateFiles("Rooms\")
+        For Each s As String In IO.Directory.EnumerateFiles("resources\rooms\")
             If IO.Path.GetFileNameWithoutExtension(s) = "up" OrElse
                     IO.Path.GetFileNameWithoutExtension(s) = "down" OrElse
                     IO.Path.GetFileNameWithoutExtension(s) = "left" OrElse
@@ -66,9 +70,8 @@
             rooms.Add(r)
         Next
 #Else
-        rooms.Add(New Room("Rooms\debug.xml"))
+        rooms.Add(New Room("resources\rooms\debug.xml"))
 #End If
-        LoadFiles()
 
         ' Generate the world to play in
         World = New World("DavidBenAndJonathan", rooms)
@@ -82,16 +85,11 @@
         'World.Rooms(0).AddGameObject(TestObject1)
         'World.Rooms(0).AddGameObject(TestObject2)
 
-        Resources = New Resources()
         UserInterface = New UserInterface(ScreenWidth, ScreenHeight)
 
         GameRunning = True
         Watch = New Stopwatch()
         Watch.Start()
-    End Sub
-
-    Private Sub LoadFiles()
-        Options = New Options()
     End Sub
 
     Public Sub StopGame()
