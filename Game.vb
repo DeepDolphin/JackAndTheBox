@@ -336,7 +336,7 @@
 
     Public Sub Resize(sender As Control)
         'ToDo: make sure bitmap resizes and the objects redraw | User interface has to be updated as well
-        ScreenWidth = sender.Width
-        ScreenHeight = sender.Height
+        ScreenWidth = sender.ClientSize.Width
+        ScreenHeight = sender.ClientSize.Height
     End Sub
 End Class

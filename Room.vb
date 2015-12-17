@@ -128,6 +128,13 @@ Public Class Room
         Graphics.DrawImage(GroundMap, 0, 32)
     End Sub
 
+    Public Sub New(GroundTexture As Bitmap, WallTexture As Bitmap, GameObjects As IEnumerable(Of GameObject), Objectives As IEnumerable(Of Objective))
+
+
+
+
+    End Sub
+
     Public Overrides Function ToString() As String
         Return IO.Path.GetFileName(Filename) & " X:" & XOffset & ", Y:" & YOffset & " GameObjects:" & GameObjects.Count
     End Function
