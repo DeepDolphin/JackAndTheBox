@@ -74,7 +74,7 @@ Public Class PlaceAbility
 
         Parent.Position = New Vector3(X, Y, Parent.Position.Z)
         Parent.Room = User.Room
-        Game.ToAddWaitlist.Add(Parent)
+        'Game.ToAddWaitlist.Add(Parent)
         CurrentCooldown = MaxCooldown
     End Sub
 

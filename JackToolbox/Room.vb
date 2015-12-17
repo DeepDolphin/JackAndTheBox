@@ -1,5 +1,6 @@
 ﻿Imports System.Xml
 Imports JackPhysics
+Imports System.Drawing
 
 Public Class Room
     Public Enum DoorState

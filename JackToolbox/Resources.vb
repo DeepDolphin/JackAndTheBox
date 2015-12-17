@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Drawing
 
 Public Module Resources
     Private ResourceBitmaps As Dictionary(Of String, Bitmap)

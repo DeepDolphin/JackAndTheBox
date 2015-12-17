@@ -20,6 +20,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DocumentationFile>JackToolbox.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DefineConstants>VersionType="Debug"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,6 +30,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DocumentationFile>JackToolbox.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
+    <DefineConstants>VersionType="Release"</DefineConstants>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -45,6 +47,8 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -63,6 +67,16 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Ability.vb" />
+    <Compile Include="Actor.vb" />
+    <Compile Include="Crate.vb" />
+    <Compile Include="Enemy.vb" />
+    <Compile Include="EXPOrb.vb" />
+    <Compile Include="Game.vb" />
+    <Compile Include="GameObject.vb" />
+    <Compile Include="GameObjectProperties.vb" />
+    <Compile Include="Inventory.vb" />
+    <Compile Include="InventoryItem.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
@@ -78,6 +92,13 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="Objective.vb" />
+    <Compile Include="Options.vb" />
+    <Compile Include="Player.vb" />
+    <Compile Include="Resources.vb" />
+    <Compile Include="Room.vb" />
+    <Compile Include="Sprite.vb" />
+    <Compile Include="World.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">

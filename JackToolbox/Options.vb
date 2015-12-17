@@ -1,4 +1,6 @@
 ﻿Imports System.Xml
+Imports System.Drawing
+Imports System.Windows.Forms
 
 Public Module Options
     Public Preferences As Dictionary(Of String, String)
