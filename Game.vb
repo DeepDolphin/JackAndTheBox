@@ -1,59 +1,32 @@
 ﻿Imports JackPhysics
+Imports JackToolbox
 
 Public Class Game
+    Inherits IGame
 
 #If VersionType = "Beta" Then
-    Public Const VersionTN As String = "1"
+    Public Shadows Const VersionTN As String = "1"
 #ElseIf VersionType = "Release" Then
-    Public Const VersionTN As String = "0"
+    Public shadows Const VersionTN As String = "0"
 #ElseIf VersionType = "Debug" Then
-    Public Const VersionTN As String = "2"
+    Public shadows Const VersionTN As String = "2"
 #End If
 
-    Public Const VersionNumber As String = "1.0.0302." + VersionTN + "000"
-
-    Public Shared ToAddWaitlist As New List(Of GameObject)
-    Public Shared Player As Player
-    Public Shared ViewOffsetX As Double
-    Public Shared ViewOffsetY As Double
-
-    Public Shared World As World
-    Public Shared UserInterface As UserInterface
-
-    Private Buffer As BufferedGraphics
-    Private GameRunning As Boolean
-    Private ScreenWidth As Integer
-    Private ScreenHeight As Integer
-
-    Private UpdateCompleteEvent As New System.Threading.AutoResetEvent(False)
-
-    Public ReadOnly Property MaxTick As Double
-        Get
-            Return 1 / Options.Preferences("MaxFPS")
-        End Get
-    End Property
-
-    Public ReadOnly Property PlayerRoom As Room
-        Get
-            Return World.RoomAt(Player.Middle.X + Player.Room.XOffset, Player.Middle.Y + Player.Room.YOffset)
-        End Get
-    End Property
+    Public Shadows Const VersionNumber As String = "1.0.0302." + VersionTN + "000"
 
     Public Sub New(Buffer As BufferedGraphics, ScreenWidth As Integer, ScreenHeight As Integer)
-        Me.Buffer = Buffer
-        Me.ScreenHeight = ScreenHeight
-        Me.ScreenWidth = ScreenWidth
+        MyBase.New(Buffer, ScreenWidth, ScreenHeight)
     End Sub
 
-    Public Sub Start()
+    Public Overrides Sub Start()
         Init()
         GameLoop()
     End Sub
 
-    Private Sub Init()
+    Protected Overrides Sub Init()
         ' Load the rooms that we have.
 
-        Options.import()
+        Options.Import()
         Resources.Import()
 
         Dim rooms As New List(Of Room)
@@ -85,19 +58,19 @@ Public Class Game
         'World.Rooms(0).AddGameObject(TestObject1)
         'World.Rooms(0).AddGameObject(TestObject2)
 
-        UserInterface = New UserInterface(ScreenWidth, ScreenHeight)
+        'UserInterface = New UserInterface(ScreenWidth, ScreenHeight)
 
         GameRunning = True
         Watch = New Stopwatch()
         Watch.Start()
     End Sub
 
-    Public Sub StopGame()
+    Public Overrides Sub StopGame()
         Options.SaveOptions()
         GameRunning = False
     End Sub
 
-    Private Sub GameLoop()
+    Protected Overrides Sub GameLoop()
         Dim tick As Double
         If (Not Options.OIStatus("Pause")) Then
             tick = MaxTick
@@ -133,7 +106,7 @@ Public Class Game
         End While
     End Sub
 
-    Private Sub DrawWorld()
+    Protected Overrides Sub DrawWorld()
         ' Take this out when we figure out how to draw only the things that
         ' actually need to be drawn
         Buffer.Graphics.Clear(Color.Black)
@@ -161,15 +134,6 @@ Public Class Game
         End If
     End Sub
 
-    Private Watch As Stopwatch
-    Private _tick As Double = 0.5
-
-    Public ReadOnly Property Tick As Double
-        Get
-            Return _tick
-        End Get
-    End Property
-
     Private Function CalcNewX(GameObject As GameObject, t As Double) As Double
         Dim retval As Double = GameObject.Position.X + (GameObject.Speed.X * t * If(GameObject.HitBox.Width > GameObject.HitBox.Height, GameObject.HitBox.Width, GameObject.HitBox.Height))
 
@@ -182,7 +146,7 @@ Public Class Game
         Return retval
     End Function
 
-    Public Sub UpdateWorld(t As Double)
+    Protected Overrides Sub UpdateWorld(t As Double)
         'Moving all objects
         Dim CurRoom As Room = Player.Room
 
@@ -288,53 +252,5 @@ Public Class Game
 
         ViewOffsetX = Player.Position.X + Player.Room.XOffset - (ScreenWidth / 2 - Player.HitBox.Width / 2)
         ViewOffsetY = Player.Position.Y + Player.Room.YOffset - (ScreenHeight / 2 - Player.HitBox.Height / 2)
-    End Sub
-
-    Public Sub KeyDown(e As KeyEventArgs)
-        For Each key As Keys In Options.OIMap.Keys
-            If (e.KeyCode = key) Then
-                Options.OIStatus(Options.OIMap(key)) = True
-            End If
-        Next
-    End Sub
-
-    Public Sub KeyUp(e As KeyEventArgs)
-        For Each key As Keys In Options.OIMap.Keys
-            If (e.KeyCode = key) Then
-                Options.OIStatus(Options.OIMap(key)) = False
-            End If
-        Next
-    End Sub
-
-    Public Sub MouseDown(e As MouseEventArgs)
-        For Each key As Keys In Options.OIMap.Keys
-            If (e.Button = key) Then
-                Options.OIStatus(Options.OIMap(key)) = True
-            End If
-        Next
-    End Sub
-
-    Public Sub MouseUp(e As MouseEventArgs)
-        For Each key As Keys In Options.OIMap.Keys
-            If (e.Button = key) Then
-                Options.OIStatus(Options.OIMap(key)) = False
-            End If
-        Next
-    End Sub
-
-    Public Sub MouseMove(e As MouseEventArgs)
-        'Dim direction As Double = Player.getDirectionTo(e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset))
-        'Player.Direction = Actor.ToActorDirection(direction)
-        'Mouse = e.Location + New Size(ViewOffsetX, ViewOffsetY) - New Size(Player.Room.XOffset, Player.Room.YOffset)
-    End Sub
-
-    Public Sub MouseWheel(e As MouseEventArgs)
-        Options.MouseWheel = e.Delta / 120
-    End Sub
-
-    Public Sub Resize(sender As Control)
-        'ToDo: make sure bitmap resizes and the objects redraw | User interface has to be updated as well
-        ScreenWidth = sender.ClientSize.Width
-        ScreenHeight = sender.ClientSize.Height
     End Sub
 End Class

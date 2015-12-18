@@ -72,7 +72,7 @@
     <Compile Include="Crate.vb" />
     <Compile Include="Enemy.vb" />
     <Compile Include="EXPOrb.vb" />
-    <Compile Include="Game.vb" />
+    <Compile Include="IGame.vb" />
     <Compile Include="GameObject.vb" />
     <Compile Include="GameObjectProperties.vb" />
     <Compile Include="Inventory.vb" />
@@ -98,6 +98,7 @@
     <Compile Include="Resources.vb" />
     <Compile Include="Room.vb" />
     <Compile Include="Sprite.vb" />
+    <Compile Include="IUserInterface.vb" />
     <Compile Include="World.vb" />
   </ItemGroup>
   <ItemGroup>
