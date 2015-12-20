@@ -46,7 +46,7 @@ Public Class Player
 
         'Player tank movement
         If Options.Preferences("PlayerMovementType") = "TankMovement" Then
-            PlayerMovement = CType((Cursor.Position + New Size(IGame.ViewOffsetX, IGame.ViewOffsetY) - New Size(Room.XOffset, Room.YOffset) - IGame.Location - New Size(8, 31)), PointF) - Middle.XY
+            'PlayerMovement = CType((Cursor.Position + New Size(IGame.ViewOffsetX, IGame.ViewOffsetY) - New Size(Room.XOffset, Room.YOffset) - Mainform.size.Location - New Size(8, 31)), PointF) - Middle.XY
             PlayerMovement.Normalize()
             If Options.OIStatus("Up") Then
                 If (Not CurrentPlayerSpeed = 0.0) Then

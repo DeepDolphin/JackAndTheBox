@@ -1,21 +1,30 @@
 ﻿Imports System.IO
 Imports System.Drawing
+Imports JackPhysics
 
 Public Module Resources
     Private ResourceBitmaps As Dictionary(Of String, Bitmap)
     Private ResourceGameObjects As Dictionary(Of String, GameObject)
     Private ResourceRooms As Dictionary(Of String, Room)
 
+    Public Function getNewGameObject(Name As String, Room As Room, Position As Vector3)
+        Dim GameObject As New GameObject(ResourceGameObjects(Name))
+
+        GameObject.Room = Room
+        GameObject.Position = Position
+        Return GameObject
+    End Function
+
     Private EXPOrb As Sprite
-    Private Player As Sprite
+        Private Player As Sprite
 
 
-    Public Shadow As Bitmap
-    Public GradientLeft As Bitmap
-    Public GradientRight As Bitmap
-    Public ShadeBrush As SolidBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
-    Public HealthBackground As Bitmap
-    Public HealthBar As Bitmap
+        Public Shadow As Bitmap
+        Public GradientLeft As Bitmap
+        Public GradientRight As Bitmap
+        Public ShadeBrush As SolidBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
+        Public HealthBackground As Bitmap
+        Public HealthBar As Bitmap
 
     Public Sub Import()
 
@@ -47,11 +56,11 @@ Public Module Resources
 
 
 
-        Shadow = New Bitmap(My.Resources.Shadow)
-        GradientRight = New Bitmap(My.Resources.GradientRight)
-        GradientLeft = New Bitmap(My.Resources.GradientLeft)
-        HealthBackground = New Bitmap(My.Resources.HealthBackground)
-        HealthBar = New Bitmap(My.Resources.HealthBar)
+        'Shadow = New Bitmap(My.Resources.Shadow)
+        'GradientRight = New Bitmap(My.Resources.GradientRight)
+        'GradientLeft = New Bitmap(My.Resources.GradientLeft)
+        'HealthBackground = New Bitmap(My.Resources.HealthBackground)
+        'HealthBar = New Bitmap(My.Resources.HealthBar)
 
     End Sub
 

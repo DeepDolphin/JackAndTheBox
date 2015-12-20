@@ -4,7 +4,7 @@ Public Class Crate
     Inherits GameObject
 
     Public Sub New(Room As Room, Position As Vector3)
-        MyBase.New(Resources.Crate, Room, Position, {10}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.Collidable, GameObjectProperties.FlagsEnum.Visible})
+        MyBase.New(Resources.getNewGameObject("Crate", Room, Position))
     End Sub
 
     Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3)

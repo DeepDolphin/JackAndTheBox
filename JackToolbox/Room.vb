@@ -114,8 +114,8 @@ Public Class Room
         GraphicsMap = New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
 
         Graphics = Graphics.FromImage(GraphicsMap)
-        GroundBrush = New TextureBrush(My.Resources.FloorTile)
-        WallBrush = New TextureBrush(My.Resources.WallStrip)
+        GroundBrush = New TextureBrush(Resources.FloorTile)
+        WallBrush = New TextureBrush(Resources.WallStrip)
 
         Dim WallGraphics As Graphics = Graphics.FromImage(WallMap)
         Dim GroundGraphics As Graphics = Graphics.FromImage(GroundMap)
