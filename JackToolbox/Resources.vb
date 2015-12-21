@@ -7,24 +7,37 @@ Public Module Resources
     Private ResourceGameObjects As Dictionary(Of String, GameObject)
     Private ResourceRooms As Dictionary(Of String, Room)
 
-    Public Function getNewGameObject(Name As String, Room As Room, Position As Vector3)
-        Dim GameObject As New GameObject(ResourceGameObjects(Name))
-
-        GameObject.Room = Room
-        GameObject.Position = Position
-        Return GameObject
+    Public Function getNewBitmap(Name As String) As Bitmap
+        Try
+            Dim Bitmap As New Bitmap(ResourceBitmaps(Name))
+            Return Bitmap
+        Catch
+            Return My.Resources.NoImage
+        End Try
     End Function
 
-    Private EXPOrb As Sprite
-        Private Player As Sprite
+    Public Function getNewGameObject(Name As String, Room As Room, Position As Vector3) As GameObject
+        Try
+            Dim GameObject As New GameObject(ResourceGameObjects(Name))
+
+            GameObject.Room = Room
+            GameObject.Position = Position
+            Return GameObject
+        Catch
+            Return New GameObject(My.Resources.NoImage, Room, Position, {}, {GameObjectProperties.FlagsEnum.Visible})
+        End Try
+    End Function
+
+    'Private EXPOrb As Sprite
+    '    Private Player As Sprite
 
 
-        Public Shadow As Bitmap
-        Public GradientLeft As Bitmap
-        Public GradientRight As Bitmap
-        Public ShadeBrush As SolidBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
-        Public HealthBackground As Bitmap
-        Public HealthBar As Bitmap
+    '    Public Shadow As Bitmap
+    '    Public GradientLeft As Bitmap
+    '    Public GradientRight As Bitmap
+    Public ShadeBrush As SolidBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
+    '    Public HealthBackground As Bitmap
+    '    Public HealthBar As Bitmap
 
     Public Sub Import()
 

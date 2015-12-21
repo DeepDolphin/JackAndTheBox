@@ -51,8 +51,8 @@ Public Class Game
 
         ' Load the player and testing stuff
         Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), {100, 100, 100, 8, 2})
-        Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
-        Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {100}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.FloorObject, GameObjectProperties.FlagsEnum.Invulnerable})
+        'Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
+        'Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {100}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.FloorObject, GameObjectProperties.FlagsEnum.Invulnerable})
 
         World.Rooms(0).AddGameObject(Player)
         'World.Rooms(0).AddGameObject(TestObject1)

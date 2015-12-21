@@ -114,15 +114,15 @@ Public Class Room
         GraphicsMap = New Bitmap(CInt(RoomWidth), CInt(RoomHeight + 32))
 
         Graphics = Graphics.FromImage(GraphicsMap)
-        GroundBrush = New TextureBrush(Resources.FloorTile)
-        WallBrush = New TextureBrush(Resources.WallStrip)
+        GroundBrush = New TextureBrush(Resources.getNewBitmap("FloorTile"))
+        WallBrush = New TextureBrush(Resources.getNewBitmap("WallStrip"))
 
         Dim WallGraphics As Graphics = Graphics.FromImage(WallMap)
         Dim GroundGraphics As Graphics = Graphics.FromImage(GroundMap)
 
         WallGraphics.FillRectangle(WallBrush, 0, 0, CIntFloor({Width}), 32)
-        WallGraphics.DrawImage(Resources.GradientLeft, 0, 0, 64, 32)
-        WallGraphics.DrawImage(Resources.GradientRight, CIntFloor({Width - 63}), 0, 64, 32)
+        WallGraphics.DrawImage(Resources.getNewBitmap("GradientLeft"), 0, 0, 64, 32)
+        WallGraphics.DrawImage(Resources.getNewBitmap("GradientRight"), CIntFloor({Width - 63}), 0, 64, 32)
 
         GroundGraphics.FillRectangle(GroundBrush, 0, 0, CIntFloor({Width}), CIntFloor({Height}))
 

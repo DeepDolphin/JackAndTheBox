@@ -50,7 +50,7 @@ Public Class Actor
         _Properties = New ActorProperties(Me, ObjectProperties, PropertyArray)
 
         Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
-        Dim y As Integer = Resources.HealthBackground.Height + 1
+        Dim y As Integer = getNewBitmap("HealthBackground").Height + 1
         Dim width As Integer = Sprite.Width
         Dim height As Integer = Sprite.Height
 
@@ -63,7 +63,7 @@ Public Class Actor
         Properties.Dirty = True
 
         If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + Resources.HealthBackground.Height + 4)
+            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + getNewBitmap("HealthBackground").Height + 4)
             Graphics = Graphics.FromImage(GraphicsMap)
         End If
 

@@ -134,7 +134,7 @@ Public Class GameObject
         _Properties = New GameObjectProperties(Me, ObjectProperties, PropertyArray)
 
         Dim x As Integer = (((Me.Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
-        Dim y As Integer = Resources.HealthBackground.Height + 1
+        Dim y As Integer = getNewBitmap("HealthBackground").Height + 1
         Dim width As Integer = Me.Sprite.Width
         Dim height As Integer = Me.Sprite.Height
 
@@ -147,7 +147,7 @@ Public Class GameObject
         Properties.Dirty = True
 
         If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Me.Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Me.Sprite.Height + Resources.HealthBackground.Height + 4)
+            GraphicsMap = New Bitmap(((Me.Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Me.Sprite.Height + getNewBitmap("HealthBackground").Height + 4)
             Graphics = Graphics.FromImage(GraphicsMap)
         End If
 
@@ -265,16 +265,16 @@ Public Class GameObject
     Public Sub Redraw()
         Graphics.Clear(Color.Transparent)
         If Properties.CastsShadow Then
-            Graphics.DrawImage(Resources.Shadow,
+            Graphics.DrawImage(Resources.getNewBitmap("Shadow"),
                                (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
-                               Resources.HealthBackground.Height + Sprite.Height - 7,
+                               Resources.getNewBitmap("HealthBackground").Height + Sprite.Height - 7,
                                Sprite.Width,
                                10)
         End If
 
         Graphics.DrawImage(Sprite.CurrentFrame,
                            (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4,
-                           Resources.HealthBackground.Height + 1,
+                           Resources.getNewBitmap("HealthBackground").Height + 1,
                            Sprite.Width,
                            Sprite.Height)
 
@@ -285,21 +285,21 @@ Public Class GameObject
             Dim maxHealth As Integer = Properties.MaxHealth
 
             While index < numBars
-                Graphics.DrawImage(Resources.HealthBackground,
+                Graphics.DrawImage(Resources.getNewBitmap("HealthBackground"),
                                    (((Sprite.Width * 2) \ numBars) + 1) * index,
                                    0,
                                    (Sprite.Width * 2) \ numBars,
-                                   Resources.HealthBackground.Height)
+                                   Resources.getNewBitmap("HealthBackground").Height)
 
-                Graphics.DrawImage(Resources.HealthBar,
+                Graphics.DrawImage(Resources.getNewBitmap("HealthBar"),
                                        New Rectangle(((((Sprite.Width * 2) \ numBars) + 1) * index) + 2,
                                                      2,
                                                      ((Sprite.Width * 2) \ numBars - 4) * (Math.Min(health, 100) / 100),
-                                                     Resources.HealthBar.Height),
+                                                     Resources.getNewBitmap("HealthBar").Height),
                                        New Rectangle(0,
                                                      0,
-                                                     Resources.HealthBar.Width * (Math.Min(health, 100) / 100),
-                                                     Resources.HealthBar.Height),
+                                                     Resources.getNewBitmap("HealthBar").Width * (Math.Min(health, 100) / 100),
+                                                     Resources.getNewBitmap("HealthBar").Height),
                                        GraphicsUnit.Pixel)
                 index += 1
                 health -= 100
