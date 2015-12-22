@@ -98,8 +98,8 @@ Public Class Room
         For Each e As XmlElement In RoomElement
             Select Case e.Name
                 Case "Crate"
-                    Dim c As New Crate(Me, New Vector3(e.GetAttribute("X"), e.GetAttribute("Y"), 0))
-                    GameObjects.Add(c)
+                    'Dim c As New Crate(Me, New Vector3(e.GetAttribute("X"), e.GetAttribute("Y"), 0))
+                    'GameObjects.Add(c)
                 Case "SurvivalTime"
                     Dim o As New SurvivalTimeObjective(e.GetAttribute("Time"))
                     Objectives.Add(o)

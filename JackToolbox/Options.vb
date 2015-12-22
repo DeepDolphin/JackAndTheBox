@@ -20,27 +20,27 @@ Public Module Options
 
         'Options File Import/Creation
 #If VersionType = "Release" Then
-        If (IO.File.Exists("options.xml")) Then
-            Dim optionsDoc As New XmlDocument
-            optionsDoc.Load("options.xml")
-            Dim options As XmlElement = optionsDoc("Options")
-            For Each section As XmlElement In options
-                Select Case section.Name
-                    Case "Preferences"
-                        For Each element As XmlElement In section
-                            Preferences.Add(element.Name, element.GetAttribute("Value"))
-                        Next
-                    Case "OIMap"
-                        For Each element As XmlElement In section
-                            OIMap.Add(element.GetAttribute("KeyCode"), element.Name)
-                            OIStatus.Add(element.Name, False)
-                        Next
-                End Select
-            Next
-        Else
-            InitOptions()
-            SaveOptions()
-        End If
+        'If (IO.File.Exists("options.xml")) Then
+        '    Dim optionsDoc As New XmlDocument
+        '    optionsDoc.Load("options.xml")
+        '    Dim options As XmlElement = optionsDoc("Options")
+        '    For Each section As XmlElement In options
+        '        Select Case section.Name
+        '            Case "Preferences"
+        '                For Each element As XmlElement In section
+        '                    Preferences.Add(element.Name, element.GetAttribute("Value"))
+        '                Next
+        '            Case "OIMap"
+        '                For Each element As XmlElement In section
+        '                    OIMap.Add(element.GetAttribute("KeyCode"), element.Name)
+        '                    OIStatus.Add(element.Name, False)
+        '                Next
+        '        End Select
+        '    Next
+        'Else
+        InitOptions()
+        SaveOptions()
+        'End If
 #Else
         InitOptions()
         SaveOptions()

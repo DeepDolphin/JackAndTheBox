@@ -2,7 +2,7 @@
 
 Public Class World
     Public Rooms As New List(Of Room)
-
+    Private Random As Random
 
     ' These methods manufacture a new copy of one of the plug rooms.
     Public ReadOnly Property LeftPlug As Room
@@ -28,7 +28,7 @@ Public Class World
 
 
     Public Sub New(seed As Object, AvailableRoomList As List(Of Room))
-        Dim random As New Random(seed.GetHashCode())
+        Random = New Random(seed.GetHashCode())
 
         Dim CoreIndex As Integer = random.Next(AvailableRoomList.Count - 1)
         Dim CoreRoom As Room = AvailableRoomList(CoreIndex)
@@ -175,10 +175,7 @@ Public Class World
 
 #If Not VersionType = "Debug" Then
         For Each r As Room In Rooms
-            For i As Integer = 0 To 10
-                Dim l As New GameObject(My.Resources.CeilingLight, r, New Vector3(random.Next(r.Width - My.Resources.CeilingLight.Width), random.Next(r.Height - My.Resources.CeilingLight.Height), 10), {100}, {GameObjectProperties.FlagsEnum.Visible})
-                r.AddGameObject(l)
-            Next
+            'PopulateRoom(r, Resources.getNewGameObject("CeilingLight", r, New Vector3()), 10)
         Next
 #Else
         'For Each r As Room In Rooms
@@ -190,6 +187,14 @@ Public Class World
         '    Next
         'Next
 #End If
+    End Sub
+
+    Public Sub PopulateRoom(r As Room, g As GameObject, num As Integer)
+        For i As Integer = 0 To num - 1
+            Dim gObject As New GameObject(g)
+            gObject.Position = New Vector3(Random.Next(r.Width - gObject.Sprite.Width), Random.Next(r.Height - gObject.Sprite.Height), gObject.Position.Z)
+            r.AddGameObject(gObject)
+        Next
     End Sub
 
     Public Function RoomFits(r As Room) As Boolean
