@@ -27,7 +27,7 @@ Public Class Game
         ' Load the rooms that we have.
 
         Options.Import()
-        Resources.Import()
+        Resources.Init()
 
         Dim rooms As New List(Of Room)
 #If Not VersionType = "Debug" Then

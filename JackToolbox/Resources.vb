@@ -3,8 +3,8 @@ Imports System.Drawing
 Imports JackPhysics
 
 Public Module Resources
-    Private ResourceCatalog As Dictionary(Of String, ResourcePack)
-    Private ResourcePacks As List(Of ResourcePack)
+    Public ResourceCatalog As New Dictionary(Of String, ResourcePack)
+    Public ResourcePacks As New List(Of ResourcePack)
 
     Public Function getNewBitmap(Name As String) As Bitmap
         Try
@@ -27,21 +27,23 @@ Public Module Resources
         End Try
     End Function
 
-    'Private EXPOrb As Sprite
-    '    Private Player As Sprite
-
-
-    '    Public Shadow As Bitmap
-    '    Public GradientLeft As Bitmap
-    '    Public GradientRight As Bitmap
     Public ShadeBrush As SolidBrush = New SolidBrush(Color.FromArgb(175, 0, 0, 0))
-    '    Public HealthBackground As Bitmap
-    '    Public HealthBar As Bitmap
 
     Public Sub Init()
         ResourcePacks.Add(New ResourcePack("other"))
+        Dim ResourceFolder As New DirectoryInfo("resources")
+        If Not ResourceFolder.Exists Then
+            ResourceFolder.Create()
+        End If
 
-        Dim Reader As New BinaryReader(New FileStream("resources\manifest.jatb", FileMode.Open))
+        Dim Manifest As New FileInfo("resources\manifest.jatb")
+        If Not Manifest.Exists Then
+            Dim Writer As New BinaryWriter(New FileStream(Manifest.FullName, FileMode.Create))
+            Writer.Write(0)
+            Writer.Dispose()
+        End If
+
+        Dim Reader As New BinaryReader(New FileStream(Manifest.FullName, FileMode.Open))
         Dim numFiles As Integer = Reader.ReadInt32
 
         Dim files As New List(Of FileInfo)(numFiles)
@@ -55,43 +57,14 @@ Public Module Resources
         For Each file As FileInfo In files
             Import(file)
         Next
-
-
-        'Shadow = New Bitmap(My.Resources.Shadow)
-        'GradientRight = New Bitmap(My.Resources.GradientRight)
-        'GradientLeft = New Bitmap(My.Resources.GradientLeft)
-        'HealthBackground = New Bitmap(My.Resources.HealthBackground)
-        'HealthBar = New Bitmap(My.Resources.HealthBar)
-
     End Sub
 
     Public Sub Import(File As FileInfo)
         Dim Reader = New BinaryReader(New FileStream(File.FullName, FileMode.Open))
         Select Case File.Extension
             Case ".jbrp"
-                Dim ResourcePack As New ResourcePack(File.Name)
+                Dim ResourcePack As New ResourcePack(File.Name, File)
                 ResourcePacks.Add(ResourcePack)
-
-                Dim imageCount As Integer = Reader.ReadInt32
-                For value As Integer = 0 To imageCount - 1
-                    Dim name As String = Reader.ReadString
-                    Dim byteCount As Integer = Reader.ReadInt32
-                    Dim ms As New MemoryStream
-                    ms.Write(Reader.ReadBytes(byteCount), 0, byteCount)
-                    Dim bitmap As New Bitmap(ms)
-                    ResourcePack.Bitmaps.Add(name, bitmap)
-                    ResourceCatalog.Add(name, ResourcePack)
-                    ms.Dispose()
-                Next
-
-                Dim gameObjectCount As Integer = Reader.ReadInt32()
-                For value As Integer = 0 To imageCount - 1
-                    Dim name As String = Reader.ReadString
-                    Dim gameObject As GameObject = GameObject.fromBytes(Reader)
-                    ResourcePack.GameObjects.Add(name, gameObject)
-                    ResourceCatalog.Add(name, ResourcePack)
-                Next
-
             Case ".jbgo"
                 Dim name As String = Reader.ReadString
                 Dim gameObject As GameObject = GameObject.fromBytes(Reader)
@@ -108,7 +81,7 @@ Public Module Resources
 
     Public Sub ExportAll(Dir As DirectoryInfo)
         For Each ResourcePack As ResourcePack In ResourcePacks
-            ResourcePack.Export(Dir)
+            If Not ResourcePack.Name.Equals("other") Then ResourcePack.Export(Dir)
         Next
     End Sub
 
@@ -116,9 +89,37 @@ End Module
 
 Public Class ResourcePack
     Public Name As String
-    Public Bitmaps As Dictionary(Of String, Bitmap)
-    Public GameObjects As Dictionary(Of String, GameObject)
-    Public Rooms As Dictionary(Of String, Room)
+    Public Bitmaps As New Dictionary(Of String, Bitmap)
+    Public GameObjects As New Dictionary(Of String, GameObject)
+    Public Rooms As New Dictionary(Of String, Room)
+
+    Public Sub New(ResourcesName As String, File As FileInfo)
+        Name = ResourcesName
+
+        Dim Reader = New BinaryReader(New FileStream(File.FullName, FileMode.Open))
+
+        Dim imageCount As Integer = Reader.ReadInt32
+        For value As Integer = 0 To imageCount - 1
+            Dim name As String = Reader.ReadString
+            Dim byteCount As Integer = Reader.ReadInt32
+            Dim ms As New MemoryStream
+            ms.Write(Reader.ReadBytes(byteCount), 0, byteCount)
+            Dim bitmap As New Bitmap(ms)
+            Bitmaps.Add(name, bitmap)
+            Resources.ResourceCatalog.Add(name, Me)
+            ms.Dispose()
+        Next
+
+        Dim gameObjectCount As Integer = Reader.ReadInt32()
+        For value As Integer = 0 To imageCount - 1
+            Dim name As String = Reader.ReadString
+            Dim gameObject As GameObject = GameObject.fromBytes(Reader)
+            GameObjects.Add(name, gameObject)
+            Resources.ResourceCatalog.Add(name, Me)
+        Next
+
+        Reader.Dispose()
+    End Sub
 
     Public Sub New(Name As String)
         Me.Name = Name
