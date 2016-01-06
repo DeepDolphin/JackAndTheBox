@@ -1,17 +1,18 @@
 ﻿Public Class GameObjectProperties
     Private Parent As GameObject
 
-    Public Sub New(GameObject As GameObject, ObjectProperties As FlagsEnum(), PropertiesArray As String())
+    Public Sub New(GameObject As GameObject, ObjectProperties As FlagsEnum(), PropertiesArray As Dictionary(Of String, String))
         Parent = GameObject
 
         For Each ObjectProperty As FlagsEnum In ObjectProperties
             Flags.Set(ObjectProperty, True)
         Next
 
-        If PropertiesArray.Length > 0 Then
-            Properties("MaxHealth") = PropertiesArray(0)
-            Properties("Health") = PropertiesArray(0)
-        End If
+        For Each PropertyName As String In PropertiesArray.Keys
+            Properties(PropertyName) = PropertiesArray(PropertyName)
+        Next
+
+        If Properties.ContainsKey("Health") Then Properties("MaxHealth") = Properties("Health")
     End Sub
 
     Public Sub New(GameObjectProperties As GameObjectProperties)
@@ -27,7 +28,13 @@
     End Property
 
 #Region "Properties Dictionary"
-    Protected Properties As New Dictionary(Of String, String)
+    Public Properties As New Dictionary(Of String, String)
+
+    Public ReadOnly Property Name As String
+        Get
+            Return Properties("Name")
+        End Get
+    End Property
 
     Public ReadOnly Property MaxHealth As Double
         Get
@@ -50,7 +57,7 @@
 #End Region
 
 #Region "Flags Enum"
-    Protected Flags As New BitArray(FlagsEnum.Max)
+    Public Flags As New BitArray(FlagsEnum.Max)
 
     Public ReadOnly Property FloorObject As Boolean
         Get
@@ -124,21 +131,16 @@ End Class
 Public Class ActorProperties
     Inherits GameObjectProperties
 
-    Public Sub New(GameObject As GameObject, ObjectProperties As FlagsEnum(), PropertiesArray As String())
+    Public Sub New(GameObject As GameObject, ObjectProperties As FlagsEnum(), PropertiesArray As Dictionary(Of String, String))
         MyBase.New(GameObject, ObjectProperties, PropertiesArray)
-
-        If PropertiesArray.Length > 0 Then
-            Properties("MaxStamina") = PropertiesArray(1)
-            Properties("Stamina") = PropertiesArray(1)
-            Properties("MaxMana") = PropertiesArray(2)
-            Properties("Mana") = PropertiesArray(2)
-            Properties("MaxSpeed") = PropertiesArray(3)
-            Properties("Acceleration") = PropertiesArray(4)
-        End If
+        If Properties.ContainsKey("Stamina") Then Properties("MaxStamina") = Properties("Stamina")
+        If Properties.ContainsKey("Mana") Then Properties("MaxMana") = Properties("Mana")
     End Sub
 
     Public Sub New(ActorProperties As ActorProperties)
         MyBase.New(ActorProperties)
+        If Properties.ContainsKey("Stamina") Then Properties("MaxStamina") = Properties("Stamina")
+        If Properties.ContainsKey("Mana") Then Properties("MaxMana") = Properties("Mana")
     End Sub
 
 #Region "Properties Dictionary"

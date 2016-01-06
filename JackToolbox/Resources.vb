@@ -23,7 +23,9 @@ Public Module Resources
             GameObject.Position = Position
             Return GameObject
         Catch
-            Return New GameObject(My.Resources.NoImage, Room, Position, {}, {GameObjectProperties.FlagsEnum.Visible})
+            Dim Properties As New Dictionary(Of String, String)
+            Properties.Add("Name", Name)
+            Return New GameObject(My.Resources.NoImage, Room, Position, Properties, {GameObjectProperties.FlagsEnum.Visible})
         End Try
     End Function
 
@@ -36,7 +38,7 @@ Public Module Resources
             ResourceFolder.Create()
         End If
 
-        Dim Manifest As New FileInfo("resources\manifest.jatb")
+        Dim Manifest As New FileInfo("resources\manifest.jbmn")
         If Not Manifest.Exists Then
             Dim Writer As New BinaryWriter(New FileStream(Manifest.FullName, FileMode.Create))
             Writer.Write(0)
@@ -81,7 +83,7 @@ Public Module Resources
 
     Public Sub ExportAll(Dir As DirectoryInfo)
         For Each ResourcePack As ResourcePack In ResourcePacks
-            If Not ResourcePack.Name.Equals("other") Then ResourcePack.Export(Dir)
+            If Not ResourcePack.Name.Equals("other") Then ResourcePack.ExportTo(Dir)
         Next
     End Sub
 
@@ -113,7 +115,7 @@ Public Class ResourcePack
         Dim gameObjectCount As Integer = Reader.ReadInt32()
         For value As Integer = 0 To imageCount - 1
             Dim name As String = Reader.ReadString
-            Dim gameObject As GameObject = GameObject.fromBytes(Reader)
+            Dim gameObject As GameObject = GameObject.FromBytes(Reader)
             GameObjects.Add(name, gameObject)
             Resources.ResourceCatalog.Add(name, Me)
         Next
@@ -125,9 +127,13 @@ Public Class ResourcePack
         Me.Name = Name
     End Sub
 
-    Public Sub Export(Dir As DirectoryInfo)
+    Public Sub ExportTo(Dir As DirectoryInfo)
         Dim Writer = New BinaryWriter(New FileStream(Dir.FullName & "\" & Name & ".jbrp", FileMode.Create))
+        ExportTo(Writer)
+        Writer.Dispose()
+    End Sub
 
+    Public Sub ExportTo(Writer As BinaryWriter)
         Writer.Write(Bitmaps.Count)
         For Each Name As String In Bitmaps.Keys
             Writer.Write(Name)
@@ -141,9 +147,7 @@ Public Class ResourcePack
         Writer.Write(GameObjects.Count)
         For Each Name As String In GameObjects.Keys
             Writer.Write(Name)
-
+            GameObjects(Name).ExportTo(Writer)
         Next
-
-        Writer.Dispose()
     End Sub
 End Class

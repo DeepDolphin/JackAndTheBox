@@ -119,6 +119,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\JackPhysics\JackPhysics.vbproj">
+      <Project>{D78B9126-E501-4616-9C5B-1D38C98DE04F}</Project>
+      <Name>JackPhysics</Name>
+    </ProjectReference>
     <ProjectReference Include="..\JackToolbox\JackToolbox.vbproj">
       <Project>{f7cc4030-ab07-4deb-9a7c-dc26877de8be}</Project>
       <Name>JackToolbox</Name>

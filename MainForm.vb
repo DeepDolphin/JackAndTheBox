@@ -3,7 +3,7 @@
     Private Buffer As BufferedGraphics
 
     Private Sub MainForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        Dim task As New System.Threading.Tasks.Task(New Action(Sub() StartGame()))
+        Dim task As New Task(New Action(Sub() StartGame()))
         task.Start()
     End Sub
 

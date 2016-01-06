@@ -5,7 +5,7 @@ Imports System.Windows.Forms
 Public Class Player
     Inherits Actor
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String())
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As Dictionary(Of String, String))
         MyBase.New(Image, Room, Position, PropertyArray)
     End Sub
 

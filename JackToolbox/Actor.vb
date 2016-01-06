@@ -35,44 +35,17 @@ Public Class Actor
 
     Public Direction As ActorDirection = ActorDirection.North
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String())
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As Dictionary(Of String, String))
         MyBase.New(Image, Room, Position, PropertyArray, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.Collidable})
     End Sub
 
-    Public Overrides Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
-        Me.Position = Position
-        Me.Speed = Speed
-        Me.Sprite = Image
-        Me.Room = Room
-
-        'If (Health <= 0) Then Throw New SyntaxErrorException("Health is less than or equal to 0")
-
-        _Properties = New ActorProperties(Me, ObjectProperties, PropertyArray)
-
-        Dim x As Integer = (((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1) \ 4
-        Dim y As Integer = getNewBitmap("HealthBackground").Height + 1
-        Dim width As Integer = Sprite.Width
-        Dim height As Integer = Sprite.Height
-
-        If (Not Properties.FloorObject) Then
-            y += Sprite.Height * (10 / 16)
-            height = (height / 2) * (10 / 16)
-        End If
-
-        HitBox = New Rectangle(x, y, width, height)
-        Properties.Dirty = True
-
-        If Graphics Is Nothing Then
-            GraphicsMap = New Bitmap(((Sprite.Width * 2) \ CInt(Math.Ceiling(Properties.MaxHealth / 100)) + 1) * CInt(Math.Ceiling(Properties.MaxHealth / 100)) - 1, Sprite.Height + getNewBitmap("HealthBackground").Height + 4)
-            Graphics = Graphics.FromImage(GraphicsMap)
-        End If
-
-        Redraw()
-    End Sub
-
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String())
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As Dictionary(Of String, String))
         MyBase.New(Image, Room, Position, Speed, PropertyArray, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.Collidable})
     End Sub
+
+    'Public Overrides Sub Init(Image As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As Dictionary(Of String, String), ObjectProperties As GameObjectProperties.FlagsEnum())
+    '    MyBase.Init(Image, Room, Position, Speed, PropertyArray, ObjectProperties)
+    'End Sub
 
     Public Overrides Sub Update(t As Double)
         MyBase.Update(t)

@@ -1,5 +1,6 @@
 ﻿Imports JackPhysics
 Imports System.Drawing
+Imports System.IO
 
 Public Class GameObject
     Implements IComparable
@@ -69,60 +70,34 @@ Public Class GameObject
 
 #Region "Constructors"
 
-    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+    Public Sub New(Sprite As Sprite, Room As Room, Position As Vector3, PropertyArray As Dictionary(Of String, String), ObjectProperties As GameObjectProperties.FlagsEnum())
         Init(Sprite, Room, Position, Me.Speed, PropertyArray, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, PropertyArray As Dictionary(Of String, String), ObjectProperties As GameObjectProperties.FlagsEnum())
         Init(New Sprite(Image), Room, Position, Me.Speed, PropertyArray, ObjectProperties)
     End Sub
 
-    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+    Public Sub New(Image As Bitmap, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As Dictionary(Of String, String), ObjectProperties As GameObjectProperties.FlagsEnum())
         Init(New Sprite(Image), Room, Position, Speed, PropertyArray, ObjectProperties)
     End Sub
 
     Public Sub New(Room As Room, Position As Vector3, Speed As Vector2, Path As String)
         Dim Reader As New IO.BinaryReader(New IO.FileStream(Path, IO.FileMode.Open))
 
-        Dim imageCount As Integer = Reader.ReadInt32()
-        Dim bitmaps As New List(Of Bitmap)
-        'Dim imageConverter As New ImageConverter()
-
-        For value As Integer = 0 To imageCount - 1
-            Dim byteCount As Integer = Reader.ReadInt32()
-            Dim ms As New IO.MemoryStream()
-            ms.Write(Reader.ReadBytes(byteCount), 0, byteCount)
-            Dim bitmap As New Bitmap(ms)
-            bitmaps.Add(bitmap)
-            ms.Dispose()
-        Next
-
-        Dim propertyCount As Integer = Reader.ReadInt32()
-        Dim propertyArray(propertyCount) As String
-
-        For value As Integer = 0 To propertyCount - 1
-            Dim gottenProperty As String = Reader.ReadString()
-            propertyArray(value) = gottenProperty
-        Next
-
-        Dim objectPropertyCount As Integer = Reader.ReadInt32()
-        Dim objectPropertyArray(objectPropertyCount) As GameObjectProperties.FlagsEnum
-
-        For value As Integer = 0 To propertyCount - 1
-            Dim gottenProperty As GameObjectProperties.FlagsEnum = Reader.ReadInt32()
-            objectPropertyArray(value) = gottenProperty
-        Next
+        Dim GameObject As GameObject = FromBytes(Reader)
 
         Reader.Dispose()
-        Init(New Sprite(bitmaps), Room, Position, Speed, propertyArray, objectPropertyArray)
+        Init(GameObject.Sprite, Room, Position, Speed, GameObject.Properties.Properties, {If(_Properties.Visible, GameObjectProperties.FlagsEnum.Visible, Nothing)})
+        _Properties = New GameObjectProperties(GameObject.Properties)
     End Sub
 
     Public Sub New(Gameobject As GameObject)
-        Init(Gameobject.Sprite, Gameobject.Room, Gameobject.Position, Gameobject.Speed, {}, {If(_Properties.Visible, GameObjectProperties.FlagsEnum.Visible, Nothing)})
+        Init(Gameobject.Sprite, Gameobject.Room, Gameobject.Position, Gameobject.Speed, Gameobject.Properties.Properties, {If(_Properties.Visible, GameObjectProperties.FlagsEnum.Visible, Nothing)})
         _Properties = New GameObjectProperties(Gameobject.Properties)
     End Sub
 
-    Public Overridable Sub Init(Sprite As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As String(), ObjectProperties As GameObjectProperties.FlagsEnum())
+    Public Overridable Sub Init(Sprite As Sprite, Room As Room, Position As Vector3, Speed As Vector2, PropertyArray As Dictionary(Of String, String), ObjectProperties As GameObjectProperties.FlagsEnum())
         Me.Position = Position
         Me._LastPosition = Position
         Me.Speed = Speed
@@ -153,8 +128,10 @@ Public Class GameObject
 
         If Properties.Visible Then Redraw()
     End Sub
+#End Region
 
-    Public Shared Function fromBytes(reader As IO.BinaryReader) As GameObject
+#Region "File Reading"
+    Public Shared Function FromBytes(reader As BinaryReader) As GameObject
         Dim imageCount As Integer = reader.ReadInt32()
         Dim bitmaps As New List(Of Bitmap)
 
@@ -168,11 +145,12 @@ Public Class GameObject
         Next
 
         Dim propertyCount As Integer = reader.ReadInt32()
-        Dim propertyArray(propertyCount) As String
+        Dim propertyArray As New Dictionary(Of String, String)
 
         For value As Integer = 0 To propertyCount - 1
             Dim gottenProperty As String = reader.ReadString()
-            propertyArray(value) = gottenProperty
+            Dim gottenPropertyValue As String = reader.ReadString()
+            propertyArray(gottenProperty) = gottenPropertyValue
         Next
 
         Dim objectPropertyCount As Integer = reader.ReadInt32()
@@ -186,7 +164,35 @@ Public Class GameObject
         Return New GameObject(New Sprite(bitmaps), Nothing, Nothing, propertyArray, objectPropertyArray)
     End Function
 
+    Public Sub ExportTo(dir As DirectoryInfo)
+        Dim Writer = New BinaryWriter(New FileStream(dir.FullName & "\" & Properties.Name & ".jbgo", FileMode.Create))
+        ExportTo(Writer)
+        Writer.Dispose()
+    End Sub
+
+    Public Sub ExportTo(Writer As BinaryWriter)
+        Writer.Write(Sprite.Frames.Count)
+        For Each Bitmap As Bitmap In Sprite.Frames
+            Dim ms As New MemoryStream
+            Bitmap.Save(ms, Imaging.ImageFormat.Png)
+            Writer.Write(ms.Length)
+            Writer.Write(ms.GetBuffer)
+            ms.Dispose()
+        Next
+
+        Writer.Write(Properties.Properties.Count)
+        For Each PropertyName As String In Properties.Properties.Keys
+            Writer.Write(PropertyName)
+            Writer.Write(Properties.Properties(PropertyName))
+        Next
+
+        Writer.Write(Properties.Flags.Length)
+        For Each Flag As Integer In Properties.Flags
+            Writer.Write(Flag)
+        Next
+    End Sub
 #End Region
+
 
     Public Overridable Sub Update(t As Double)
         Sprite.Tick(t)

@@ -50,7 +50,15 @@ Public Class Game
         World = New World("DavidBenAndJonathan", rooms)
 
         ' Load the player and testing stuff
-        Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), {100, 100, 100, 8, 2})
+        Dim Properties As New Dictionary(Of String, String)
+        Properties.Add("Health", 100)
+        Properties.Add("Stamina", 100)
+        Properties.Add("Mana", 100)
+        Properties.Add("Name", "Player1")
+        Properties.Add("MaxSpeed", 8)
+        Properties.Add("Acceleration", 2)
+
+        Player = New Player(My.Resources.CharacterUp1, World.RoomAt(150, 150), New Vector3(World.RoomAt(150, 150).XOffset + World.RoomAt(150, 150).Width / 2, World.RoomAt(150, 150).YOffset + World.RoomAt(150, 150).Height / 2, 0), Properties)
         'Dim TestObject1 = New EXPOrb(100, PlayerRoom, New Vector3(200, 200, 0))
         'Dim TestObject2 = New GameObject(My.Resources.Telepad, PlayerRoom, New Vector3(100, 100, 0), {100}, {GameObjectProperties.FlagsEnum.CastsShadow, GameObjectProperties.FlagsEnum.FloorObject, GameObjectProperties.FlagsEnum.Invulnerable})
 
